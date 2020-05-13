@@ -67,7 +67,6 @@ struct ContentView: View {
 struct FirstRowView: View {
   var body: some View {
     HStack {
-      //Text("Top").frame(maxWidth: .infinity, maxHeight: 100)
       Button(action: {showDx(count: 20)}) {
         Text("empty").frame(minWidth: 75, maxWidth: 75)
       }
@@ -90,7 +89,6 @@ struct FirstRowView: View {
 struct SecondRowView: View {
   var body: some View {
     HStack {
-      //Text("Top").frame(maxWidth: .infinity, maxHeight: 100)
       Button(action: {showDx(count: 20)}) {
         Text("empty").frame(minWidth: 75, maxWidth: 75)
       }
@@ -140,13 +138,7 @@ struct RadioPicker: View {
   @Environment(\.presentationMode) var presentationMode
   
   var body: some View {
-    
-//    HStack {
-//        Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
-//         Text("Close Picker")
-//        }
-//    }
-   
+
     let first = Radio(model: "Flex 6500", name: "DXSeeker", station: "Anya", isDefault: true)
     let second = Radio(model: "Flex 6500", name: "DXSeeker", station: "Char", isDefault: false )
     let third = Radio(model: "Flex 6500", name: "DXSeeker", station: "XYZZY", isDefault: false )
@@ -154,6 +146,11 @@ struct RadioPicker: View {
     let radios = [first, second, third]
     
     return VStack{
+      HStack{
+        Text("Model               NickName         Station         Default Radio")
+          .font(.system(size: 14))
+          .foregroundColor(Color.blue)
+      }
       HStack {
         List(radios, rowContent: RadioRow.init)
       }.frame(minWidth: 400, minHeight: 120)
@@ -162,7 +159,7 @@ struct RadioPicker: View {
            Text("Close Picker")
           }
       }
-    }
+    }.background(Color.gray.opacity(0.5))
   }
 }
 
@@ -179,8 +176,12 @@ struct RadioRow: View {
     var radio: Radio
 
     var body: some View {
-      
-     Text("\(radio.model) : \(radio.name) : \(radio.station) : \(String(radio.isDefault))")
+      HStack {
+        Text("\(radio.model)").frame(minWidth: 50).padding(.leading, 2).border(Color.black)
+        Text("\(radio.name)").frame(minWidth: 70).border(Color.black).padding(.leading, 25)
+        Text("\(radio.station)").frame(minWidth: 60).border(Color.black).padding(.leading, 25)
+        Text("\(String(radio.isDefault))").frame(minWidth: 50).border(Color.black).padding(.leading, 25)
+      }
     }
 }
 
