@@ -8,14 +8,19 @@
 
 import SwiftUI
 
+// MARK: - Primary View ----------------------------------------------------------------------------
+
+/**
+ primary Content View for the application.
+ */
 struct ContentView: View {
   @State private var status = false
   @State private var cwText = CWText()
   @State private var showingDetail = false
   @Environment(\.presentationMode) var presentationMode
   
-  let constHeightRatio : CGFloat = 0.55 //use for assembly with other fonts.
-  let defaultHeight : CGFloat = 250 //use for assembly with other views.
+  // radio
+  var radioManager: RadioManager!
   
   var body: some View {
     HStack {
@@ -26,12 +31,16 @@ struct ContentView: View {
         Divider()
         
         HStack {
-          FreeFormTextView(cwText: cwText)
+          //FreeFormTextView(cwText: cwText)
+          FreeFormScrollView(cwText: cwText)
         }.frame(minWidth: 550, maxWidth: 550, minHeight: 110, maxHeight: 110)
         
         Divider()
         
         HStack(spacing: 25) {
+          Button(action: {sendFreeText()}) {
+            Text("Send Free Text")//.frame(minWidth: 75, maxWidth: 75)
+          }
           Button(action: {showDx(count: 20)}) {
             Text("Stop")//.frame(minWidth: 75, maxWidth: 75)
           }
@@ -50,13 +59,13 @@ struct ContentView: View {
           Text("Slice").frame(minWidth: 75, maxWidth: 75)
           Text("Mode").frame(minWidth: 75, maxWidth: 75)
           Text("Frequency").frame(minWidth: 75, maxWidth: 75)
-          Button(action: {showDx(count: 20)}) {
-            Text("Send Id").frame(minWidth: 75, maxWidth: 75)
-          }
+//          Button(action: {showDx(count: 20)}) {
+//            Text("Send Id").frame(minWidth: 75, maxWidth: 75)
+//          }
           // https://swiftwithmajid.com/2020/03/04/customizing-toggle-in-swiftui/
-          Toggle(isOn: $status) {
-            Text("Id Timer")
-          }.frame(minWidth: 75, maxWidth: 75)
+//          Toggle(isOn: $status) {
+//            Text("Id Timer")
+//          }.frame(minWidth: 75, maxWidth: 75)
         }.padding(.bottom, 5)
       }.frame(minWidth: 600, maxWidth: 600)
       
@@ -64,6 +73,11 @@ struct ContentView: View {
   } // end body
 }
 
+// MARK: - Sub Views ----------------------------------------------------------------------------
+
+/**
+ The first row of memory buttons.
+ */
 struct FirstRowView: View {
   var body: some View {
     HStack {
@@ -86,6 +100,9 @@ struct FirstRowView: View {
   }
 }
 
+/**
+The second row of memory buttons.
+*/
 struct SecondRowView: View {
   var body: some View {
     HStack {
@@ -108,14 +125,21 @@ struct SecondRowView: View {
   }
 }
 
-struct CWText {
-  var line1: String = ""
-  var line2: String = ""
-  var line3: String = ""
-  var line4: String = ""
-  var line5: String = ""
+struct  FreeFormScrollView: View {
+  @State public var cwText: CWText
+  
+  var body: some View{
+    VStack{
+      //ScrollView(.vertical, showsIndicators: true) {
+        TextView(text: $cwText.line1)
+      //}.frame(minHeight: 100, maxHeight: 100)
+    }
+  }
 }
 
+/**
+ View of the freeform text area.
+ */
 struct FreeFormTextView: View {
   @State public var cwText: CWText
   
@@ -131,7 +155,10 @@ struct FreeFormTextView: View {
   }
 }
 
+// MARK: - Radio Picker Sheet ----------------------------------------------------------------------------
+
 /**
+ View of the Radio Picker sheet.
  https://www.hackingwithswift.com/quick-start/swiftui/how-to-present-a-new-view-using-sheets
  */
 struct RadioPicker: View {
@@ -139,20 +166,22 @@ struct RadioPicker: View {
   
   var body: some View {
 
-    let first = Radio(model: "Flex 6500", name: "DXSeeker", station: "Anya", isDefault: true)
-    let second = Radio(model: "Flex 6500", name: "DXSeeker", station: "Char", isDefault: false )
-    let third = Radio(model: "Flex 6500", name: "DXSeeker", station: "XYZZY", isDefault: false )
+    let first = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "40 Meters CW", isDefaultStation: true)
+    let second = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "15 Meters DIGI", isDefaultStation: false )
+    let third = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "20 meters USB", isDefaultStation: false )
     
     let radios = [first, second, third]
     
     return VStack{
       HStack{
-        Text("Model               NickName         Station         Default Radio")
-          .font(.system(size: 14))
-          .foregroundColor(Color.blue)
-      }
+        Text("Model").frame(minWidth: 50).padding(.leading, 5)
+        Text("NickName").frame(minWidth: 90).padding(.leading, 28)
+        Text("Station").frame(minWidth: 70).padding(.leading, 8)
+        Text("Default Radio").frame(minWidth: 50).padding(.leading, 22)
+      }.font(.system(size: 14))
+      .foregroundColor(Color.blue)
       HStack {
-        List(radios, rowContent: RadioRow.init)
+        List(radios, rowContent: StationRow.init)
       }.frame(minWidth: 400, minHeight: 120)
       HStack {
           Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
@@ -163,41 +192,134 @@ struct RadioPicker: View {
   }
 }
 
-struct Radio: Identifiable {
-  var id = UUID()
-  
-  var model: String = ""
-  var name: String = ""
-  var station: String = ""
-  var isDefault: Bool = false
-}
 
-struct RadioRow: View {
-    var radio: Radio
+
+/**
+ View of rows of stations to select from.
+ */
+struct StationRow: View {
+    var station: StationSelection
 
     var body: some View {
       HStack {
-        Text("\(radio.model)").frame(minWidth: 50).padding(.leading, 2).border(Color.black)
-        Text("\(radio.name)").frame(minWidth: 70).border(Color.black).padding(.leading, 25)
-        Text("\(radio.station)").frame(minWidth: 60).border(Color.black).padding(.leading, 25)
-        Text("\(String(radio.isDefault))").frame(minWidth: 50).border(Color.black).padding(.leading, 25)
+        HStack {
+        Text("\(station.radioModel)").frame(minWidth: 50).padding(.leading, 2)
+        Text("\(station.radioNickname)").frame(minWidth: 90).border(Color.black).padding(.leading, 25)
+          Text("\(station.stationName)").frame(minWidth: 70).padding(.leading, 5).tag(station.stationName)
+        Text("\(String(station.isDefaultStation))").frame(minWidth: 50).border(Color.black).padding(.leading, 25)
+        }.border(Color.black) // may want to add min/max width
       }
     }
 }
 
-// https://www.hackingwithswift.com/quick-start/swiftui/how-to-make-a-view-dismiss-itself
-func closePicker() {
-  //self.presentationMode.wrappedValue.dismiss()
+
+// MARK: - Models ----------------------------------------------------------------------------
+
+/**
+ Data model for a radio and station selection in the Radio Picker.
+ // var stations = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
+ */
+struct StationSelection: Identifiable {
+  var id = UUID()
+  
+  var radioModel: String = ""
+  var radioNickname: String = ""
+  var stationName: String = ""
+  var serialNumber: String = ""
+  var clientId: String = ""
+  var handle: UInt32 = 0
+  var isDefaultStation: Bool = false
 }
 
+/**
+ Data model for the text in the freeform text section.
+ */
+struct CWText {
+  var line1: String = ""
+  var line2: String = ""
+  var line3: String = ""
+  var line4: String = ""
+  var line5: String = ""
+}
+
+
+// https://www.hackingwithswift.com/quick-start/swiftui/how-to-make-a-view-dismiss-itself
+//func closePicker() {
+//  //self.presentationMode.wrappedValue.dismiss()
+//}
+
+// MARK: - Button Implementation ----------------------------------------------------------------------------
+
+func sendFreeText() {
+  
+}
 func showDx(count: Int) {
   
 }
 
+// MARK: - Preview Provider ----------------------------------------------------------------------------
+/**
+ Preview provider.
+ */
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
     ContentView()
   }
+}
+
+// MARK: - TextView Wrapper ----------------------------------------------------------------------------
+
+
+struct TextView: NSViewRepresentable {
+   
+    @Binding var text: String
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    func makeNSView(context: Context) -> NSTextView {
+
+      let myTextView = NSTextView()
+      myTextView.delegate = context.coordinator
+
+        myTextView.font = NSFont(name: "HelveticaNeue", size: 15)
+//        myTextView.isScrollEnabled = true
+        myTextView.isEditable = true
+//        myTextView.isUserInteractionEnabled = true
+        myTextView.backgroundColor = NSColor(white: 0.0, alpha: 0.05)
+
+        return myTextView
+    }
+
+    func updateNSView(_ nsView: NSTextView, context: Context) {
+        nsView.string = text
+    }
+
+    class Coordinator : NSObject, NSTextViewDelegate {
+
+        var parent: TextView
+
+        init(_ nsTextView: TextView) {
+            self.parent = nsTextView
+        }
+
+      func textView(_ textView: NSTextView, shouldChangeTextIn range: NSRange, replacementString text: String?) -> Bool {
+        let newText = textView.string
+        
+//        newText.removeAll { (character) -> Bool in
+//            return character == " " || character == "\n"
+//        }
+
+        return newText.count < 500
+            //return true
+        }
+
+        func textViewDidChange(_ textView: NSTextView) {
+            //print("text now: \(String(describing: textView.text!))")
+            self.parent.text = textView.string
+        }
+    }
 }
 
 

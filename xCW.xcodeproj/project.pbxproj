@@ -3,10 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9976094F246D8DAD003E6B8E /* xLib6000 in Frameworks */ = {isa = PBXBuildFile; productRef = 9976094E246D8DAD003E6B8E /* xLib6000 */; };
+		99760951246D8DAD003E6B8E /* CocoaAsyncSocket in Frameworks */ = {isa = PBXBuildFile; productRef = 99760950246D8DAD003E6B8E /* CocoaAsyncSocket */; };
+		99760954246D8F26003E6B8E /* RadioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99760953246D8F26003E6B8E /* RadioManager.swift */; };
+		99760957246D935B003E6B8E /* Repeat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99760956246D935B003E6B8E /* Repeat.framework */; };
+		99760958246D935B003E6B8E /* Repeat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 99760956246D935B003E6B8E /* Repeat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		99EDEDCF2469DF87003F7608 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99EDEDCE2469DF87003F7608 /* AppDelegate.swift */; };
 		99EDEDD12469DF87003F7608 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99EDEDD02469DF87003F7608 /* ContentView.swift */; };
 		99EDEDD32469DF88003F7608 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99EDEDD22469DF88003F7608 /* Assets.xcassets */; };
@@ -14,7 +19,23 @@
 		99EDEDD92469DF88003F7608 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 99EDEDD72469DF88003F7608 /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		99760959246D935B003E6B8E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				99760958246D935B003E6B8E /* Repeat.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		99760953246D8F26003E6B8E /* RadioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioManager.swift; sourceTree = "<group>"; };
+		99760956246D935B003E6B8E /* Repeat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Repeat.framework; path = ../../Library/Frameworks/Repeat.framework; sourceTree = "<group>"; };
 		99EDEDCB2469DF87003F7608 /* xCW.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xCW.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99EDEDCE2469DF87003F7608 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		99EDEDD02469DF87003F7608 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -30,17 +51,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				99760951246D8DAD003E6B8E /* CocoaAsyncSocket in Frameworks */,
+				99760957246D935B003E6B8E /* Repeat.framework in Frameworks */,
+				9976094F246D8DAD003E6B8E /* xLib6000 in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		99760952246D8EF5003E6B8E /* Radio Implementation */ = {
+			isa = PBXGroup;
+			children = (
+				99760953246D8F26003E6B8E /* RadioManager.swift */,
+			);
+			path = "Radio Implementation";
+			sourceTree = "<group>";
+		};
+		99760955246D935B003E6B8E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				99760956246D935B003E6B8E /* Repeat.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		99EDEDC22469DF87003F7608 = {
 			isa = PBXGroup;
 			children = (
 				99EDEDCD2469DF87003F7608 /* xCW */,
 				99EDEDCC2469DF87003F7608 /* Products */,
+				99760955246D935B003E6B8E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -55,6 +96,7 @@
 		99EDEDCD2469DF87003F7608 /* xCW */ = {
 			isa = PBXGroup;
 			children = (
+				99760952246D8EF5003E6B8E /* Radio Implementation */,
 				99EDEDCE2469DF87003F7608 /* AppDelegate.swift */,
 				99EDEDD02469DF87003F7608 /* ContentView.swift */,
 				99EDEDD22469DF88003F7608 /* Assets.xcassets */,
@@ -84,12 +126,17 @@
 				99EDEDC72469DF87003F7608 /* Sources */,
 				99EDEDC82469DF87003F7608 /* Frameworks */,
 				99EDEDC92469DF87003F7608 /* Resources */,
+				99760959246D935B003E6B8E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = xCW;
+			packageProductDependencies = (
+				9976094E246D8DAD003E6B8E /* xLib6000 */,
+				99760950246D8DAD003E6B8E /* CocoaAsyncSocket */,
+			);
 			productName = xCW;
 			productReference = 99EDEDCB2469DF87003F7608 /* xCW.app */;
 			productType = "com.apple.product-type.application";
@@ -118,6 +165,9 @@
 				Base,
 			);
 			mainGroup = 99EDEDC22469DF87003F7608;
+			packageReferences = (
+				9976094D246D8DAD003E6B8E /* XCRemoteSwiftPackageReference "xLib6000" */,
+			);
 			productRefGroup = 99EDEDCC2469DF87003F7608 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -146,6 +196,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				99EDEDD12469DF87003F7608 /* ContentView.swift in Sources */,
+				99760954246D8F26003E6B8E /* RadioManager.swift in Sources */,
 				99EDEDCF2469DF87003F7608 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,6 +339,10 @@
 				DEVELOPMENT_TEAM = JE278GX57V;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Frameworks",
+				);
 				INFOPLIST_FILE = xCW/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -311,6 +366,10 @@
 				DEVELOPMENT_TEAM = JE278GX57V;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Frameworks",
+				);
 				INFOPLIST_FILE = xCW/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -345,6 +404,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9976094D246D8DAD003E6B8E /* XCRemoteSwiftPackageReference "xLib6000" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/K3TZR/xLib6000.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.14;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9976094E246D8DAD003E6B8E /* xLib6000 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9976094D246D8DAD003E6B8E /* XCRemoteSwiftPackageReference "xLib6000" */;
+			productName = xLib6000;
+		};
+		99760950246D8DAD003E6B8E /* CocoaAsyncSocket */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9976094D246D8DAD003E6B8E /* XCRemoteSwiftPackageReference "xLib6000" */;
+			productName = CocoaAsyncSocket;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 99EDEDC32469DF87003F7608 /* Project object */;
 }
