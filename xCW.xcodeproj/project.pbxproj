@@ -12,6 +12,7 @@
 		99760954246D8F26003E6B8E /* RadioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99760953246D8F26003E6B8E /* RadioManager.swift */; };
 		99760957246D935B003E6B8E /* Repeat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99760956246D935B003E6B8E /* Repeat.framework */; };
 		99760958246D935B003E6B8E /* Repeat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 99760956246D935B003E6B8E /* Repeat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9976095B246DCF3A003E6B8E /* RadioBinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9976095A246DCF3A003E6B8E /* RadioBinder.swift */; };
 		99EDEDCF2469DF87003F7608 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99EDEDCE2469DF87003F7608 /* AppDelegate.swift */; };
 		99EDEDD12469DF87003F7608 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99EDEDD02469DF87003F7608 /* ContentView.swift */; };
 		99EDEDD32469DF88003F7608 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99EDEDD22469DF88003F7608 /* Assets.xcassets */; };
@@ -36,6 +37,7 @@
 /* Begin PBXFileReference section */
 		99760953246D8F26003E6B8E /* RadioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioManager.swift; sourceTree = "<group>"; };
 		99760956246D935B003E6B8E /* Repeat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Repeat.framework; path = ../../Library/Frameworks/Repeat.framework; sourceTree = "<group>"; };
+		9976095A246DCF3A003E6B8E /* RadioBinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioBinder.swift; sourceTree = "<group>"; };
 		99EDEDCB2469DF87003F7608 /* xCW.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xCW.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99EDEDCE2469DF87003F7608 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		99EDEDD02469DF87003F7608 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 			isa = PBXGroup;
 			children = (
 				99760953246D8F26003E6B8E /* RadioManager.swift */,
+				9976095A246DCF3A003E6B8E /* RadioBinder.swift */,
 			);
 			path = "Radio Implementation";
 			sourceTree = "<group>";
@@ -198,6 +201,7 @@
 				99EDEDD12469DF87003F7608 /* ContentView.swift in Sources */,
 				99760954246D8F26003E6B8E /* RadioManager.swift in Sources */,
 				99EDEDCF2469DF87003F7608 /* AppDelegate.swift in Sources */,
+				9976095B246DCF3A003E6B8E /* RadioBinder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -14,18 +14,27 @@ import SwiftUI
  primary Content View for the application.
  */
 struct ContentView: View {
+  // initialize radio
+  @ObservedObject private var radioManager = RadioManager()
+  
+  @State private var isConnected = false
+  @State private var isBound = false
   @State private var status = false
   @State private var cwText = CWText()
   @State private var showingDetail = false
+  @State private var isEnabled = false
+  //@ObservedObject var isEnabled = false
   @Environment(\.presentationMode) var presentationMode
   
+  //@Environment(StationSelection) var stationSelection
+  
   // radio
-  var radioManager: RadioManager!
+  //var radioManager: RadioManager
   
   var body: some View {
     HStack {
       VStack {
-        FirstRowView()
+        FirstRowView(isEnabled: $isEnabled)
         SecondRowView()
         
         Divider()
@@ -51,7 +60,13 @@ struct ContentView: View {
           }.sheet(isPresented: $showingDetail) {
             RadioPicker()
           }
-          Text("Connected")//.frame(minWidth: 100, maxWidth: 100)
+          if radioManager.guiClientView.count > 0 {
+            Text("Found \(radioManager.guiClientView[0].stationName)" )
+          }
+          else {
+            Text("Disconnected")
+          }
+          
         }.frame(minWidth: 600, maxWidth: 600).padding(.bottom, 1)
         
         Divider()
@@ -79,11 +94,13 @@ struct ContentView: View {
  The first row of memory buttons.
  */
 struct FirstRowView: View {
+  @Binding var isEnabled: Bool
+  
   var body: some View {
     HStack {
       Button(action: {showDx(count: 20)}) {
         Text("empty").frame(minWidth: 75, maxWidth: 75)
-      }
+        }
       Button(action: {showDx(count: 20)}) {
         Text("empty").frame(minWidth: 75, maxWidth: 75)
       }
@@ -127,12 +144,11 @@ struct SecondRowView: View {
 
 struct  FreeFormScrollView: View {
   @State public var cwText: CWText
+  // @ObjectBinding var cwText: CWText
   
   var body: some View{
     VStack{
-      //ScrollView(.vertical, showsIndicators: true) {
         TextView(text: $cwText.line1)
-      //}.frame(minHeight: 100, maxHeight: 100)
     }
   }
 }
@@ -140,20 +156,20 @@ struct  FreeFormScrollView: View {
 /**
  View of the freeform text area.
  */
-struct FreeFormTextView: View {
-  @State public var cwText: CWText
-  
-  var body: some View {
-    
-    VStack(spacing: 0) {
-      TextField("Placeholder1", text: $cwText.line1)
-      TextField("Placeholder2", text: $cwText.line2)
-      TextField("Placeholder3", text: $cwText.line3)
-      TextField("Placeholder4", text: $cwText.line4)
-      TextField("Placeholder5", text: $cwText.line5)
-    }.frame(minHeight: 100, maxHeight: 100)
-  }
-}
+//struct FreeFormTextView: View {
+//  @State public var cwText: CWText
+//
+//  var body: some View {
+//
+//    VStack(spacing: 0) {
+//      TextField("Placeholder1", text: $cwText.line1)
+//      TextField("Placeholder2", text: $cwText.line2)
+//      TextField("Placeholder3", text: $cwText.line3)
+//      TextField("Placeholder4", text: $cwText.line4)
+//      TextField("Placeholder5", text: $cwText.line5)
+//    }.frame(minHeight: 100, maxHeight: 100)
+//  }
+//}
 
 // MARK: - Radio Picker Sheet ----------------------------------------------------------------------------
 
@@ -286,8 +302,7 @@ struct TextView: NSViewRepresentable {
         myTextView.font = NSFont(name: "HelveticaNeue", size: 15)
 //        myTextView.isScrollEnabled = true
         myTextView.isEditable = true
-//        myTextView.isUserInteractionEnabled = true
-        myTextView.backgroundColor = NSColor(white: 0.0, alpha: 0.05)
+        myTextView.backgroundColor = NSColor(white: 0.0, alpha: 0.15)
 
         return myTextView
     }

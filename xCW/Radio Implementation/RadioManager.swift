@@ -154,7 +154,7 @@ public enum sliceStatus : String {
  This class will isolate other apps from the API implemenation allowing reuse by multiple
  programs.
  */
-class RadioManager: NSObject, ApiDelegate {
+class RadioManager: NSObject, ApiDelegate, ObservableObject {
   
   func addReplyHandler(_ sequenceNumber: SequenceNumber, replyTuple: ReplyTuple) {
     os_log("addReplyHandler added.", log: RadioManager.model_log, type: .info)
@@ -336,6 +336,9 @@ class RadioManager: NSObject, ApiDelegate {
   
   // MARK: - Dicovery Methods ----------------------------------------------------------------------------
   
+
+@Published var guiClientView = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
+  
   /**
    Notification that one or more radios were discovered.
    - parameters:
@@ -345,24 +348,35 @@ class RadioManager: NSObject, ApiDelegate {
     // receive the updated list of Radios
     let discoveryPacket = (note.object as! [DiscoveryPacket])
     
-    var guiClientView = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
-    
+//    var guiClientView = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
+//
     // just collect the radio's gui clients
     for radio in discoveryPacket {
       for guiClient in radio.guiClients {
         let handle = guiClient.key
-        guiClientView.append((radio.model, radio.nickname, guiClient.value.station, "No", radio.serialNumber, guiClient.value.clientId ?? "", handle))
+        UI() {
+          self.guiClientView.append((radio.model, radio.nickname, guiClient.value.station, "No", radio.serialNumber, guiClient.value.clientId ?? "", handle))
+        }
+        os_log("Radios updated.", log: RadioManager.model_log, type: .info)
       }
     }
     
-    if guiClientView.count > 0 {
-      // let the view controller know a radio was discovered
-      // this is the first thing to occur after xLib adds a radio
-      UI() {
-        os_log("Radios updated.", log: RadioManager.model_log, type: .info)
-        self.radioManagerDelegate?.didDiscoverGUIClients(discoveredGUIClients: guiClientView, isGuiClientUpdate: false)
-      }
-    }
+//    if guiClientView.count > 0 {
+//      // let the view controller know a radio was discovered
+//      // this is the first thing to occur after xLib adds a radio
+//      UI() {
+//        //os_log("Radios updated.", log: RadioManager.model_log, type: .info)
+//
+////        var value = self.guiClientView {
+////            willSet {
+////              os_log("Radios updated.", log: RadioManager.model_log, type: .info)
+////              self.objectWillChange.send()
+////            }
+////        }
+//
+////        self.radioManagerDelegate?.didDiscoverGUIClients(discoveredGUIClients: self.guiClientView, isGuiClientUpdate: false)
+//      }
+//    }
   }
   
   /**
