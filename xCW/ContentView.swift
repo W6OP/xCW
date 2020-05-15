@@ -15,7 +15,9 @@ import SwiftUI
  */
 struct ContentView: View {
   // initialize radio
-  @ObservedObject private var radioManager = RadioManager()
+  //@ObservedObject private var radioManager = RadioManager()
+  @EnvironmentObject var radioManager: RadioManager
+  @Environment(\.presentationMode) var presentationMode
   
   @State private var isConnected = false
   @State private var isBound = false
@@ -24,12 +26,7 @@ struct ContentView: View {
   @State private var showingDetail = false
   @State private var isEnabled = false
   //@ObservedObject var isEnabled = false
-  @Environment(\.presentationMode) var presentationMode
   
-  //@Environment(StationSelection) var stationSelection
-  
-  // radio
-  //var radioManager: RadioManager
   
   var body: some View {
     HStack {
@@ -58,8 +55,11 @@ struct ContentView: View {
           }) {
             Text("Radio Picker")
           }.sheet(isPresented: $showingDetail) {
-            RadioPicker()
+            //RadioPicker() - should work
+            // https://stackoverflow.com/questions/58743004/swiftui-environmentobject-error-may-be-missing-as-an-ancestor-of-this-view
+            return RadioPicker().environmentObject(self.radioManager)
           }
+          
           if radioManager.guiClientView.count > 0 {
             Text("Found \(radioManager.guiClientView[0].stationName)" )
           }
@@ -179,14 +179,31 @@ struct  FreeFormScrollView: View {
  */
 struct RadioPicker: View {
   @Environment(\.presentationMode) var presentationMode
+  @EnvironmentObject var radioManager: RadioManager
   
   var body: some View {
-
-    let first = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "40 Meters CW", isDefaultStation: true)
-    let second = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "15 Meters DIGI", isDefaultStation: false )
-    let third = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "20 meters USB", isDefaultStation: false )
     
-    let radios = [first, second, third]
+     var first = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "40 Meters CW", isDefaultStation: true)
+    var second = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "15 Meters DIGI", isDefaultStation: false )
+    
+    if radioManager.guiClientView.count > 0 {
+      first = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "\(radioManager.guiClientView[0].stationName)", isDefaultStation: true)
+    }
+    
+    if radioManager.guiClientView.count > 1 {
+      second = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "\(radioManager.guiClientView[1].stationName)", isDefaultStation: false )
+    }
+    
+
+    let radios = [first, second]
+    
+    let client = (model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32).self
+    
+//    ForEach(radioManager.guiClientView, id: \.self) { client in
+//
+//    }
+    
+    
     
     return VStack{
       HStack{
@@ -235,17 +252,17 @@ struct StationRow: View {
  Data model for a radio and station selection in the Radio Picker.
  // var stations = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
  */
-struct StationSelection: Identifiable {
-  var id = UUID()
-  
-  var radioModel: String = ""
-  var radioNickname: String = ""
-  var stationName: String = ""
-  var serialNumber: String = ""
-  var clientId: String = ""
-  var handle: UInt32 = 0
-  var isDefaultStation: Bool = false
-}
+//struct StationSelection: Identifiable {
+//  var id = UUID()
+//
+//  var radioModel: String = ""
+//  var radioNickname: String = ""
+//  var stationName: String = ""
+//  var serialNumber: String = ""
+//  var clientId: String = ""
+//  var handle: UInt32 = 0
+//  var isDefaultStation: Bool = false
+//}
 
 /**
  Data model for the text in the freeform text section.
