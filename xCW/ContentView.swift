@@ -180,27 +180,24 @@ struct  FreeFormScrollView: View {
 struct RadioPicker: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var radioManager: RadioManager
-  
+  @State private var selectedStation = 0
   var body: some View {
     
-     var first = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "40 Meters CW", isDefaultStation: true)
-    var second = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "15 Meters DIGI", isDefaultStation: false )
-    
-    if radioManager.guiClientView.count > 0 {
-      first = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "\(radioManager.guiClientView[0].stationName)", isDefaultStation: true)
-    }
-    
-    if radioManager.guiClientView.count > 1 {
-      second = StationSelection(radioModel: "Flex 6500", radioNickname: "DXSeeker", stationName: "\(radioManager.guiClientView[1].stationName)", isDefaultStation: false )
-    }
-    
-
-    let radios = [first, second]
-    
-    let client = (model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32).self
-    
-//    ForEach(radioManager.guiClientView, id: \.self) { client in
+//    var first = StationSelection(radioModel: "", radioNickname: "", stationName: "", isDefaultStation: false)
+//    var second = StationSelection(radioModel: "", radioNickname: "", stationName: "", isDefaultStation: false )
 //
+//    if radioManager.guiClientView.count > 0 {
+//      first = StationSelection(radioModel: "\(radioManager.stationView[0].radioModel)", radioNickname: "\(radioManager.stationView[0].radioNickname)", stationName: "\(radioManager.stationView[0].stationName)", isDefaultStation: Bool("\(radioManager.stationView[0].isDefaultStation)") ?? false)
+//    }
+//
+//    if radioManager.guiClientView.count > 1 {
+//      second = StationSelection(radioModel: "\(radioManager.guiClientView[1].model)", radioNickname: "\(radioManager.guiClientView[1].nickname)", stationName: "\(radioManager.guiClientView[1].stationName)", isDefaultStation: Bool("\(radioManager.guiClientView[1].default)") ?? false)
+//    }
+    
+    //let radios = radioManager.stationView // radioManager.$stationView //
+    
+//    ForEach(0 ..< radioManager.guiClientView.count) {
+//      radios.append(StationSelection(radioModel: "\(radioManager.guiClientView[$0].model)", radioNickname: "\(radioManager.guiClientView[$0].nickname)", stationName: "\(radioManager.guiClientView[$0].stationName)", isDefaultStation: Bool("\(radioManager.guiClientView[$0].default)") ?? false))
 //    }
     
     
@@ -212,14 +209,14 @@ struct RadioPicker: View {
         Text("Station").frame(minWidth: 70).padding(.leading, 8)
         Text("Default Radio").frame(minWidth: 50).padding(.leading, 22)
       }.font(.system(size: 14))
-      .foregroundColor(Color.blue)
+        .foregroundColor(Color.blue)
       HStack {
-        List(radios, rowContent: StationRow.init)
+        List(radioManager.stationView, rowContent: StationRow.init)
       }.frame(minWidth: 400, minHeight: 120)
       HStack {
-          Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
-           Text("Close Picker")
-          }
+        Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
+          Text("Close Picker")
+        }
       }
     }.background(Color.gray.opacity(0.5))
   }
@@ -252,17 +249,17 @@ struct StationRow: View {
  Data model for a radio and station selection in the Radio Picker.
  // var stations = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
  */
-//struct StationSelection: Identifiable {
-//  var id = UUID()
-//
-//  var radioModel: String = ""
-//  var radioNickname: String = ""
-//  var stationName: String = ""
-//  var serialNumber: String = ""
-//  var clientId: String = ""
-//  var handle: UInt32 = 0
-//  var isDefaultStation: Bool = false
-//}
+struct StationSelection: Identifiable {
+  var id = UUID()
+
+  var radioModel: String = ""
+  var radioNickname: String = ""
+  var stationName: String = ""
+  var serialNumber: String = ""
+  var clientId: String = ""
+  var handle: UInt32 = 0
+  var isDefaultStation: Bool = false
+}
 
 /**
  Data model for the text in the freeform text section.
