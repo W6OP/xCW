@@ -136,7 +136,11 @@ public enum radioMode : String {
   case usb = "USB"
   case lsb = "LSB"
   case fm = "FM"
-  case invalid = "Invalid"
+  case cw = "CW"
+  case digu = "DIGU"
+  case digl = "DIGL"
+  case rtty = "RTTY"
+  case invalid = "Unknown"
 }
 
 public enum sliceStatus : String {
@@ -173,7 +177,7 @@ struct SliceModel: Identifiable {
   var sliceLetter: String = ""
   var radioMode: radioMode
   var txEnabled: Bool = false
-  var frequency: String = ""
+  var frequency: String = "00.000"
   var sliceHandle: UInt32
 }
 
@@ -507,15 +511,12 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     let mode: radioMode = radioMode(rawValue: slice.mode) ?? radioMode.invalid
     let frequency: String = convertFrequencyToDecimalString (frequency: slice.frequency)
     
-    //    var sliceView = [(sliceLetter: String, radioMode: radioMode, txEnabled: Bool, frequency: String, sliceHandle: UInt32)]()
-      addObservations(slice: slice)
+    addObservations(slice: slice)
     
     // I really only care about a slice that is tx enabled
     if slice.txEnabled {
     UI() {
       self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
-      
-//      self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
       }
     }
 
@@ -558,32 +559,34 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
       self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
       }
     } else {
-      // check if any slices txEnabled
+      if self.sliceModel.sliceHandle == slice.clientHandle {
+        self.sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
+      }
     }
-  }
-  
-  /**
-   Respond to a change in a slice
-   - parameters:
-   - slice:
-   */
-  func addObservations(slice: xLib6000.Slice ) {
-    
-    _observations.append( slice.observe(\.active, options: [.initial, .new]) { [weak self] (slice, change) in
-      self?.updateSliceStatus(slice,sliceStatus: sliceStatus.active, change) })
-    
-    _observations.append( slice.observe(\.mode, options: [.initial, .new]) { [weak self] (slice, change) in
-      self?.updateSliceStatus(slice, sliceStatus: sliceStatus.mode, change) })
-    
-    _observations.append(  slice.observe(\.txEnabled, options: [.initial, .new]) { [weak self] (slice, change) in
-      self?.updateSliceStatus(slice,sliceStatus: sliceStatus.txEnabled, change) })
-    
-    _observations.append( slice.observe(\.frequency, options: [.initial, .new]) { [weak self] (slice, change) in
-      self?.updateSliceStatus(slice,sliceStatus: sliceStatus.frequency, change) })
   }
   
   // MARK: - Utlity Functions for Slices
   
+  /**
+    Respond to a change in a slice
+    - parameters:
+    - slice:
+    */
+   func addObservations(slice: xLib6000.Slice ) {
+     
+     _observations.append( slice.observe(\.active, options: [.initial, .new]) { [weak self] (slice, change) in
+       self?.updateSliceStatus(slice,sliceStatus: sliceStatus.active, change) })
+     
+     _observations.append( slice.observe(\.mode, options: [.initial, .new]) { [weak self] (slice, change) in
+       self?.updateSliceStatus(slice, sliceStatus: sliceStatus.mode, change) })
+     
+     _observations.append(  slice.observe(\.txEnabled, options: [.initial, .new]) { [weak self] (slice, change) in
+       self?.updateSliceStatus(slice,sliceStatus: sliceStatus.txEnabled, change) })
+     
+     _observations.append( slice.observe(\.frequency, options: [.initial, .new]) { [weak self] (slice, change) in
+       self?.updateSliceStatus(slice,sliceStatus: sliceStatus.frequency, change) })
+   }
+   
   /**
    Convert the frequency (10136000) to a string with a decimal place (10136.000)
    Use an extension to String to format frequency correctly

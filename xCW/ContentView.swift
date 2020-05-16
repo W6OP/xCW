@@ -71,9 +71,9 @@ struct ContentView: View {
         
         Divider()
         HStack(spacing: 30) {
-          Text("\(radioManager.sliceModel.sliceLetter)").frame(minWidth: 75, maxWidth: 75)
-          Text("\(radioManager.sliceModel.radioMode.rawValue)").frame(minWidth: 75, maxWidth: 75)
-          Text("\(radioManager.sliceModel.frequency)").frame(minWidth: 75, maxWidth: 75)
+          Text("Slice: \(radioManager.sliceModel.sliceLetter)").frame(minWidth: 100, maxWidth: 100)
+          Text("Mode: \(radioManager.sliceModel.radioMode.rawValue)").frame(minWidth: 100, maxWidth: 100)
+          Text("\(radioManager.sliceModel.frequency)").frame(minWidth: 100, maxWidth: 100)
           // https://swiftwithmajid.com/2020/03/04/customizing-toggle-in-swiftui/
 //          Toggle(isOn: $status) {
 //            Text("Id Timer")
