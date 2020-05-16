@@ -75,9 +75,6 @@ struct ContentView: View {
           Text("Slice").frame(minWidth: 75, maxWidth: 75)
           Text("Mode").frame(minWidth: 75, maxWidth: 75)
           Text("Frequency").frame(minWidth: 75, maxWidth: 75)
-//          Button(action: {showDx(count: 20)}) {
-//            Text("Send Id").frame(minWidth: 75, maxWidth: 75)
-//          }
           // https://swiftwithmajid.com/2020/03/04/customizing-toggle-in-swiftui/
 //          Toggle(isOn: $status) {
 //            Text("Id Timer")
@@ -154,23 +151,6 @@ struct  FreeFormScrollView: View {
   }
 }
 
-/**
- View of the freeform text area.
- */
-//struct FreeFormTextView: View {
-//  @State public var cwText: CWText
-//
-//  var body: some View {
-//
-//    VStack(spacing: 0) {
-//      TextField("Placeholder1", text: $cwText.line1)
-//      TextField("Placeholder2", text: $cwText.line2)
-//      TextField("Placeholder3", text: $cwText.line3)
-//      TextField("Placeholder4", text: $cwText.line4)
-//      TextField("Placeholder5", text: $cwText.line5)
-//    }.frame(minHeight: 100, maxHeight: 100)
-//  }
-//}
 
 // MARK: - Radio Picker Sheet ----------------------------------------------------------------------------
 
@@ -183,26 +163,7 @@ struct RadioPicker: View {
   @EnvironmentObject var radioManager: RadioManager
   @State private var selectedStation = 0
   var body: some View {
-    
-//    var first = StationSelection(radioModel: "", radioNickname: "", stationName: "", isDefaultStation: false)
-//    var second = StationSelection(radioModel: "", radioNickname: "", stationName: "", isDefaultStation: false )
-//
-//    if radioManager.guiClientView.count > 0 {
-//      first = StationSelection(radioModel: "\(radioManager.stationView[0].radioModel)", radioNickname: "\(radioManager.stationView[0].radioNickname)", stationName: "\(radioManager.stationView[0].stationName)", isDefaultStation: Bool("\(radioManager.stationView[0].isDefaultStation)") ?? false)
-//    }
-//
-//    if radioManager.guiClientView.count > 1 {
-//      second = StationSelection(radioModel: "\(radioManager.guiClientView[1].model)", radioNickname: "\(radioManager.guiClientView[1].nickname)", stationName: "\(radioManager.guiClientView[1].stationName)", isDefaultStation: Bool("\(radioManager.guiClientView[1].default)") ?? false)
-//    }
-    
-    //let radios = radioManager.stationView // radioManager.$stationView //
-    
-//    ForEach(0 ..< radioManager.guiClientView.count) {
-//      radios.append(StationSelection(radioModel: "\(radioManager.guiClientView[$0].model)", radioNickname: "\(radioManager.guiClientView[$0].nickname)", stationName: "\(radioManager.guiClientView[$0].stationName)", isDefaultStation: Bool("\(radioManager.guiClientView[$0].default)") ?? false))
-//    }
-    
-    
-    
+
     return VStack{
       HStack{
         Text("Model").frame(minWidth: 50).padding(.leading, 5)
@@ -213,19 +174,19 @@ struct RadioPicker: View {
         .foregroundColor(Color.blue)
       HStack {
         List(radioManager.guiClientModels, rowContent: StationRow.init)
-      }.frame(minWidth: 400, minHeight: 120)
+      }.frame(minWidth: 400, minHeight: 120)//.background(Color.blue.opacity(0.25))
       HStack {
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
-          Text("Set as Default")
+          Text("Set as Default").padding(.bottom, 5)
         }
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Connect")
-        }
+        }.padding(.leading, 25).padding(.bottom, 5)
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Cancel")
-        }
+          }.padding(.leading, 25).padding(.bottom, 5)
       }
-    }.background(Color.gray.opacity(0.5))
+    }.background(Color.gray.opacity(0.10))
   }
 }
 
@@ -243,10 +204,10 @@ struct StationRow: View {
         Text("\(station.radioModel)").frame(minWidth: 50).padding(.leading, 2)
         Text("\(station.radioNickname)").frame(minWidth: 90).border(Color.black).padding(.leading, 25)
           Text("\(station.stationName)").frame(minWidth: 70).padding(.leading, 5).tag(station.stationName)
-        Text("\(String(station.isDefaultStation))").frame(minWidth: 50).border(Color.black).padding(.leading, 25)
+        Text("\(String(station.isDefaultStation))").frame(minWidth: 60).border(Color.black).padding(.leading, 25)
         }.border(Color.black) // may want to add min/max width
-      }
-    }
+      }.background(Color.blue.opacity(0.15))
+  }
 }
 
 
