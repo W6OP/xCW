@@ -25,7 +25,6 @@ struct ContentView: View {
   @State private var cwText = CWText()
   @State private var showingDetail = false
   @State private var isEnabled = false
-  //@ObservedObject var isEnabled = false
   
   
   var body: some View {
@@ -58,11 +57,11 @@ struct ContentView: View {
             //RadioPicker() - should work
             // https://stackoverflow.com/questions/58743004/swiftui-environmentobject-error-may-be-missing-as-an-ancestor-of-this-view
             // this is how to pass the radioManager
-            return RadioPicker().environmentObject(self.radioManager)
+          return RadioPicker().environmentObject(self.radioManager)
           }
           
-          if radioManager.guiClientModels.count > 0 {
-            Text("Found \(radioManager.guiClientModels[0].stationName)" )
+          if radioManager.connectSuccessful {
+            Text("Connected to \(radioManager.guiClientModels[0].stationName)" )
           }
           else {
             Text("Disconnected")
@@ -72,9 +71,9 @@ struct ContentView: View {
         
         Divider()
         HStack(spacing: 30) {
-          Text("Slice").frame(minWidth: 75, maxWidth: 75)
-          Text("Mode").frame(minWidth: 75, maxWidth: 75)
-          Text("Frequency").frame(minWidth: 75, maxWidth: 75)
+          Text("\(radioManager.sliceModel.sliceLetter)").frame(minWidth: 75, maxWidth: 75)
+          Text("\(radioManager.sliceModel.radioMode.rawValue)").frame(minWidth: 75, maxWidth: 75)
+          Text("\(radioManager.sliceModel.frequency)").frame(minWidth: 75, maxWidth: 75)
           // https://swiftwithmajid.com/2020/03/04/customizing-toggle-in-swiftui/
 //          Toggle(isOn: $status) {
 //            Text("Id Timer")
@@ -161,7 +160,7 @@ struct  FreeFormScrollView: View {
 struct RadioPicker: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var radioManager: RadioManager
-  @State private var selectedStation = 0
+  
   var body: some View {
 
     return VStack{
@@ -174,19 +173,22 @@ struct RadioPicker: View {
         .foregroundColor(Color.blue)
       HStack {
         List(radioManager.guiClientModels, rowContent: StationRow.init)
-      }.frame(minWidth: 400, minHeight: 120)//.background(Color.blue.opacity(0.25))
+      }.frame(minWidth: 400, minHeight: 120)
       HStack {
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Set as Default").padding(.bottom, 5)
         }
-        Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
+        Button(action: {self.radioManager.connectToRadio(serialNumber: self.radioManager.guiClientModels[0].serialNumber, station: self.radioManager.guiClientModels[0].stationName, clientId: self.radioManager.guiClientModels[0].clientId, didConnect: true); self.presentationMode.wrappedValue.dismiss()}) {
           Text("Connect")
         }.padding(.leading, 25).padding(.bottom, 5)
+//        Button(action: {selectStation(stationName: "\(self.radioManager.guiClientModels[0].stationName)", radioManager: self.radioManager)}) {
+//          Text("Connect")
+//        }.padding(.leading, 25).padding(.bottom, 5)
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Cancel")
           }.padding(.leading, 25).padding(.bottom, 5)
       }
-    }.background(Color.gray.opacity(0.10))
+    }.background(Color.gray.opacity(0.20))
   }
 }
 
@@ -196,20 +198,36 @@ struct RadioPicker: View {
  View of rows of stations to select from.
  */
 struct StationRow: View {
-    var station: GUIClientModel
-
-    var body: some View {
+  var station: GUIClientModel
+  
+  var body: some View {
+    HStack {
       HStack {
-        HStack {
         Text("\(station.radioModel)").frame(minWidth: 50).padding(.leading, 2)
         Text("\(station.radioNickname)").frame(minWidth: 90).border(Color.black).padding(.leading, 25)
-          Text("\(station.stationName)").frame(minWidth: 70).padding(.leading, 5).tag(station.stationName)
-        Text("\(String(station.isDefaultStation))").frame(minWidth: 60).border(Color.black).padding(.leading, 25)
-        }.border(Color.black) // may want to add min/max width
-      }.background(Color.blue.opacity(0.15))
+        Text("\(station.stationName)").frame(minWidth: 70).padding(.leading, 5).tag(station.stationName)
+        
+        Button(action: {showDx(count: 20)}) {
+          Text("\(String(station.isDefaultStation))").frame(minWidth: 75, maxWidth: 75).background(Color.green.opacity(0.15))
+        }
+      }.border(Color.black)
+    }.background(Color.blue.opacity(0.15))
   }
 }
 
+/**
+ Button(action: {
+     self.selectedBtn = item
+ }){
+     Text(self.box.title)
+         .foregroundColor(.white)
+ }
+ .frame(width: 130, height: 50)
+ .background(self.selectedBtn == item ? Color.red : Color.blue)
+ .cornerRadius(25)
+ .shadow(radius: 10)
+ .padding(10)
+ */
 
 // https://www.hackingwithswift.com/quick-start/swiftui/how-to-make-a-view-dismiss-itself
 //func closePicker() {
@@ -223,6 +241,18 @@ func sendFreeText() {
 }
 func showDx(count: Int) {
   
+}
+
+func selectStation(stationName: String, radioManager: RadioManager )  {
+  
+//  for guiClient in radioManager.guiClientModels{
+////  if let client = guiClient.first(where: { $0.value.station == stationName} ){
+////  }
+//  }
+  
+  
+  
+//  radioManager.connectToRadio(serialNumber: self.radioManager.guiClientModels[0].serialNumber, station: self.radioManager.guiClientModels[0].stationName, clientId: self.radioManager.guiClientModels[0].clientId, didConnect: true)
 }
 
 // MARK: - Preview Provider ----------------------------------------------------------------------------

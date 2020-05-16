@@ -165,6 +165,19 @@ struct GUIClientModel: Identifiable {
 }
 
 /**
+ var sliceView = [(sliceLetter: String, radioMode: radioMode, txEnabled: Bool, frequency: String, sliceHandle: UInt32)]()
+ */
+struct SliceModel: Identifiable {
+ var id = UUID()
+  
+  var sliceLetter: String = ""
+  var radioMode: radioMode
+  var txEnabled: Bool = false
+  var frequency: String = ""
+  var sliceHandle: UInt32
+}
+
+/**
  Data model for the text in the freeform text section.
  */
 struct CWText {
@@ -213,6 +226,8 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   
 //  @Published var guiClientView = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
   @Published var guiClientModels = [GUIClientModel]()
+  @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
+  var connectSuccessful = false
   
   // MARK: - Private properties ----------------------------------------------------------------------------
   // Notification observers collection
@@ -242,6 +257,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     addNotificationListeners()
     
     api.delegate = self
+    
   }
   
   // MARK: - Open and Close Radio Methods - Required by xLib6000 - Not Used ----------------------------------------------------------------------------
@@ -309,8 +325,9 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
    - clientId: client id if available
    - doConnect: bool returning true if the connect was successful
    */
-  func connectToRadio(serialNumber: String, station: String, clientId: String, didConnect: Bool) -> Bool {
+  func connectToRadio(serialNumber: String, station: String, clientId: String, didConnect: Bool) {
     
+    connectSuccessful = false
     os_log("Connect to the Radio.", log: RadioManager.model_log, type: .info)
     
     // allow time to hear the UDP broadcasts
@@ -323,11 +340,13 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
         
         if api.connect(activeRadio!, programName: clientProgram, clientId: nil, isGui: false) {
           os_log("Connected to the Radio.", log: RadioManager.model_log, type: .info)
-          return true
+          connectSuccessful = true
+          //return true
         }
       }
     }
-    return false
+    
+    //return false
   }
   
   /**
@@ -380,9 +399,12 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
       for guiClient in radio.guiClients {
         let handle = guiClient.key
         UI() {
+          
+          
+          
 //          self.guiClientView.append((radio.model, radio.nickname, guiClient.value.station, "No", radio.serialNumber, guiClient.value.clientId ?? "", handle))
           
-          self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: false))
+          self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, serialNumber: radio.serialNumber, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: false))
         }
         os_log("Radios updated.", log: RadioManager.model_log, type: .info)
       }
@@ -405,7 +427,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
           UI() {
 //            self.guiClientView.append((radio.model, radio.nickname, guiClient.station, "No", radio.serialNumber, String(guiClient.clientId ?? ""), handle))
             
-            self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: false))
+            self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: false))
           }
           os_log("GUI clients have been added.", log: RadioManager.model_log, type: .info)
         }
@@ -430,7 +452,10 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
           UI() {
 //            self.guiClientView.append((radio.model, radio.nickname, guiClient.station, "No", radio.serialNumber, String(guiClient.clientId ?? ""), handle))
             
-            self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: false))
+            // first remove the old one
+            self.guiClientModels.removeAll(where: { $0.stationName == guiClient.station })
+            
+            self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: false))
           }
           os_log("GUI clients have been updated.", log: RadioManager.model_log, type: .info)
         }
@@ -460,6 +485,17 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   // MARK: - Slice handling
   
   /**
+   struct SliceModel: Identifiable {
+    var id = UUID()
+     
+     var sliceLetter: String = ""
+     var radioMode: radioMode
+     var txEnabled: Bool = false
+     var frequency: String = ""
+     var sliceHandle: UInt32
+   }
+   */
+  /**
    Notification that one or more slices were added.
    The slice that is added becomes the active slice.
    - parameters:
@@ -471,17 +507,20 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     let mode: radioMode = radioMode(rawValue: slice.mode) ?? radioMode.invalid
     let frequency: String = convertFrequencyToDecimalString (frequency: slice.frequency)
     
-    var sliceView = [(sliceLetter: String, radioMode: radioMode, txEnabled: Bool, frequency: String, sliceHandle: UInt32)]()
+    //    var sliceView = [(sliceLetter: String, radioMode: radioMode, txEnabled: Bool, frequency: String, sliceHandle: UInt32)]()
+      addObservations(slice: slice)
     
-    addObservations(slice: slice)
-    
-    sliceView.append((sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle))
-    
+    // I really only care about a slice that is tx enabled
+    if slice.txEnabled {
     UI() {
-      self.radioManagerDelegate?.didAddSlice(slice: sliceView)
+      self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+      
+//      self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+      }
     }
-    
+
     os_log("Slice has been addded.", log: RadioManager.model_log, type: .info)
+    print("\(slice.txEnabled)")
   }
   
   /**
@@ -497,7 +536,9 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     os_log("Slice has been removed.", log: RadioManager.model_log, type: .info)
     
     UI() {
-      self.radioManagerDelegate?.didRemoveSlice(sliceHandle: slice.clientHandle, sliceLetter: slice.sliceLetter ?? "")
+      if self.sliceModel.sliceHandle == slice.clientHandle {
+        self.sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
+      }
     }
   }
   
@@ -509,21 +550,15 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
    */
   func updateSliceStatus(_ slice: xLib6000.Slice, sliceStatus: sliceStatus,  _ change: Any) {
     
-    var newValue: Any = change
-    
-    switch sliceStatus {
-    case .active:
-      newValue = "Active" // not used
-    case .mode:
-      newValue = radioMode(rawValue: slice.mode) ?? radioMode.invalid
-    case .txEnabled:
-      newValue = slice.txEnabled
-    case .frequency:
-      newValue = convertFrequencyToDecimalString (frequency: slice.frequency)
-    }
-    
+    let mode: radioMode = radioMode(rawValue: slice.mode) ?? radioMode.invalid
+    let frequency: String = convertFrequencyToDecimalString (frequency: slice.frequency)
+
+    if slice.txEnabled {
     UI() {
-      self.radioManagerDelegate?.didUpdateSlice(sliceHandle: slice.clientHandle, sliceLetter: slice.sliceLetter ?? "", sliceStatus: sliceStatus, newValue: newValue)
+      self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+      }
+    } else {
+      // check if any slices txEnabled
     }
   }
   
