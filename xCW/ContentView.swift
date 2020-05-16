@@ -57,11 +57,12 @@ struct ContentView: View {
           }.sheet(isPresented: $showingDetail) {
             //RadioPicker() - should work
             // https://stackoverflow.com/questions/58743004/swiftui-environmentobject-error-may-be-missing-as-an-ancestor-of-this-view
+            // this is how to pass the radioManager
             return RadioPicker().environmentObject(self.radioManager)
           }
           
-          if radioManager.guiClientView.count > 0 {
-            Text("Found \(radioManager.guiClientView[0].stationName)" )
+          if radioManager.guiClientModels.count > 0 {
+            Text("Found \(radioManager.guiClientModels[0].stationName)" )
           }
           else {
             Text("Disconnected")
@@ -211,11 +212,17 @@ struct RadioPicker: View {
       }.font(.system(size: 14))
         .foregroundColor(Color.blue)
       HStack {
-        List(radioManager.stationView, rowContent: StationRow.init)
+        List(radioManager.guiClientModels, rowContent: StationRow.init)
       }.frame(minWidth: 400, minHeight: 120)
       HStack {
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
-          Text("Close Picker")
+          Text("Set as Default")
+        }
+        Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
+          Text("Connect")
+        }
+        Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
+          Text("Cancel")
         }
       }
     }.background(Color.gray.opacity(0.5))
@@ -228,7 +235,7 @@ struct RadioPicker: View {
  View of rows of stations to select from.
  */
 struct StationRow: View {
-    var station: StationSelection
+    var station: GUIClientModel
 
     var body: some View {
       HStack {
@@ -240,36 +247,6 @@ struct StationRow: View {
         }.border(Color.black) // may want to add min/max width
       }
     }
-}
-
-
-// MARK: - Models ----------------------------------------------------------------------------
-
-/**
- Data model for a radio and station selection in the Radio Picker.
- // var stations = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
- */
-struct StationSelection: Identifiable {
-  var id = UUID()
-
-  var radioModel: String = ""
-  var radioNickname: String = ""
-  var stationName: String = ""
-  var serialNumber: String = ""
-  var clientId: String = ""
-  var handle: UInt32 = 0
-  var isDefaultStation: Bool = false
-}
-
-/**
- Data model for the text in the freeform text section.
- */
-struct CWText {
-  var line1: String = ""
-  var line2: String = ""
-  var line3: String = ""
-  var line4: String = ""
-  var line5: String = ""
 }
 
 

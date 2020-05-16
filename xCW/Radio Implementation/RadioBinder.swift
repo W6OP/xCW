@@ -21,12 +21,12 @@ class RadioBinder: ObservableObject {
 
 } // end class
 
-class GUIClientModel: ObservableObject {
-  
-  @Published var guiClientModel = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
-  
-  
-  
-  
-  
-} // end class
+//class GUIClientModel: ObservableObject {
+//
+//  @Published var guiClientModel = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
+//
+//
+//
+//
+//
+//} // end class

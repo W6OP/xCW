@@ -146,6 +146,35 @@ public enum sliceStatus : String {
   case frequency
 }
 
+// MARK: - Models ----------------------------------------------------------------------------
+
+/**
+ Data model for a radio and station selection in the Radio Picker.
+ // var stations = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
+ */
+struct GUIClientModel: Identifiable {
+  var id = UUID()
+
+  var radioModel: String = ""
+  var radioNickname: String = ""
+  var stationName: String = ""
+  var serialNumber: String = ""
+  var clientId: String = ""
+  var handle: UInt32 = 0
+  var isDefaultStation: Bool = false
+}
+
+/**
+ Data model for the text in the freeform text section.
+ */
+struct CWText {
+  var line1: String = ""
+  var line2: String = ""
+  var line3: String = ""
+  var line4: String = ""
+  var line5: String = ""
+}
+
 // MARK: - Class Definition ------------------------------------------------------------------------------------------------
 
 /**
@@ -180,11 +209,12 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   private var api = Api.sharedInstance
   private let discovery = Discovery.sharedInstance
   
+  // MARK: - Published properties ----------------------------------------------------------------------------
+  
+//  @Published var guiClientView = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
+  @Published var guiClientModels = [GUIClientModel]()
+  
   // MARK: - Private properties ----------------------------------------------------------------------------
-  
-  @Published var guiClientView = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
-  @Published var stationView = [StationSelection]()
-  
   // Notification observers collection
   private var notifications = [NSObjectProtocol]()
   
@@ -350,9 +380,9 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
       for guiClient in radio.guiClients {
         let handle = guiClient.key
         UI() {
-          self.guiClientView.append((radio.model, radio.nickname, guiClient.value.station, "No", radio.serialNumber, guiClient.value.clientId ?? "", handle))
+//          self.guiClientView.append((radio.model, radio.nickname, guiClient.value.station, "No", radio.serialNumber, guiClient.value.clientId ?? "", handle))
           
-          self.stationView.append( StationSelection(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, isDefaultStation: false))
+          self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: false))
         }
         os_log("Radios updated.", log: RadioManager.model_log, type: .info)
       }
@@ -373,9 +403,9 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
         if let client = radio.guiClients.first(where: { $0.value.station == guiClient.station} ){
           let handle = client.key
           UI() {
-            self.guiClientView.append((radio.model, radio.nickname, guiClient.station, "No", radio.serialNumber, String(guiClient.clientId ?? ""), handle))
+//            self.guiClientView.append((radio.model, radio.nickname, guiClient.station, "No", radio.serialNumber, String(guiClient.clientId ?? ""), handle))
             
-            self.stationView.append( StationSelection(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, isDefaultStation: false))
+            self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: false))
           }
           os_log("GUI clients have been added.", log: RadioManager.model_log, type: .info)
         }
@@ -398,9 +428,9 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
         if let client = radio.guiClients.first(where: { $0.value.station == guiClient.station} ){
           let handle = client.key
           UI() {
-            self.guiClientView.append((radio.model, radio.nickname, guiClient.station, "No", radio.serialNumber, String(guiClient.clientId ?? ""), handle))
+//            self.guiClientView.append((radio.model, radio.nickname, guiClient.station, "No", radio.serialNumber, String(guiClient.clientId ?? ""), handle))
             
-            self.stationView.append( StationSelection(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, isDefaultStation: false))
+            self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: false))
           }
           os_log("GUI clients have been updated.", log: RadioManager.model_log, type: .info)
         }
@@ -418,9 +448,9 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     
     if let guiClient = note.object as? GuiClient {
        UI() {
-        self.guiClientView.removeAll(where: { $0.stationName == guiClient.station })
+        //self.guiClientView.removeAll(where: { $0.stationName == guiClient.station })
         
-        self.stationView.removeAll(where: { $0.stationName == guiClient.station })
+        self.guiClientModels.removeAll(where: { $0.stationName == guiClient.station })
       }
         os_log("GUI clients have been removed.", log: RadioManager.model_log, type: .info)
         
