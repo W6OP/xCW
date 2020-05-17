@@ -15,19 +15,21 @@ import SwiftUI
  */
 struct ContentView: View {
   // initialize radio
-  //@ObservedObject private var radioManager = RadioManager()
   @EnvironmentObject var radioManager: RadioManager
   @Environment(\.presentationMode) var presentationMode
+  //@ObservedObject var memories = CWMemories()
   
   @State private var isConnected = false
   @State private var isBound = false
   @State private var status = false
   @State private var cwText = CWText()
   @State private var showingDetail = false
+  @State private var showMemories = false
   @State private var isEnabled = false
   
   
   var body: some View {
+    
     HStack {
       VStack {
         FirstRowView(isEnabled: $isEnabled).environmentObject(self.radioManager)
@@ -48,6 +50,18 @@ struct ContentView: View {
           Button(action: {showDx(count: 20)}) {
             Text("Stop")//.frame(minWidth: 75, maxWidth: 75)
           }
+          
+          Button(action: {
+            self.showMemories.toggle()
+          }) {
+            Text("Memories")
+          }.sheet(isPresented: $showMemories) {
+            //CWMemoriesPanel() //- should work
+            // https://stackoverflow.com/questions/58743004/swiftui-environmentobject-error-may-be-missing-as-an-ancestor-of-this-view
+            // this is how to pass the radioManager
+            return CWMemoriesPanel(cwText: CWText())
+          }
+          
           Button(action: {
             self.showingDetail.toggle()
           }) {
@@ -91,24 +105,25 @@ struct ContentView: View {
  */
 struct FirstRowView: View {
   @EnvironmentObject var radioManager: RadioManager
+  @ObservedObject var memories = CWMemories()
   @Binding var isEnabled: Bool
   
   var body: some View {
     HStack {
-      Button(action: {self.radioManager.sendCWMessage(message: "W6OP")}) {
-        Text("empty").frame(minWidth: 75, maxWidth: 75)
+      Button(action: {self.radioManager.sendCWMessage(message: self.memories.retrieveCWMemory(tag: "cw1"))}) {
+        Text("W6OP").frame(minWidth: 75, maxWidth: 75)
         }
-      Button(action: {showDx(count: 20)}) {
-        Text("empty").frame(minWidth: 75, maxWidth: 75)
+      Button(action: {self.radioManager.sendCWMessage(message: self.memories.retrieveCWMemory(tag: "cw2"))}) {
+        Text("CW2").frame(minWidth: 75, maxWidth: 75)
       }
-      Button(action: {showDx(count: 20)}) {
-        Text("empty").frame(minWidth: 75, maxWidth: 75)
+      Button(action: {self.radioManager.sendCWMessage(message: self.memories.retrieveCWMemory(tag: "cw3"))}) {
+        Text("CW3").frame(minWidth: 75, maxWidth: 75)
       }
-      Button(action: {showDx(count: 20)}) {
-        Text("empty").frame(minWidth: 75, maxWidth: 75)
+      Button(action: {self.radioManager.sendCWMessage(message: self.memories.retrieveCWMemory(tag: "cw4"))}) {
+        Text("CW4").frame(minWidth: 75, maxWidth: 75)
       }
-      Button(action: {showDx(count: 20)}) {
-        Text("empty").frame(minWidth: 75, maxWidth: 75)
+      Button(action: {self.radioManager.sendCWMessage(message: self.memories.retrieveCWMemory(tag: "cw5"))}) {
+        Text("CW5").frame(minWidth: 75, maxWidth: 75)
       }
     }.frame(maxWidth: .infinity, maxHeight: 25).padding(.top, 5)
   }
@@ -119,6 +134,7 @@ The second row of memory buttons.
 */
 struct SecondRowView: View {
   @EnvironmentObject var radioManager: RadioManager
+  @ObservedObject var memories = CWMemories()
   @Binding var isEnabled: Bool
   
   var body: some View {
@@ -144,7 +160,6 @@ struct SecondRowView: View {
 
 struct  FreeFormScrollView: View {
   @State public var cwText: CWText
-  // @ObjectBinding var cwText: CWText
   
   var body: some View{
     VStack{
@@ -174,19 +189,18 @@ struct RadioPicker: View {
         Text("Default Radio").frame(minWidth: 50).padding(.leading, 22)
       }.font(.system(size: 14))
         .foregroundColor(Color.blue)
-      HStack {
-        List(radioManager.guiClientModels, rowContent: StationRow.init)
-      }.frame(minWidth: 400, minHeight: 120)
+
+        List(radioManager.guiClientModels, rowContent: StationRow.init).frame(minWidth: 400, minHeight: 120)
+
       HStack {
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Set as Default").padding(.bottom, 5)
         }
+        
         Button(action: {self.radioManager.connectToRadio(serialNumber: self.radioManager.guiClientModels[0].serialNumber, station: self.radioManager.guiClientModels[0].stationName, clientId: self.radioManager.guiClientModels[0].clientId, didConnect: true); self.presentationMode.wrappedValue.dismiss()}) {
           Text("Connect")
         }.padding(.leading, 25).padding(.bottom, 5)
-//        Button(action: {selectStation(stationName: "\(self.radioManager.guiClientModels[0].stationName)", radioManager: self.radioManager)}) {
-//          Text("Connect")
-//        }.padding(.leading, 25).padding(.bottom, 5)
+        
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Cancel")
           }.padding(.leading, 25).padding(.bottom, 5)
@@ -195,7 +209,30 @@ struct RadioPicker: View {
   }
 }
 
+// MARK: - CW Message Panel ----------------------------------------------------------------------------
 
+struct CWMemoriesPanel: View {
+  @Environment(\.presentationMode) var presentationMode
+  @ObservedObject var memories = CWMemories()
+  @State public var cwText: CWText
+  //@State private var cwString1: String = UserDefaults.standard.string(forKey: "cw1") ?? ""
+  
+  var body: some View {
+
+    return VStack(spacing: 0){
+      TextField("Placeholder1", text: $cwText.line1)
+      TextField("Placeholder2", text: $cwText.line2)
+      TextField("Placeholder3", text: $cwText.line3)
+      TextField("Placeholder4", text: $cwText.line4)
+      TextField("Placeholder5", text: $cwText.line5)
+      HStack{
+        Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
+          Text("Done")
+          }.padding(.leading, 25).padding(.bottom, 5)
+      }
+    }.frame(minWidth: 100, maxWidth: 100).background(Color.gray.opacity(0.20))
+  }
+}
 
 /**
  View of rows of stations to select from.

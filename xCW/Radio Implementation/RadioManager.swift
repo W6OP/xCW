@@ -144,7 +144,9 @@ struct SliceModel: Identifiable {
 /**
  Data model for the text in the freeform text section.
  */
-struct CWText {
+struct CWText: Hashable {
+  var id = UUID()
+  
   var line1: String = ""
   var line2: String = ""
   var line3: String = ""
