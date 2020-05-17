@@ -90,31 +90,6 @@ func UI(_ block: @escaping ()->Void) {
   DispatchQueue.main.async(execute: block)
 }
 
-// MARK: Event Delegates ------------------------------------------------------------------------------------------------
-
-/**
- Implement in your viewcontroller to receive messages from the radio manager
- */
-//protocol RadioManagerDelegate: class {
-//  // radio and gui clients were discovered - notify GUI
-//  func didDiscoverGUIClients(discoveredGUIClients: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isGuiClientUpdate: Bool)
-//
-//  func didAddGUIClients(discoveredGUIClients: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isGuiClientUpdate: Bool)
-//
-//  func didUpdateGUIClients(discoveredGUIClients: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isGuiClientUpdate: Bool)
-//
-//  func didRemoveGUIClients(station: String)
-//
-//  func didAddSlice(slice: [(sliceLetter: String, radioMode: radioMode, txEnabled: Bool, frequency: String, sliceHandle: UInt32)])
-//
-//  func didRemoveSlice(sliceHandle: UInt32, sliceLetter: String)
-//
-//  func didUpdateSlice(sliceHandle: UInt32, sliceLetter: String, sliceStatus: sliceStatus, newValue: Any)
-//
-//  // notify the GUI the tcp connection to the radio was closed
-//  func didDisconnectFromRadio()
-//}
-
 // MARK: - Enums ------------------------------------------------------------------------------------------------
 
 public enum radioMode : String {
@@ -140,11 +115,10 @@ public enum sliceStatus : String {
 
 /**
  Data model for a radio and station selection in the Radio Picker.
- // var stations = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
  */
 struct GUIClientModel: Identifiable {
   var id = UUID()
-
+  
   var radioModel: String = ""
   var radioNickname: String = ""
   var stationName: String = ""
@@ -158,7 +132,7 @@ struct GUIClientModel: Identifiable {
  var sliceView = [(sliceLetter: String, radioMode: radioMode, txEnabled: Bool, frequency: String, sliceHandle: UInt32)]()
  */
 struct SliceModel: Identifiable {
- var id = UUID()
+  var id = UUID()
   
   var sliceLetter: String = ""
   var radioMode: radioMode
@@ -200,9 +174,6 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   // setup logging for the RadioManager
   static let model_log = OSLog(subsystem: "com.w6op.RadioManager-Swift", category: "xCW")
   
-  // delegate to pass messages back to viewcontroller
-  //weak var radioManagerDelegate:RadioManagerDelegate?
-  
   // MARK: - Internal Radio properties ----------------------------------------------------------------------------
   
   // Radio currently running
@@ -214,7 +185,6 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   
   // MARK: - Published properties ----------------------------------------------------------------------------
   
-//  @Published var guiClientView = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
   @Published var guiClientModels = [GUIClientModel]()
   @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
   
@@ -225,16 +195,8 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   var boundStationHandle: UInt32 = 0
   
   // MARK: - Private properties ----------------------------------------------------------------------------
-  // Notification observers collection
-  //private var notifications = [NSObjectProtocol]()
   
-  private let clientProgram = "xVoiceKeyer"
-  //private var daxTxAudioStream: DaxTxAudioStream!
-  private var daxTxAudioStreamId: StreamId
-  private var daxTxAudioStreamRequested = false
-  private var audioBuffer = [Float]()
-  private var audioStreamTimer :Repeater? // timer to meter audio chunks to radio at 24khz sample rate
-  private var xmitGain = 35
+  private let clientProgramName = "xVoiceKeyer"
   
   // MARK: - RadioManager Initialization ----------------------------------------------------------------------------
   
@@ -242,9 +204,6 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
    Initialize the class, create the RadioFactory, add notification listeners
    */
   override init() {
-    
-    //audiomanager = AudioManager()
-    daxTxAudioStreamId = StreamId()
     
     super.init()
     
@@ -336,7 +295,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
         
         activeRadio = foundRadio
         
-        if api.connect(activeRadio!, programName: clientProgram, clientId: nil, isGui: false) {
+        if api.connect(activeRadio!, programName: clientProgramName, clientId: nil, isGui: false) {
           os_log("Connected to the Radio.", log: RadioManager.model_log, type: .info)
           isConnected = true
           connectedStationName = station
@@ -344,8 +303,6 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
         }
       }
     }
-    
-    //return false
   }
   
   /**
@@ -369,11 +326,8 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
         boundStationHandle = handle
         os_log("Bound to the Radio.", log: RadioManager.model_log, type: .info)
         
-        //return handle
       }
     }
-    
-    //return 0
   }
   
   /**
@@ -394,17 +348,12 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   func discoveryPacketsReceived(_ note: Notification) {
     // receive the updated list of Radios
     let discoveryPacket = (note.object as! [DiscoveryPacket])
-   
+    
     // just collect the radio's gui clients
     for radio in discoveryPacket {
       for guiClient in radio.guiClients {
         let handle = guiClient.key
         UI() {
-          
-          
-          
-//          self.guiClientView.append((radio.model, radio.nickname, guiClient.value.station, "No", radio.serialNumber, guiClient.value.clientId ?? "", handle))
-          
           self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, serialNumber: radio.serialNumber, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: false))
         }
         os_log("Radios updated.", log: RadioManager.model_log, type: .info)
@@ -419,15 +368,13 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
    - note: a Notification instance
    */
   func guiClientsAdded(_ note: Notification) {
-   
+    
     if let guiClient = note.object as? GuiClient {
       
       for radio in discovery.discoveredRadios {
         if let client = radio.guiClients.first(where: { $0.value.station == guiClient.station} ){
           let handle = client.key
           UI() {
-//            self.guiClientView.append((radio.model, radio.nickname, guiClient.station, "No", radio.serialNumber, String(guiClient.clientId ?? ""), handle))
-            
             self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: false))
           }
           os_log("GUI clients have been added.", log: RadioManager.model_log, type: .info)
@@ -451,8 +398,6 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
         if let client = radio.guiClients.first(where: { $0.value.station == guiClient.station} ){
           let handle = client.key
           UI() {
-//            self.guiClientView.append((radio.model, radio.nickname, guiClient.station, "No", radio.serialNumber, String(guiClient.clientId ?? ""), handle))
-            
             // first remove the old one
             self.guiClientModels.removeAll(where: { $0.stationName == guiClient.station })
             
@@ -479,29 +424,16 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   func guiClientsRemoved(_ note: Notification) {
     
     if let guiClient = note.object as? GuiClient {
-       UI() {
-        //self.guiClientView.removeAll(where: { $0.stationName == guiClient.station })
-        
+      UI() {
         self.guiClientModels.removeAll(where: { $0.stationName == guiClient.station })
       }
-        os_log("GUI clients have been removed.", log: RadioManager.model_log, type: .info)
-        
-      }
+      os_log("GUI clients have been removed.", log: RadioManager.model_log, type: .info)
+      
+    }
   }
   
-  // MARK: - Slice handling
+  // MARK: - Slice handling ----------------------------------------------------------------------------
   
-  /**
-   struct SliceModel: Identifiable {
-    var id = UUID()
-     
-     var sliceLetter: String = ""
-     var radioMode: radioMode
-     var txEnabled: Bool = false
-     var frequency: String = ""
-     var sliceHandle: UInt32
-   }
-   */
   /**
    Notification that one or more slices were added.
    The slice that is added becomes the active slice.
@@ -518,11 +450,11 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     
     // I really only care about a slice that is tx enabled
     if slice.txEnabled {
-    UI() {
-      self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+      UI() {
+        self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
       }
     }
-
+    
     os_log("Slice has been addded.", log: RadioManager.model_log, type: .info)
     print("\(slice.txEnabled)")
   }
@@ -556,10 +488,10 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     
     let mode: radioMode = radioMode(rawValue: slice.mode) ?? radioMode.invalid
     let frequency: String = convertFrequencyToDecimalString (frequency: slice.frequency)
-
+    
     if slice.txEnabled {
-    UI() {
-      self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+      UI() {
+        self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
       }
     } else {
       if self.sliceModel.sliceHandle == slice.clientHandle {
@@ -571,25 +503,25 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   // MARK: - Utlity Functions for Slices
   
   /**
-    Respond to a change in a slice
-    - parameters:
-    - slice:
-    */
-   func addObservations(slice: xLib6000.Slice ) {
-     
-     _observations.append( slice.observe(\.active, options: [.initial, .new]) { [weak self] (slice, change) in
-       self?.updateSliceStatus(slice,sliceStatus: sliceStatus.active, change) })
-     
-     _observations.append( slice.observe(\.mode, options: [.initial, .new]) { [weak self] (slice, change) in
-       self?.updateSliceStatus(slice, sliceStatus: sliceStatus.mode, change) })
-     
-     _observations.append(  slice.observe(\.txEnabled, options: [.initial, .new]) { [weak self] (slice, change) in
-       self?.updateSliceStatus(slice,sliceStatus: sliceStatus.txEnabled, change) })
-     
-     _observations.append( slice.observe(\.frequency, options: [.initial, .new]) { [weak self] (slice, change) in
-       self?.updateSliceStatus(slice,sliceStatus: sliceStatus.frequency, change) })
-   }
-   
+   Respond to a change in a slice
+   - parameters:
+   - slice:
+   */
+  func addObservations(slice: xLib6000.Slice ) {
+    
+    _observations.append( slice.observe(\.active, options: [.initial, .new]) { [weak self] (slice, change) in
+      self?.updateSliceStatus(slice,sliceStatus: sliceStatus.active, change) })
+    
+    _observations.append( slice.observe(\.mode, options: [.initial, .new]) { [weak self] (slice, change) in
+      self?.updateSliceStatus(slice, sliceStatus: sliceStatus.mode, change) })
+    
+    _observations.append(  slice.observe(\.txEnabled, options: [.initial, .new]) { [weak self] (slice, change) in
+      self?.updateSliceStatus(slice,sliceStatus: sliceStatus.txEnabled, change) })
+    
+    _observations.append( slice.observe(\.frequency, options: [.initial, .new]) { [weak self] (slice, change) in
+      self?.updateSliceStatus(slice,sliceStatus: sliceStatus.frequency, change) })
+  }
+  
   /**
    Convert the frequency (10136000) to a string with a decimal place (10136.000)
    Use an extension to String to format frequency correctly
@@ -616,122 +548,9 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   
   // MARK: Transmit methods ----------------------------------------------------------------------------
   
-  /**
-   Prepare to key the selected Radio. Create the audio stream to be sent.
-   - parameters:
-   - doTransmit: true create and send an audio stream, false will unkey MOX
-   - buffer: an array of floats representing an audio sample in PCM format
-   */
-  func keyRadio(doTransmit: Bool, buffer: [Float]? = nil, xmitGain: Int) {
-    
-    self.xmitGain = xmitGain
-    
-    // temp code
-    if buffer == nil {
-      if doTransmit  {
-        if (api.radio?.mox == false)  {
-          api.radio?.mox = true
-        } else {
-          api.radio?.mox = false
-        }
-        return
-      }
-    }
-    
-    if doTransmit  {
-      audioBuffer = buffer!
-      if daxTxAudioStreamRequested == false {
-        api.radio!.requestDaxTxAudioStream(callback: updateDaxTxStreamId)
-        daxTxAudioStreamRequested = true
-      }
-      else{
-        DispatchQueue.global(qos: .userInteractive).async {
-          if self.daxTxAudioStreamId != 0
-          {
-            self.sendDaxTxAudioStream(streamId: self.daxTxAudioStreamId)
-          }
-        }
-      }
-    } else{
-      audioStreamTimer = nil
-      api.radio?.mox = false
-    }
-  }
-  
   // cleanup so we can bind with another station
   func cleanUp() {
-    if daxTxAudioStreamId != 0 {
-      api.radio?.daxTxAudioStreams[daxTxAudioStreamId]?.remove()
-      daxTxAudioStreamId = StreamId()
-    }
-    
-    daxTxAudioStreamRequested = false
     api.radio?.boundClientId = nil
-  }
-  
-  /**
-   Callback for the TX Stream Request command.
-   - Parameters:
-   - command:        the original command
-   - sequenceNumber: the Sequence Number of the original command
-   - responseValue:  the response value
-   - reply:          the reply
-   */
-  func updateDaxTxStreamId(_ command: String, sequenceNumber: UInt, responseValue: String, reply: String) {
-    
-    guard responseValue == "0" else {
-      // Anything other than 0 is an error, log it and ignore the Reply
-      os_log("Error requesting tx audio stream ID.", log: RadioManager.model_log, type: .error)
-      // TODO: notify GUI
-      return
-    }
-    
-    // check if we have a stream requested
-    if !daxTxAudioStreamRequested {
-      os_log("Unsolicited audio stream received.", log: RadioManager.model_log, type: .error)
-      return
-    }
-    
-    if let streamId = reply.streamId {
-      
-      daxTxAudioStreamId = streamId
-      
-      DispatchQueue.global(qos: .userInteractive).async {
-        self.sendDaxTxAudioStream(streamId: self.daxTxAudioStreamId)
-      }
-    }
-  }
-  
-  /**
-   Send the audio buffer in 128 frame chunks for the Vita parser. This must be
-   sent at a 24 khz rate (5300 microseconds).
-   */
-  func sendDaxTxAudioStream(streamId: StreamId){
-    var frameCount: Int = 0
-    let result = audioBuffer.chunked(into: 128)
-    let daxTxAudioStream = api.radio?.daxTxAudioStreams[streamId]
-    
-    api.radio?.transmit.daxEnabled = true
-    api.radio?.mox = true
-    daxTxAudioStream?.isTransmitChannel = true
-    daxTxAudioStream?.txGain = xmitGain
-    
-    // define the repeating timer for 24000 hz - why 5300?, seems it should be 4160
-    audioStreamTimer = Repeater.every(.microseconds(5300), count: result.count, tolerance: .nanoseconds(1), queue: DispatchQueue(label: "com.w6op", qos: .userInteractive)) { _ in
-      let _ = daxTxAudioStream?.sendTXAudio(left: result[frameCount], right: result[frameCount], samples: Int(result[frameCount].count))
-      frameCount += 1
-    }
-    
-    // stop transmitting when you run out of audio - could also be interrupted by STOP button
-    audioStreamTimer!.onStateChanged = { (_ timer: Repeater, _ state: Repeater.State) in
-      if self.audioStreamTimer!.state.isFinished {
-        self.api.radio?.mox = false
-        self.api.radio?.transmit.daxEnabled = false
-        self.audioStreamTimer = nil
-      }
-    }
-    // start the timer
-    audioStreamTimer?.start()
   }
   
   func sendCWMessage(message: String)
