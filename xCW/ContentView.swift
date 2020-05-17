@@ -30,13 +30,12 @@ struct ContentView: View {
   var body: some View {
     HStack {
       VStack {
-        FirstRowView(isEnabled: $isEnabled)
-        SecondRowView()
+        FirstRowView(isEnabled: $isEnabled).environmentObject(self.radioManager)
+        SecondRowView(isEnabled: $isEnabled).environmentObject(self.radioManager)
         
         Divider()
         
         HStack {
-          //FreeFormTextView(cwText: cwText)
           FreeFormScrollView(cwText: cwText)
         }.frame(minWidth: 550, maxWidth: 550, minHeight: 110, maxHeight: 110)
         
@@ -60,7 +59,7 @@ struct ContentView: View {
           return RadioPicker().environmentObject(self.radioManager)
           }
           
-          if radioManager.connectSuccessful {
+          if radioManager.isConnected {
             Text("Connected to \(radioManager.guiClientModels[0].stationName)" )
           }
           else {
@@ -91,11 +90,12 @@ struct ContentView: View {
  The first row of memory buttons.
  */
 struct FirstRowView: View {
+  @EnvironmentObject var radioManager: RadioManager
   @Binding var isEnabled: Bool
   
   var body: some View {
     HStack {
-      Button(action: {showDx(count: 20)}) {
+      Button(action: {self.radioManager.sendCWMessage(message: "W6OP")}) {
         Text("empty").frame(minWidth: 75, maxWidth: 75)
         }
       Button(action: {showDx(count: 20)}) {
@@ -118,6 +118,9 @@ struct FirstRowView: View {
 The second row of memory buttons.
 */
 struct SecondRowView: View {
+  @EnvironmentObject var radioManager: RadioManager
+  @Binding var isEnabled: Bool
+  
   var body: some View {
     HStack {
       Button(action: {showDx(count: 20)}) {

@@ -95,41 +95,27 @@ func UI(_ block: @escaping ()->Void) {
 /**
  Implement in your viewcontroller to receive messages from the radio manager
  */
-protocol RadioManagerDelegate: class {
-  // radio and gui clients were discovered - notify GUI
-  func didDiscoverGUIClients(discoveredGUIClients: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isGuiClientUpdate: Bool)
-  
-  func didAddGUIClients(discoveredGUIClients: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isGuiClientUpdate: Bool)
-  
-  func didUpdateGUIClients(discoveredGUIClients: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isGuiClientUpdate: Bool)
-  
-  func didRemoveGUIClients(station: String)
-  
-  func didAddSlice(slice: [(sliceLetter: String, radioMode: radioMode, txEnabled: Bool, frequency: String, sliceHandle: UInt32)])
-  
-  func didRemoveSlice(sliceHandle: UInt32, sliceLetter: String)
-  
-  func didUpdateSlice(sliceHandle: UInt32, sliceLetter: String, sliceStatus: sliceStatus, newValue: Any)
-  
-  // notify the GUI the tcp connection to the radio was closed
-  func didDisconnectFromRadio()
-}
+//protocol RadioManagerDelegate: class {
+//  // radio and gui clients were discovered - notify GUI
+//  func didDiscoverGUIClients(discoveredGUIClients: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isGuiClientUpdate: Bool)
+//
+//  func didAddGUIClients(discoveredGUIClients: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isGuiClientUpdate: Bool)
+//
+//  func didUpdateGUIClients(discoveredGUIClients: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isGuiClientUpdate: Bool)
+//
+//  func didRemoveGUIClients(station: String)
+//
+//  func didAddSlice(slice: [(sliceLetter: String, radioMode: radioMode, txEnabled: Bool, frequency: String, sliceHandle: UInt32)])
+//
+//  func didRemoveSlice(sliceHandle: UInt32, sliceLetter: String)
+//
+//  func didUpdateSlice(sliceHandle: UInt32, sliceLetter: String, sliceStatus: sliceStatus, newValue: Any)
+//
+//  // notify the GUI the tcp connection to the radio was closed
+//  func didDisconnectFromRadio()
+//}
 
 // MARK: - Enums ------------------------------------------------------------------------------------------------
-
-/*
- case AM
- case SAM
- case CW
- case USB
- case LSB
- case FM
- case NFM
- case DFM
- case DIGU
- case DIGL
- case RTTY
- */
 
 public enum radioMode : String {
   case am = "AM"
@@ -212,10 +198,10 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   private var _observations = [NSKeyValueObservation]()
   
   // setup logging for the RadioManager
-  static let model_log = OSLog(subsystem: "com.w6op.RadioManager-Swift", category: "xVoiceKeyer")
+  static let model_log = OSLog(subsystem: "com.w6op.RadioManager-Swift", category: "xCW")
   
   // delegate to pass messages back to viewcontroller
-  weak var radioManagerDelegate:RadioManagerDelegate?
+  //weak var radioManagerDelegate:RadioManagerDelegate?
   
   // MARK: - Internal Radio properties ----------------------------------------------------------------------------
   
@@ -231,11 +217,16 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
 //  @Published var guiClientView = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
   @Published var guiClientModels = [GUIClientModel]()
   @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
-  var connectSuccessful = false
+  
+  var isConnected = false
+  var isBoundToClient = false
+  var boundStationName = ""
+  var connectedStationName = ""
+  var boundStationHandle: UInt32 = 0
   
   // MARK: - Private properties ----------------------------------------------------------------------------
   // Notification observers collection
-  private var notifications = [NSObjectProtocol]()
+  //private var notifications = [NSObjectProtocol]()
   
   private let clientProgram = "xVoiceKeyer"
   //private var daxTxAudioStream: DaxTxAudioStream!
@@ -331,7 +322,10 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
    */
   func connectToRadio(serialNumber: String, station: String, clientId: String, didConnect: Bool) {
     
-    connectSuccessful = false
+    isConnected = false
+    connectedStationName = ""
+    boundStationName = ""
+    
     os_log("Connect to the Radio.", log: RadioManager.model_log, type: .info)
     
     // allow time to hear the UDP broadcasts
@@ -344,7 +338,8 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
         
         if api.connect(activeRadio!, programName: clientProgram, clientId: nil, isGui: false) {
           os_log("Connected to the Radio.", log: RadioManager.model_log, type: .info)
-          connectSuccessful = true
+          isConnected = true
+          connectedStationName = station
           //return true
         }
       }
@@ -359,7 +354,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
    - clientId: the client id to bind with represented as a string
    - station: station name used to find the key which is the guiClient handle
    */
-  func bindToStation(clientId: String, station: String) -> UInt32 {
+  func bindToStation(clientId: String, station: String)  { //-> UInt32
     
     cleanUp()
     
@@ -370,13 +365,15 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
       if let guiClient = radio.guiClients.filter({ $0.value.station == station }).first {
         let handle = guiClient.key
         
+        boundStationName = station
+        boundStationHandle = handle
         os_log("Bound to the Radio.", log: RadioManager.model_log, type: .info)
         
-        return handle
+        //return handle
       }
     }
     
-    return 0
+    //return 0
   }
   
   /**
@@ -460,6 +457,12 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
             self.guiClientModels.removeAll(where: { $0.stationName == guiClient.station })
             
             self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: false))
+            
+            if guiClient.station == self.connectedStationName {
+              if guiClient.clientId != "" {
+                self.bindToStation(clientId: guiClient.clientId ?? "", station: self.connectedStationName)
+              }
+            }
           }
           os_log("GUI clients have been updated.", log: RadioManager.model_log, type: .info)
         }
@@ -734,7 +737,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   func sendCWMessage(message: String)
   {
     
-    api.radio?.cwx.send("w6op")
+    api.radio?.cwx.send(message)
     
   }
 } // end class
