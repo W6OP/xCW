@@ -131,8 +131,8 @@ struct GUIClientModel: Identifiable {
 /**
  Data model for the text in the freeform text section.
  */
-struct CWTextModel: Identifiable {
-  var id = UUID()
+struct CWMemoryModel: Identifiable {
+  var id: Int
   
   var tag: String = ""
   var line: String = ""
@@ -187,7 +187,8 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   @Published var guiClientModels = [GUIClientModel]()
   @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
   
-  var cwTextModels = [CWTextModel]()
+  @Published var cwMemoryModels = [CWMemoryModel]()
+  
   var isConnected = false
   var isBoundToClient = false
   var boundStationName = ""
@@ -232,8 +233,8 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   func retrieveAllCWmemories() {
     
     for index in 1...10 {
-      let cwTextModel = CWTextModel(id: UUID(), tag: String(index), line: UserDefaults.standard.string(forKey: String(index)) ?? "Missing")
-      cwTextModels.append(cwTextModel)
+      let cwTextModel = CWMemoryModel(id: index, tag: String(index), line: UserDefaults.standard.string(forKey: String(index)) ?? "")
+      cwMemoryModels.append(cwTextModel)
     }
   }
   
@@ -302,8 +303,8 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
    - clientId: client id if available
    - doConnect: bool returning true if the connect was successful
    */
-  func connectToRadio(serialNumber: String, station: String, clientId: String, didConnect: Bool) {
-    
+  func connectToRadio(guiclientModel: GUIClientModel, didConnect: Bool) {
+
     isConnected = false
     connectedStationName = ""
     boundStationName = ""
@@ -314,15 +315,14 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     usleep(1500)
     
     if (didConnect){
-      for (_, foundRadio) in discovery.discoveredRadios.enumerated() where foundRadio.serialNumber == serialNumber {
+      for (_, foundRadio) in discovery.discoveredRadios.enumerated() where foundRadio.serialNumber == guiclientModel.serialNumber {
         
         activeRadio = foundRadio
         
         if api.connect(activeRadio!, programName: clientProgramName, clientId: nil, isGui: false) {
           os_log("Connected to the Radio.", log: RadioManager.model_log, type: .info)
           isConnected = true
-          connectedStationName = station
-          //return true
+          connectedStationName = guiclientModel.stationName
         }
       }
     }

@@ -16,18 +16,16 @@ import SwiftUI
 struct ContentView: View {
   // initialize radio
   @EnvironmentObject var radioManager: RadioManager
-  //@EnvironmentObject var cwMemories: CWMemories // ------------------- start here
   @Environment(\.presentationMode) var presentationMode
-  //@ObservedObject var memories = CWMemories()
   
   @State private var isConnected = false
   @State private var isBound = false
   @State private var status = false
-  @State private var cwText = CWTextModel()
+  @State private var cwText = CWMemoryModel(id: 0)
   @State private var showingDetail = false
   @State private var showingMemories = false
   @State private var isEnabled = false
-  
+  @State private var cwTextMessage = ""
   
   var body: some View {
     
@@ -58,7 +56,7 @@ struct ContentView: View {
             Text("Memories")
           }.sheet(isPresented: $showingMemories) {
             // this is how to pass the radioManager
-            return CWMemoriesPicker(cwTextModel: self.cwText).environmentObject(self.radioManager)
+            return CWMemoriesPicker(cwTextMemoryModel: self.cwText, cwTextMessage: self.cwTextMessage).environmentObject(self.radioManager)
           }
           
           Button(action: {
@@ -158,7 +156,7 @@ struct SecondRowView: View {
 }
 
 struct  FreeFormScrollView: View {
-  @State public var cwText: CWTextModel
+  @State public var cwText: CWMemoryModel
   
   var body: some View{
     VStack{
@@ -196,13 +194,15 @@ struct RadioPicker: View {
           Text("Set as Default").padding(.bottom, 5)
         }
         
-        Button(action: {self.radioManager.connectToRadio(serialNumber: self.radioManager.guiClientModels[0].serialNumber, station: self.radioManager.guiClientModels[0].stationName, clientId: self.radioManager.guiClientModels[0].clientId, didConnect: true); self.presentationMode.wrappedValue.dismiss()}) {
+        Button(action: {self.radioManager.connectToRadio( guiclientModel: self.radioManager.guiClientModels[0], didConnect: true); self.presentationMode.wrappedValue.dismiss()}) {
           Text("Connect")
-        }.padding(.leading, 25).padding(.bottom, 5)
+        }
+        .padding(.leading, 25).padding(.bottom, 5)
         
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Cancel")
-          }.padding(.leading, 25).padding(.bottom, 5)
+          }
+        .padding(.leading, 25).padding(.bottom, 5)
       }
     }.background(Color.gray.opacity(0.20))
   }
@@ -213,33 +213,35 @@ struct RadioPicker: View {
 struct CWMemoriesPicker: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var radioManager: RadioManager
-  @State var cwTextModel: CWTextModel
+  @State var cwTextMemoryModel: CWMemoryModel
+  @State var cwTextMessage: String
   var body: some View {
 
     return VStack{
       HStack{
-        Text("Model").frame(minWidth: 50).padding(.leading, 5)
-        Text("NickName").frame(minWidth: 90).padding(.leading, 28)
-        Text("Station").frame(minWidth: 70).padding(.leading, 8)
-        Text("Default Radio").frame(minWidth: 50).padding(.leading, 22)
-      }.font(.system(size: 14))
-        .foregroundColor(Color.blue)
-
-      //List(radioManager.cwTextModels, rowContent: CWTextRow.init).frame(minWidth: 400, minHeight: 120)
-
-      List (radioManager.cwTextModels) {cwText in
-        HStack {
-          Text(cwText.line).frame(minWidth: 200).border(Color.black).padding(.leading, 2)
-        }
+        Text("CW Memory Panel").frame(minWidth: 50).padding(.leading, 5)
       }
-      
-      
-      
+      .font(.system(size: 14))
+      .foregroundColor(Color.blue)
+
+      VStack {
+        ForEach(radioManager.cwMemoryModels.indices ) { cwMemoryModel in
+          //TextField("\(cwMemoryModel.line)", text: self.$cwTextMemoryModel.line).tag("\(cwMemoryModel.tag)")
+          // https://www.reddit.com/r/SwiftUI/comments/fauxsb/error_binding_textfield_to_object_in_array/
+          TextField("\(self.radioManager.cwMemoryModels[cwMemoryModel].line)", text: self.$radioManager.cwMemoryModels[cwMemoryModel].line)
+        }
+        .frame(minWidth: 350, maxWidth: 350)
+      }
+      .frame(minWidth: 400, maxWidth: 400)
       
       HStack {
         Button(action: {sendFreeText(); self.presentationMode.wrappedValue.dismiss()}) {
           Text("Send")
         }.padding(.leading, 25).padding(.bottom, 5)
+        
+        Button(action: {sendFreeText(); self.presentationMode.wrappedValue.dismiss()}) {
+          Text("Close")
+        }.padding(.leading, 125).padding(.bottom, 5)
       }
     }.background(Color.gray.opacity(0.20))
   }
@@ -266,26 +268,26 @@ struct StationRow: View {
   }
 }
 
-struct CWTextRow: View {
-  var station: CWTextModel
-  //@State var cwText = ""
-  
-  var body: some View {
-    VStack {
-      HStack {
-        Button(action: {showDx(count: 20)}) {
-          Text("\(String(station.tag))")
-            .foregroundColor(.blue)
-            .cornerRadius(25)
-          .shadow(radius: 10)
-          .padding(10)
-        }
-        //TextField("\(station.line)", text: cwText).tag
-          Text("\(station.line)").frame(minWidth: 200).border(Color.black).padding(.leading, 2)
-        }
-    }.background(Color.blue.opacity(0.15))
-  }
-}
+//struct CWTextRow: View {
+//  var station: CWTextModel
+//  //@State var cwText = ""
+//
+//  var body: some View {
+//    VStack {
+//      HStack {
+//        Button(action: {showDx(count: 20)}) {
+//          Text("\(String(station.tag))")
+//            .foregroundColor(.blue)
+//            .cornerRadius(25)
+//          .shadow(radius: 10)
+//          .padding(10)
+//        }
+//        //TextField("\(station.line)", text: cwText).tag
+//          Text("\(station.line)").frame(minWidth: 200).border(Color.black).padding(.leading, 2)
+//        }
+//    }.background(Color.blue.opacity(0.15))
+//  }
+//}
 
 /**
  Button(action: {

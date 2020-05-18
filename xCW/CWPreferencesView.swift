@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct CWPreferencesView: View {
-  @State private var cwText = CWTextModel()
+  @State private var cwText = CWMemoryModel(id: 0)
   
     var body: some View {
      
@@ -19,7 +19,7 @@ struct CWPreferencesView: View {
 }
 
 struct FreeFormTextView: View {
-  @State public var cwText: CWTextModel
+  @State public var cwText: CWMemoryModel
   @State private var cwString1: String = UserDefaults.standard.string(forKey: "cw1") ?? ""
   @State private var name: String = "Tim"
   

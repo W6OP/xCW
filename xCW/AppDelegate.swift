@@ -21,7 +21,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // Create the SwiftUI view that provides the window contents.
     // Pass in the environment radio instance
     let radioManager = RadioManager()
-    //let cwMemories = CWMemories()
     let contentView = ContentView().environmentObject(radioManager)
 
     // Create the window and set the content view. 
