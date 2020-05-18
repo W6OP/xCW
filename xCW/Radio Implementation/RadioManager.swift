@@ -220,7 +220,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
    // MARK: - CW Memory Functions ----------------------------------------------------------------------------
   
   func saveCWMemories(message: String, tag: String) {
-    print("Message: \(message)")
+    //print("Message: \(message)")
     UserDefaults.standard.set(message, forKey: String(tag))
   }
   

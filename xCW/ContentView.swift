@@ -231,13 +231,23 @@ struct CWMemoriesPicker: View {
               Text("Send")
             }.padding(.leading, 5).padding(.trailing, 5)
             // https://www.reddit.com/r/SwiftUI/comments/fauxsb/error_binding_textfield_to_object_in_array/
-            TextField("\(self.radioManager.cwMemoryModels[cwMemoryModel].line)", text: self.$radioManager.cwMemoryModels[cwMemoryModel].line,
-                      onEditingChanged: { _ in  self.radioManager.saveCWMemories(message: self.radioManager.cwMemoryModels[cwMemoryModel].line, tag: self.radioManager.cwMemoryModels[cwMemoryModel].tag)  }) // if $0 {
+            TextField("Enter Text Here", text: self.$radioManager.cwMemoryModels[cwMemoryModel].line,
+              onEditingChanged: { _ in  self.radioManager.saveCWMemories(message: self.radioManager.cwMemoryModels[cwMemoryModel].line, tag: self.radioManager.cwMemoryModels[cwMemoryModel].tag)  }) // if $0 {
           }
         }
         .frame(minWidth: 350, maxWidth: 350)
       }
       .frame(minWidth: 400, maxWidth: 400)
+      
+      /**
+       List {
+           ForEach(1...10, id: \.self) { index in
+               HStack {
+                 TextField("\(self.radioManager.cwMemoryModels[index].line)", text: self.$radioManager.cwMemoryModels[index].line)
+               }
+           }
+       }
+       */
       
       HStack {
         Button(action: {sendFreeText(); self.presentationMode.wrappedValue.dismiss()}) {
