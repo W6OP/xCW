@@ -129,6 +129,16 @@ struct GUIClientModel: Identifiable {
 }
 
 /**
+ Data model for the text in the freeform text section.
+ */
+struct CWTextModel: Identifiable {
+  var id = UUID()
+  
+  var tag: String = ""
+  var line: String = ""
+}
+
+/**
  var sliceView = [(sliceLetter: String, radioMode: radioMode, txEnabled: Bool, frequency: String, sliceHandle: UInt32)]()
  */
 struct SliceModel: Identifiable {
@@ -139,19 +149,6 @@ struct SliceModel: Identifiable {
   var txEnabled: Bool = false
   var frequency: String = "00.000"
   var sliceHandle: UInt32
-}
-
-/**
- Data model for the text in the freeform text section.
- */
-struct CWText: Hashable {
-  var id = UUID()
-  
-  var line1: String = ""
-  var line2: String = ""
-  var line3: String = ""
-  var line4: String = ""
-  var line5: String = ""
 }
 
 // MARK: - Class Definition ------------------------------------------------------------------------------------------------
@@ -190,6 +187,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   @Published var guiClientModels = [GUIClientModel]()
   @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
   
+  var cwTextModels = [CWTextModel]()
   var isConnected = false
   var isBoundToClient = false
   var boundStationName = ""
@@ -198,7 +196,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   
   // MARK: - Private properties ----------------------------------------------------------------------------
   
-  private let clientProgramName = "xVoiceKeyer"
+  private let clientProgramName = "xCW"
   
   // MARK: - RadioManager Initialization ----------------------------------------------------------------------------
   
@@ -214,6 +212,29 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     
     api.delegate = self
     
+    retrieveAllCWmemories()
+  }
+  
+   // MARK: - CW Memory Functions ----------------------------------------------------------------------------
+  
+  func saveCWMemories(message: String, tag: String) {
+    
+    UserDefaults.standard.set(message, forKey: String(tag))
+  }
+  
+  func retrieveCWMemory(tag: String) -> String {
+    return(UserDefaults.standard.string(forKey: String(tag)) ?? "")
+  }
+  
+  /**
+   Retrieve all of the memories at startup.
+   */
+  func retrieveAllCWmemories() {
+    
+    for index in 1...10 {
+      let cwTextModel = CWTextModel(id: UUID(), tag: String(index), line: UserDefaults.standard.string(forKey: String(index)) ?? "Missing")
+      cwTextModels.append(cwTextModel)
+    }
   }
   
   // MARK: - Open and Close Radio Methods - Required by xLib6000 - Not Used ----------------------------------------------------------------------------

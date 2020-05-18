@@ -16,15 +16,16 @@ import SwiftUI
 struct ContentView: View {
   // initialize radio
   @EnvironmentObject var radioManager: RadioManager
+  //@EnvironmentObject var cwMemories: CWMemories // ------------------- start here
   @Environment(\.presentationMode) var presentationMode
   //@ObservedObject var memories = CWMemories()
   
   @State private var isConnected = false
   @State private var isBound = false
   @State private var status = false
-  @State private var cwText = CWText()
+  @State private var cwText = CWTextModel()
   @State private var showingDetail = false
-  @State private var showMemories = false
+  @State private var showingMemories = false
   @State private var isEnabled = false
   
   
@@ -52,14 +53,12 @@ struct ContentView: View {
           }
           
           Button(action: {
-            self.showMemories.toggle()
+            self.showingMemories.toggle()
           }) {
             Text("Memories")
-          }.sheet(isPresented: $showMemories) {
-            //CWMemoriesPanel() //- should work
-            // https://stackoverflow.com/questions/58743004/swiftui-environmentobject-error-may-be-missing-as-an-ancestor-of-this-view
+          }.sheet(isPresented: $showingMemories) {
             // this is how to pass the radioManager
-            return CWMemoriesPanel(cwText: CWText())
+            return CWMemoriesPicker(cwTextModel: self.cwText).environmentObject(self.radioManager)
           }
           
           Button(action: {
@@ -105,24 +104,24 @@ struct ContentView: View {
  */
 struct FirstRowView: View {
   @EnvironmentObject var radioManager: RadioManager
-  @ObservedObject var memories = CWMemories()
+  //@ObservedObject var memories = CWMemories()
   @Binding var isEnabled: Bool
   
   var body: some View {
     HStack {
-      Button(action: {self.radioManager.sendCWMessage(message: self.memories.retrieveCWMemory(tag: "cw1"))}) {
+      Button(action: {self.radioManager.sendCWMessage(message: self.radioManager.retrieveCWMemory(tag: "cw1"))}) {
         Text("W6OP").frame(minWidth: 75, maxWidth: 75)
         }
-      Button(action: {self.radioManager.sendCWMessage(message: self.memories.retrieveCWMemory(tag: "cw2"))}) {
+      Button(action: {self.radioManager.sendCWMessage(message: self.radioManager.retrieveCWMemory(tag: "cw2"))}) {
         Text("CW2").frame(minWidth: 75, maxWidth: 75)
       }
-      Button(action: {self.radioManager.sendCWMessage(message: self.memories.retrieveCWMemory(tag: "cw3"))}) {
+      Button(action: {self.radioManager.sendCWMessage(message: self.radioManager.retrieveCWMemory(tag: "cw3"))}) {
         Text("CW3").frame(minWidth: 75, maxWidth: 75)
       }
-      Button(action: {self.radioManager.sendCWMessage(message: self.memories.retrieveCWMemory(tag: "cw4"))}) {
+      Button(action: {self.radioManager.sendCWMessage(message: self.radioManager.retrieveCWMemory(tag: "cw4"))}) {
         Text("CW4").frame(minWidth: 75, maxWidth: 75)
       }
-      Button(action: {self.radioManager.sendCWMessage(message: self.memories.retrieveCWMemory(tag: "cw5"))}) {
+      Button(action: {self.radioManager.sendCWMessage(message: self.radioManager.retrieveCWMemory(tag: "cw5"))}) {
         Text("CW5").frame(minWidth: 75, maxWidth: 75)
       }
     }.frame(maxWidth: .infinity, maxHeight: 25).padding(.top, 5)
@@ -134,7 +133,7 @@ The second row of memory buttons.
 */
 struct SecondRowView: View {
   @EnvironmentObject var radioManager: RadioManager
-  @ObservedObject var memories = CWMemories()
+  //@ObservedObject var memories = CWMemories()
   @Binding var isEnabled: Bool
   
   var body: some View {
@@ -159,11 +158,11 @@ struct SecondRowView: View {
 }
 
 struct  FreeFormScrollView: View {
-  @State public var cwText: CWText
+  @State public var cwText: CWTextModel
   
   var body: some View{
     VStack{
-        TextView(text: $cwText.line1)
+        TextView(text: $cwText.line)
     }
   }
 }
@@ -211,26 +210,38 @@ struct RadioPicker: View {
 
 // MARK: - CW Message Panel ----------------------------------------------------------------------------
 
-struct CWMemoriesPanel: View {
+struct CWMemoriesPicker: View {
   @Environment(\.presentationMode) var presentationMode
-  @ObservedObject var memories = CWMemories()
-  @State public var cwText: CWText
-  //@State private var cwString1: String = UserDefaults.standard.string(forKey: "cw1") ?? ""
-  
+  @EnvironmentObject var radioManager: RadioManager
+  @State var cwTextModel: CWTextModel
   var body: some View {
 
-    return VStack(spacing: 0){
-      TextField("Placeholder1", text: $cwText.line1)
-      TextField("Placeholder2", text: $cwText.line2)
-      TextField("Placeholder3", text: $cwText.line3)
-      TextField("Placeholder4", text: $cwText.line4)
-      TextField("Placeholder5", text: $cwText.line5)
+    return VStack{
       HStack{
-        Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
-          Text("Done")
-          }.padding(.leading, 25).padding(.bottom, 5)
+        Text("Model").frame(minWidth: 50).padding(.leading, 5)
+        Text("NickName").frame(minWidth: 90).padding(.leading, 28)
+        Text("Station").frame(minWidth: 70).padding(.leading, 8)
+        Text("Default Radio").frame(minWidth: 50).padding(.leading, 22)
+      }.font(.system(size: 14))
+        .foregroundColor(Color.blue)
+
+      //List(radioManager.cwTextModels, rowContent: CWTextRow.init).frame(minWidth: 400, minHeight: 120)
+
+      List (radioManager.cwTextModels) {cwText in
+        HStack {
+          Text(cwText.line).frame(minWidth: 200).border(Color.black).padding(.leading, 2)
+        }
       }
-    }.frame(minWidth: 100, maxWidth: 100).background(Color.gray.opacity(0.20))
+      
+      
+      
+      
+      HStack {
+        Button(action: {sendFreeText(); self.presentationMode.wrappedValue.dismiss()}) {
+          Text("Send")
+        }.padding(.leading, 25).padding(.bottom, 5)
+      }
+    }.background(Color.gray.opacity(0.20))
   }
 }
 
@@ -251,6 +262,27 @@ struct StationRow: View {
           Text("\(String(station.isDefaultStation))").frame(minWidth: 75, maxWidth: 75).background(Color.green.opacity(0.15))
         }
       }.border(Color.black)
+    }.background(Color.blue.opacity(0.15))
+  }
+}
+
+struct CWTextRow: View {
+  var station: CWTextModel
+  //@State var cwText = ""
+  
+  var body: some View {
+    VStack {
+      HStack {
+        Button(action: {showDx(count: 20)}) {
+          Text("\(String(station.tag))")
+            .foregroundColor(.blue)
+            .cornerRadius(25)
+          .shadow(radius: 10)
+          .padding(10)
+        }
+        //TextField("\(station.line)", text: cwText).tag
+          Text("\(station.line)").frame(minWidth: 200).border(Color.black).padding(.leading, 2)
+        }
     }.background(Color.blue.opacity(0.15))
   }
 }

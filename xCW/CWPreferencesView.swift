@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct CWPreferencesView: View {
-  @State private var cwText = CWText()
+  @State private var cwText = CWTextModel()
   
     var body: some View {
      
@@ -19,7 +19,7 @@ struct CWPreferencesView: View {
 }
 
 struct FreeFormTextView: View {
-  @State public var cwText: CWText
+  @State public var cwText: CWTextModel
   @State private var cwString1: String = UserDefaults.standard.string(forKey: "cw1") ?? ""
   @State private var name: String = "Tim"
   
@@ -27,10 +27,7 @@ struct FreeFormTextView: View {
     
     VStack(spacing: 0) {
       TextField("Placeholder1", text: $cwString1)
-      TextField("Placeholder2", text: $cwText.line2)
-      TextField("Placeholder3", text: $cwText.line3)
-      TextField("Placeholder4", text: $cwText.line4)
-      TextField("Placeholder5", text: $cwText.line5)
+      
     }.frame(minHeight: 100, maxHeight: 100)
     
   }
