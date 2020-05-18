@@ -226,9 +226,14 @@ struct CWMemoriesPicker: View {
 
       VStack {
         ForEach(radioManager.cwMemoryModels.indices ) { cwMemoryModel in
-          //TextField("\(cwMemoryModel.line)", text: self.$cwTextMemoryModel.line).tag("\(cwMemoryModel.tag)")
-          // https://www.reddit.com/r/SwiftUI/comments/fauxsb/error_binding_textfield_to_object_in_array/
-          TextField("\(self.radioManager.cwMemoryModels[cwMemoryModel].line)", text: self.$radioManager.cwMemoryModels[cwMemoryModel].line)
+          HStack {
+            Button(action: { sendMemory(tag: "") }) {
+              Text("Send")
+            }.padding(.leading, 5).padding(.trailing, 5)
+            // https://www.reddit.com/r/SwiftUI/comments/fauxsb/error_binding_textfield_to_object_in_array/
+            TextField("\(self.radioManager.cwMemoryModels[cwMemoryModel].line)", text: self.$radioManager.cwMemoryModels[cwMemoryModel].line,
+                      onEditingChanged: { _ in  self.radioManager.saveCWMemories(message: self.radioManager.cwMemoryModels[cwMemoryModel].line, tag: self.radioManager.cwMemoryModels[cwMemoryModel].tag)  }) // if $0 {
+          }
         }
         .frame(minWidth: 350, maxWidth: 350)
       }
@@ -309,6 +314,10 @@ struct StationRow: View {
 //}
 
 // MARK: - Button Implementation ----------------------------------------------------------------------------
+func sendMemory(tag: String)
+{
+  
+}
 
 func sendFreeText() {
   
