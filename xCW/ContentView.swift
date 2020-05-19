@@ -8,6 +8,14 @@
 
 import SwiftUI
 
+
+extension EnvironmentObject
+{
+  var safeToUse: Bool {
+    return (Mirror(reflecting: self).children.first(where: { $0.label == "_store"})?.value as? ObjectType) != nil
+  }
+}
+
 // MARK: - Primary View ----------------------------------------------------------------------------
 
 /**
@@ -28,6 +36,9 @@ struct ContentView: View {
   @State private var cwTextMessage = ""
   
   var body: some View {
+    
+    //let txt = _radioManager.safeToUse ? radioManager : nil
+    //return RadioManager(txt)
     
     HStack {
       VStack {
@@ -215,6 +226,7 @@ struct CWMemoriesPicker: View {
   @EnvironmentObject var radioManager: RadioManager
   @State var cwTextMemoryModel: CWMemoryModel
   @State var cwTextMessage: String
+  
   var body: some View {
 
     return VStack{
@@ -229,10 +241,15 @@ struct CWMemoriesPicker: View {
           HStack {
             Button(action: { sendMemory(tag: "") }) {
               Text("Send")
-            }.padding(.leading, 5).padding(.trailing, 5)
+            }
+            .padding(.leading, 5).padding(.trailing, 5)
+            
             // https://www.reddit.com/r/SwiftUI/comments/fauxsb/error_binding_textfield_to_object_in_array/
             TextField("Enter Text Here", text: self.$radioManager.cwMemoryModels[cwMemoryModel].line,
-              onEditingChanged: { _ in  self.radioManager.saveCWMemories(message: self.radioManager.cwMemoryModels[cwMemoryModel].line, tag: self.radioManager.cwMemoryModels[cwMemoryModel].tag)  }) // if $0 {
+                      onEditingChanged: { _ in
+                        self.radioManager.saveCWMemories(message:
+                          self.radioManager.cwMemoryModels[cwMemoryModel].line, tag:
+                          self.radioManager.cwMemoryModels[cwMemoryModel].tag)  })
           }
         }
         .frame(minWidth: 350, maxWidth: 350)

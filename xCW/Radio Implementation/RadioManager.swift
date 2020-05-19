@@ -187,7 +187,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   @Published var guiClientModels = [GUIClientModel]()
   @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
   
-  var cwMemoryModels = [CWMemoryModel]()
+  @Published var cwMemoryModels = [CWMemoryModel]()
   
   
   var isConnected = false
@@ -220,7 +220,14 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
    // MARK: - CW Memory Functions ----------------------------------------------------------------------------
   
   func saveCWMemories(message: String, tag: String) {
-    //print("Message: \(message)")
+    // change this to a where: tag =
+    let index = Int(tag)!
+    
+    //cwMemoryModels.First({where: $0 == tag}).line = message
+    //cwMemoryModels.First({where: $0 == tag}).tag = tag
+    cwMemoryModels[index - 1].line = message
+    cwMemoryModels[index - 1].tag = tag
+    
     UserDefaults.standard.set(message, forKey: String(tag))
   }
   
