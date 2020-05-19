@@ -584,10 +584,18 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     api.radio?.boundClientId = nil
   }
   
-  func sendCWMessage(message: String)
+  /**
+   Send a CW message to the radio
+   */
+  func sendCWMessage(tag: String)
   {
+    let message = UserDefaults.standard.string(forKey: String(tag)) ?? ""
     
-    api.radio?.cwx.send(message)
+    print("Tag: \(tag)  Message: \(message)")
+    
+    if message != "" {
+      api.radio?.cwx.send(message)
+    }
     
   }
 } // end class
