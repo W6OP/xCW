@@ -149,6 +149,7 @@ struct SliceModel: Identifiable {
   var txEnabled: Bool = false
   var frequency: String = "00.000"
   var sliceHandle: UInt32
+  var associatedStationName = ""
 }
 
 // MARK: - Class Definition ------------------------------------------------------------------------------------------------
@@ -186,7 +187,6 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   
   @Published var guiClientModels = [GUIClientModel]()
   @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
-  
   @Published var cwMemoryModels = [CWMemoryModel]()
   
   
@@ -195,6 +195,8 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   var boundStationName = ""
   var connectedStationName = ""
   var boundStationHandle: UInt32 = 0
+  // internal collection for my use here only
+  var sliceModels = [SliceModel]()
   
   // MARK: - Private properties ----------------------------------------------------------------------------
   
@@ -377,6 +379,10 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
         
         boundStationName = station
         boundStationHandle = handle
+        
+        self.sliceModel = sliceModels.first(where: { $0.sliceHandle == boundStationHandle} )!
+        self.sliceModel.associatedStationName = boundStationName
+
         os_log("Bound to the Radio.", log: RadioManager.model_log, type: .info)
         
       }
@@ -518,7 +524,9 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     // I really only care about a slice that is tx enabled
     if slice.txEnabled {
       UI() {
-        self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+//        self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+      
+        self.sliceModels.append(SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle))
       }
     }
     
@@ -556,22 +564,14 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     let mode: radioMode = radioMode(rawValue: slice.mode) ?? radioMode.invalid
     let frequency: String = convertFrequencyToDecimalString (frequency: slice.frequency)
     
-//    if let index = discoveredGUIClients.firstIndex(where: {$0.stationName == defaultStation.stationName}) {
-//    for s in discovery.discoveredRadios. {
-//
-//    }
-    
-//    for radio in discovery.discoveredRadios {
-//      if let client = radio.guiClients.first(where: { $0.value.station == "guiClient.station"} ){
-//      }
-    
-    
     if slice.txEnabled {
       UI() {
-        self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+//        self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+        self.sliceModels.append(SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle))
       }
     } else {
       if self.sliceModel.sliceHandle == slice.clientHandle {
+        // don't think this is correct
         self.sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
       }
     }

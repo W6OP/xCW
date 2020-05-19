@@ -97,7 +97,7 @@ struct ContentView: View {
           Text("\(radioManager.sliceModel.frequency)").frame(minWidth: 100, maxWidth: 100)
           
           if radioManager.isConnected {
-            Text("Connected to \(radioManager.guiClientModels[0].stationName)" )
+            Text("Connected to \(radioManager.sliceModel.associatedStationName)" )
           }
           else {
             Text("Disconnected")
