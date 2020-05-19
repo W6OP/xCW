@@ -231,6 +231,24 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     UserDefaults.standard.set(message, forKey: String(tag))
   }
   
+  func setDefaultRadio(stationName: String) {
+    UserDefaults.standard.set(stationName, forKey: "defaultRadio")
+    
+    if var client = guiClientModels.first(where: { $0.isDefaultStation == true} ){
+      self.guiClientModels.removeAll(where: { $0.isDefaultStation == true })
+      client.isDefaultStation = false
+      self.guiClientModels.append((client))
+    }
+    
+    if var client = guiClientModels.first(where: { $0.stationName == stationName} ){
+      UI() {
+        self.guiClientModels.removeAll(where: { $0.stationName == stationName })
+        client.isDefaultStation = true
+        self.guiClientModels.append((client))
+      }
+    }
+  }
+  
   func retrieveCWMemory(tag: String) -> String {
     return(UserDefaults.standard.string(forKey: String(tag)) ?? "")
   }
@@ -327,7 +345,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
         
         activeRadio = foundRadio
         
-        if api.connect(activeRadio!, programName: clientProgramName, clientId: nil, isGui: false) {
+        if api.connect(activeRadio!, program: clientProgramName, clientId: nil, isGui: false) {
           os_log("Connected to the Radio.", log: RadioManager.model_log, type: .info)
           isConnected = true
           connectedStationName = guiclientModel.stationName
@@ -385,11 +403,25 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
       for guiClient in radio.guiClients {
         let handle = guiClient.key
         UI() {
-          self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, serialNumber: radio.serialNumber, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: false))
+          self.guiClientModels.append(GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, serialNumber: radio.serialNumber, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.value.station)))
         }
         os_log("Radios updated.", log: RadioManager.model_log, type: .info)
       }
     }
+  }
+  
+  /**
+   Return true if this is the default station
+   */
+  func isDefaultStation (stationName: String) -> Bool {
+    
+    let defaultStation = UserDefaults.standard.string(forKey: "defaultRadio") ?? ""
+    
+    if stationName == defaultStation {
+      return true
+    }
+    
+    return false
   }
   
   /**
@@ -406,7 +438,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
         if let client = radio.guiClients.first(where: { $0.value.station == guiClient.station} ){
           let handle = client.key
           UI() {
-            self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: false))
+            self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station)))
           }
           os_log("GUI clients have been added.", log: RadioManager.model_log, type: .info)
         }
@@ -432,7 +464,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
             // first remove the old one
             self.guiClientModels.removeAll(where: { $0.stationName == guiClient.station })
             
-            self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: false))
+            self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station)))
             
             if guiClient.station == self.connectedStationName {
               if guiClient.clientId != "" {

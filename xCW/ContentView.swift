@@ -27,23 +27,16 @@ struct ContentView: View {
   @Environment(\.presentationMode) var presentationMode
   
   @State private var isConnected = false
-  @State private var isBound = false
-  @State private var status = false
   @State private var cwText = CWMemoryModel(id: 0)
-  @State private var showingDetail = false
+  @State private var showingRadios = false
   @State private var showingMemories = false
-  @State private var isEnabled = false
-  //@State private var cwTextMessage = ""
   
   var body: some View {
-    
-    //let txt = _radioManager.safeToUse ? radioManager : nil
-    //return RadioManager(txt)
-    
+   
     HStack {
       VStack {
-        FirstRowView(isEnabled: $isEnabled).environmentObject(self.radioManager)
-        SecondRowView(isEnabled: $isEnabled).environmentObject(self.radioManager)
+        FirstRowView().environmentObject(self.radioManager).disabled(!radioManager.isConnected)
+        SecondRowView().environmentObject(self.radioManager).disabled(!radioManager.isConnected)
         
         Divider()
         
@@ -55,43 +48,39 @@ struct ContentView: View {
         Divider()
         
         HStack(spacing: 25) {
-          Button(action: {sendFreeText()}) {
-            Text("Send Free Text")//.frame(minWidth: 75, maxWidth: 75)
-          }
           Button(action: {showDx(count: 20)}) {
-            Text("Stop")//.frame(minWidth: 75, maxWidth: 75)
-          }
+            Text("Stop")
+              .frame(minWidth: 78, maxWidth: 78)
+          }.disabled(!radioManager.isConnected)
+          
+          Button(action: {sendFreeText()}) {
+            Text("Send Text")
+              .frame(minWidth: 78, maxWidth: 78)
+          }.disabled(!radioManager.isConnected)
           
           // show the cw memory panel
           Button(action: {
             self.showingMemories.toggle()
           }) {
             Text("Memories")
-          }
+              .frame(minWidth: 78, maxWidth: 78)
+          }.disabled(!radioManager.isConnected)
           .sheet(isPresented: $showingMemories) {
             return CWMemoriesPicker().environmentObject(self.radioManager)
           }
           
           // show the radio picker
           Button(action: {
-            self.showingDetail.toggle()
+            self.showingRadios.toggle()
           }) {
             Text("Radio Picker")
+              .frame(minWidth: 78, maxWidth: 78)
           }
-          .sheet(isPresented: $showingDetail) {
-            //RadioPicker() - should work
+          .sheet(isPresented: $showingRadios) {
             // https://stackoverflow.com/questions/58743004/swiftui-environmentobject-error-may-be-missing-as-an-ancestor-of-this-view
             // this is how to pass the radioManager
             return RadioPicker().environmentObject(self.radioManager)
           }
-          
-          if radioManager.isConnected {
-            Text("Connected to \(radioManager.guiClientModels[0].stationName)" )
-          }
-          else {
-            Text("Disconnected")
-          }
-          
         }
         .frame(minWidth: 600, maxWidth: 600).padding(.bottom, 1)
         
@@ -100,10 +89,13 @@ struct ContentView: View {
           Text("Slice: \(radioManager.sliceModel.sliceLetter)").frame(minWidth: 100, maxWidth: 100)
           Text("Mode: \(radioManager.sliceModel.radioMode.rawValue)").frame(minWidth: 100, maxWidth: 100)
           Text("\(radioManager.sliceModel.frequency)").frame(minWidth: 100, maxWidth: 100)
-          // https://swiftwithmajid.com/2020/03/04/customizing-toggle-in-swiftui/
-          //          Toggle(isOn: $status) {
-          //            Text("Id Timer")
-          //          }.frame(minWidth: 75, maxWidth: 75)
+          
+          if radioManager.isConnected {
+            Text("Connected to \(radioManager.guiClientModels[0].stationName)" )
+          }
+          else {
+            Text("Disconnected")
+          }
         }
         .padding(.bottom, 5)
       }
@@ -119,19 +111,20 @@ struct ContentView: View {
  */
 struct FirstRowView: View {
   @EnvironmentObject var rM: RadioManager
-  @Binding var isEnabled: Bool
   
   var body: some View {
     HStack {
       Button(action: {self.rM.sendCWMessage(tag: "1")}) {
         Text("CW1")
-          .frame(minWidth: 75, maxWidth: 75)
+          .frame(minWidth: 75, maxWidth: 75)//.background(Color.blue.opacity(0.20)).cornerRadius(5)
       }
+      //.background(Color.blue.opacity(0.20)).cornerRadius(5)
       
       Button(action: {self.rM.sendCWMessage(tag: "2")}) {
         Text("CW2")
           .frame(minWidth: 75, maxWidth: 75)
       }
+      //.background(Color.blue).cornerRadius(5)
       
       Button(action: {self.rM.sendCWMessage(tag: "3")}) {
         Text("CW3")
@@ -157,7 +150,6 @@ struct FirstRowView: View {
  */
 struct SecondRowView: View {
   @EnvironmentObject var rM: RadioManager
-  @Binding var isEnabled: Bool
   
   var body: some View {
     HStack {
@@ -218,16 +210,34 @@ struct RadioPicker: View {
     
     return VStack{
       HStack{
-        Text("Model").frame(minWidth: 50).padding(.leading, 5)
-        Text("NickName").frame(minWidth: 90).padding(.leading, 28)
-        Text("Station").frame(minWidth: 70).padding(.leading, 8)
+        Text("Model").frame(minWidth: 70)//.padding(.leading, 2)
+        Text("NickName").frame(minWidth: 100).padding(.leading, 20)
+        Text("Station").frame(minWidth: 80).padding(.leading, 8)
         Text("Default Radio").frame(minWidth: 50).padding(.leading, 22)
       }
       .font(.system(size: 14))
       .foregroundColor(Color.blue)
       
-      List(radioManager.guiClientModels, rowContent: StationRow.init).frame(minWidth: 400, minHeight: 120)
-      
+      // this works but I can't get a handle to radioManager in the StationRow
+      //      List(radioManager.guiClientModels, rowContent: StationRow.init)
+      //        .frame(minWidth: 450, minHeight: 120)
+      // Radio Picker
+      ForEach(radioManager.guiClientModels.indices ) { guiclientModel in
+        HStack {
+          HStack {
+            Text("\(self.radioManager.guiClientModels[guiclientModel].radioModel)").frame(minWidth: 70).padding(.leading, 2)
+            Text("\(self.radioManager.guiClientModels[guiclientModel].radioNickname)").frame(minWidth: 120).padding(.leading, 25)
+            Text("\(self.radioManager.guiClientModels[guiclientModel].stationName)").frame(minWidth: 90).padding(.leading, 5).tag(self.radioManager.guiClientModels[guiclientModel].stationName)
+            
+            Button(action: {setDefault(stationName: self.radioManager.guiClientModels[guiclientModel].stationName, radioManager: self.radioManager)}) {
+              Text("\(String(self.radioManager.guiClientModels[guiclientModel].isDefaultStation))").frame(minWidth: 65, maxWidth: 65)
+            }
+          }
+          .border(Color.black)
+        }
+        .background(Color.blue.opacity(0.15))
+      }
+
       HStack {
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Set as Default").padding(.bottom, 5)
@@ -268,6 +278,7 @@ struct CWMemoriesPicker: View {
           HStack {
             Button(action: { sendMemory(tag: self.radioManager.cwMemoryModels[cwMemoryModel].tag, radioManager: self.radioManager) }) {
               Text(self.radioManager.cwMemoryModels[cwMemoryModel].tag)
+                .frame(minWidth: 30)
             }
             .padding(.leading, 5).padding(.trailing, 5)
             
@@ -279,13 +290,13 @@ struct CWMemoriesPicker: View {
                           self.radioManager.cwMemoryModels[cwMemoryModel].tag)  })
           }
         }
-        .frame(minWidth: 350, maxWidth: 350)
+        .frame(minWidth: 400, maxWidth: 400)
       }
-      .frame(minWidth: 400, maxWidth: 400)
+      .frame(minWidth: 450, maxWidth: 450)
       
       HStack {
         Button(action: {sendFreeText(); self.presentationMode.wrappedValue.dismiss()}) {
-          Text("Done")
+          Text("Close")
         }
         .padding(.leading, 125).padding(.bottom, 5)
       }
@@ -297,44 +308,23 @@ struct CWMemoriesPicker: View {
 /**
  View of rows of stations to select from.
  */
-struct StationRow: View {
-  var station: GUIClientModel
-  
-  var body: some View {
-    HStack {
-      HStack {
-        Text("\(station.radioModel)").frame(minWidth: 50).padding(.leading, 2)
-        Text("\(station.radioNickname)").frame(minWidth: 90).border(Color.black).padding(.leading, 25)
-        Text("\(station.stationName)").frame(minWidth: 70).padding(.leading, 5).tag(station.stationName)
-        
-        Button(action: {showDx(count: 20)}) {
-          Text("\(String(station.isDefaultStation))").frame(minWidth: 75, maxWidth: 75).background(Color.green.opacity(0.15))
-        }
-      }
-      .border(Color.black)
-    }
-    .background(Color.blue.opacity(0.15))
-  }
-}
-
-//struct CWTextRow: View {
-//  var station: CWTextModel
-//  //@State var cwText = ""
+//struct StationRow: View {
+//  var guiClient: GUIClientModel
 //
 //  var body: some View {
-//    VStack {
+//    HStack {
 //      HStack {
-//        Button(action: {showDx(count: 20)}) {
-//          Text("\(String(station.tag))")
-//            .foregroundColor(.blue)
-//            .cornerRadius(25)
-//          .shadow(radius: 10)
-//          .padding(10)
+//        Text("\(guiClient.radioModel)").frame(minWidth: 70).padding(.leading, 2)
+//        Text("\(guiClient.radioNickname)").frame(minWidth: 120).padding(.leading, 25)
+//        Text("\(guiClient.stationName)").frame(minWidth: 90).padding(.leading, 5).tag(guiClient.stationName)
+//
+//        Button(action: {setDefault(stationName: self.guiClient.stationName)}) {
+//          Text("\(String(guiClient.isDefaultStation))").frame(minWidth: 65, maxWidth: 65)
 //        }
-//        //TextField("\(station.line)", text: cwText).tag
-//          Text("\(station.line)").frame(minWidth: 200).border(Color.black).padding(.leading, 2)
-//        }
-//    }.background(Color.blue.opacity(0.15))
+//      }
+//      .border(Color.black)
+//    }
+//    .background(Color.blue.opacity(0.15))
 //  }
 //}
 
@@ -364,6 +354,10 @@ func sendFreeText() {
 }
 func showDx(count: Int) {
   
+}
+
+func setDefault(stationName: String, radioManager: RadioManager) {
+  radioManager.setDefaultRadio(stationName: stationName)
 }
 
 func selectStation(stationName: String, radioManager: RadioManager )  {
