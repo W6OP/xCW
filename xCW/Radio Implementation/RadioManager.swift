@@ -329,8 +329,14 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
    - clientId: client id if available
    - doConnect: bool returning true if the connect was successful
    */
-  func connectToRadio(guiclientModel: GUIClientModel, didConnect: Bool) {
-
+  func connectToRadio(guiClientModel: GUIClientModel) {
+    
+    if isConnected {
+      cleanUp()
+      bindToStation(clientId: guiClientModel.clientId, station: guiClientModel.stationName)
+      return
+    }
+    
     isConnected = false
     connectedStationName = ""
     boundStationName = ""
@@ -340,17 +346,15 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     // allow time to hear the UDP broadcasts
     usleep(1500)
     
-    if (didConnect){
-      for (_, foundRadio) in discovery.discoveredRadios.enumerated() where foundRadio.serialNumber == guiclientModel.serialNumber {
+      for (_, foundRadio) in discovery.discoveredRadios.enumerated() where foundRadio.serialNumber == guiClientModel.serialNumber {
         
         activeRadio = foundRadio
         
         if api.connect(activeRadio!, program: clientProgramName, clientId: nil, isGui: false) {
           os_log("Connected to the Radio.", log: RadioManager.model_log, type: .info)
           isConnected = true
-          connectedStationName = guiclientModel.stationName
+          connectedStationName = guiClientModel.stationName
         }
-      }
     }
   }
   
@@ -551,6 +555,16 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     
     let mode: radioMode = radioMode(rawValue: slice.mode) ?? radioMode.invalid
     let frequency: String = convertFrequencyToDecimalString (frequency: slice.frequency)
+    
+//    if let index = discoveredGUIClients.firstIndex(where: {$0.stationName == defaultStation.stationName}) {
+//    for s in discovery.discoveredRadios. {
+//
+//    }
+    
+//    for radio in discovery.discoveredRadios {
+//      if let client = radio.guiClients.first(where: { $0.value.station == "guiClient.station"} ){
+//      }
+    
     
     if slice.txEnabled {
       UI() {

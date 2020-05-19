@@ -86,6 +86,12 @@ struct ContentView: View {
         
         Divider()
         HStack(spacing: 30) {
+          // this needs to be when
+          // boundStationHandle == sliceHandle
+          
+          // first(where: $0.slicehandle == guiClienet.handle
+          // guiClientModels.first(where: { $0.clientHandle == radioManager.guiClients.handle} )
+          // radioManager.guiClients.filter({ $0.handle == radioManager.sliceModel.clientHandle }).first
           Text("Slice: \(radioManager.sliceModel.sliceLetter)").frame(minWidth: 100, maxWidth: 100)
           Text("Mode: \(radioManager.sliceModel.radioMode.rawValue)").frame(minWidth: 100, maxWidth: 100)
           Text("\(radioManager.sliceModel.frequency)").frame(minWidth: 100, maxWidth: 100)
@@ -222,15 +228,19 @@ struct RadioPicker: View {
       //      List(radioManager.guiClientModels, rowContent: StationRow.init)
       //        .frame(minWidth: 450, minHeight: 120)
       // Radio Picker
-      ForEach(radioManager.guiClientModels.indices ) { guiclientModel in
+      ForEach(radioManager.guiClientModels.indices ) { guiClientModel in
         HStack {
           HStack {
-            Text("\(self.radioManager.guiClientModels[guiclientModel].radioModel)").frame(minWidth: 70).padding(.leading, 2)
-            Text("\(self.radioManager.guiClientModels[guiclientModel].radioNickname)").frame(minWidth: 120).padding(.leading, 25)
-            Text("\(self.radioManager.guiClientModels[guiclientModel].stationName)").frame(minWidth: 90).padding(.leading, 5).tag(self.radioManager.guiClientModels[guiclientModel].stationName)
+//            Text("\(self.radioManager.guiClientModels[guiclientModel].radioModel)").frame(minWidth: 70).padding(.leading, 2)
+            Button(action: {connectToRadio( guiClientModel: self.radioManager.guiClientModels[guiClientModel], radioManager: self.radioManager); self.presentationMode.wrappedValue.dismiss()}) {
+              Text("\(self.radioManager.guiClientModels[guiClientModel].radioModel)")
+            }
             
-            Button(action: {setDefault(stationName: self.radioManager.guiClientModels[guiclientModel].stationName, radioManager: self.radioManager)}) {
-              Text("\(String(self.radioManager.guiClientModels[guiclientModel].isDefaultStation))").frame(minWidth: 65, maxWidth: 65)
+            Text("\(self.radioManager.guiClientModels[guiClientModel].radioNickname)").frame(minWidth: 120).padding(.leading, 25)
+            Text("\(self.radioManager.guiClientModels[guiClientModel].stationName)").frame(minWidth: 90).padding(.leading, 5).tag(self.radioManager.guiClientModels[guiClientModel].stationName)
+            
+            Button(action: {setDefault(stationName: self.radioManager.guiClientModels[guiClientModel].stationName, radioManager: self.radioManager)}) {
+              Text("\(String(self.radioManager.guiClientModels[guiClientModel].isDefaultStation))").frame(minWidth: 65, maxWidth: 65)
             }
           }
           .border(Color.black)
@@ -239,14 +249,14 @@ struct RadioPicker: View {
       }
 
       HStack {
-        Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
-          Text("Set as Default").padding(.bottom, 5)
-        }
+//        Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
+//          Text("Set as Default").padding(.bottom, 5)
+//        }
         
-        Button(action: {self.radioManager.connectToRadio( guiclientModel: self.radioManager.guiClientModels[0], didConnect: true); self.presentationMode.wrappedValue.dismiss()}) {
-          Text("Connect")
-        }
-        .padding(.leading, 25).padding(.bottom, 5)
+//        Button(action: {self.radioManager.connectToRadio( guiclientModel: self.radioManager.guiClientModels[0], didConnect: true); self.presentationMode.wrappedValue.dismiss()}) {
+//          Text("Connect")
+//        }
+//        .padding(.leading, 25).padding(.bottom, 5)
         
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Cancel")
@@ -354,6 +364,11 @@ func sendFreeText() {
 }
 func showDx(count: Int) {
   
+}
+
+func connectToRadio(guiClientModel: GUIClientModel, radioManager: RadioManager){
+  
+  radioManager.connectToRadio(guiClientModel: guiClientModel)
 }
 
 func setDefault(stationName: String, radioManager: RadioManager) {
