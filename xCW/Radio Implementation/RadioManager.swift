@@ -194,6 +194,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   var isBoundToClient = false
   var boundStationName = ""
   var connectedStationName = ""
+  var defaultStationName = ""
   var boundStationHandle: UInt32 = 0
   // internal collection for my use here only
   var sliceModels = [SliceModel]()
@@ -216,13 +217,19 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     
     api.delegate = self
     
-    retrieveAllCWmemories()
+    retrieveUserDefaults()
   }
   
    // MARK: - CW Memory Functions ----------------------------------------------------------------------------
   
-  func saveCWMemories(message: String, tag: String) {
-    // change this to a where: tag =
+  /**
+   Save the memory set by the user.
+   - parameters:
+   - message: text entered by user
+   - tag: key for UserDefaults
+   */
+  func saveCWMemory(message: String, tag: String) {
+  
     let index = Int(tag)!
     
     //cwMemoryModels.First({where: $0 == tag}).line = message
@@ -233,10 +240,20 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     UserDefaults.standard.set(message, forKey: String(tag))
   }
   
+  /**
+  Save the speed set by the user.
+  - parameters:
+  - speed: speed in wpm.
+  */
   func saveCWSpeed(speed: Int){
     UserDefaults.standard.set(speed, forKey: "cwSpeed")
   }
   
+  /**
+  Save the default staion to UserDefaults.
+  - parameters:
+  - stationName: name of the station to save.
+  */
   func setDefaultRadio(stationName: String) {
     
     UserDefaults.standard.set(stationName, forKey: "defaultRadio")
@@ -256,14 +273,20 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     }
   }
   
+  /**
+  Retrieve a CW message from UserDefaults.
+  - parameters:
+  - tag: key for UserDefaults.
+  */
   func retrieveCWMemory(tag: String) -> String {
     return(UserDefaults.standard.string(forKey: String(tag)) ?? "")
   }
   
   /**
    Retrieve all of the memories at startup.
+   - parameters:
    */
-  func retrieveAllCWmemories() {
+  func retrieveUserDefaults() {
     
     for index in 1...10 {
       let cwTextModel = CWMemoryModel(id: index, tag: String(index), line: UserDefaults.standard.string(forKey: String(index)) ?? "")
@@ -271,6 +294,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     }
     
     cwSpeed = UserDefaults.standard.integer(forKey: "cwSpeed")
+    defaultStationName = UserDefaults.standard.string(forKey: "defaultRadio") ?? ""
   }
   
   // MARK: - Open and Close Radio Methods - Required by xLib6000 - Not Used ----------------------------------------------------------------------------

@@ -73,7 +73,7 @@ struct ContentView: View {
           Button(action: {
             self.showingRadios.toggle()
           }) {
-            Text("Radio Picker")
+            Text("Select Radio")
               .frame(minWidth: 78, maxWidth: 78)
           }
           .sheet(isPresented: $showingRadios) {
@@ -217,9 +217,9 @@ struct RadioPicker: View {
     return VStack{
       HStack{
         Text("Model").frame(minWidth: 70)//.padding(.leading, 2)
-        Text("NickName").frame(minWidth: 100).padding(.leading, 20)
-        Text("Station").frame(minWidth: 80).padding(.leading, 8)
-        Text("Default Radio").frame(minWidth: 50).padding(.leading, 22)
+        Text("NickName").frame(minWidth: 100).padding(.leading, 30)
+        Text("Connect").frame(minWidth: 80).padding(.leading, 30)
+        Text("Set Default").frame(minWidth: 50).padding(.leading, 22)
       }
       .font(.system(size: 14))
       .foregroundColor(Color.blue)
@@ -231,17 +231,21 @@ struct RadioPicker: View {
       ForEach(radioManager.guiClientModels.indices ) { guiClientModel in
         HStack {
           HStack {
-            Text("\(self.radioManager.guiClientModels[guiClientModel].radioModel)").frame(minWidth: 70).padding(.leading, 2)
+            Text("\(self.radioManager.guiClientModels[guiClientModel].radioModel)")
+              .frame(minWidth: 70, maxWidth: 70)
+              .padding(.leading, 2)
             
-            Text("\(self.radioManager.guiClientModels[guiClientModel].radioNickname)").frame(minWidth: 120).padding(.leading, 25)
+            Text("\(self.radioManager.guiClientModels[guiClientModel].radioNickname)")
+              .frame(minWidth: 120, maxWidth: 120)
+              .padding(.leading, 20)
             
             Button(action: {connectToRadio( guiClientModel: self.radioManager.guiClientModels[guiClientModel], radioManager: self.radioManager); self.presentationMode.wrappedValue.dismiss()}) {
               Text("\(self.radioManager.guiClientModels[guiClientModel].stationName)")
+              .frame(minWidth: 100, maxWidth: 100)
             }
-//            Text("\(self.radioManager.guiClientModels[guiClientModel].stationName)").frame(minWidth: 90).padding(.leading, 5).tag(self.radioManager.guiClientModels[guiClientModel].stationName)
             
             Button(action: {setDefault(stationName: self.radioManager.guiClientModels[guiClientModel].stationName, radioManager: self.radioManager)}) {
-              Text("\(String(self.radioManager.guiClientModels[guiClientModel].isDefaultStation))")//.frame(minWidth: 65, maxWidth: 65)
+              Text("\(String(self.radioManager.guiClientModels[guiClientModel].isDefaultStation))").frame(minWidth: 55, maxWidth: 55)
             }
           }
           .border(Color.black)
@@ -250,22 +254,14 @@ struct RadioPicker: View {
       }
 
       HStack {
-//        Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
-//          Text("Set as Default").padding(.bottom, 5)
-//        }
-        
-//        Button(action: {self.radioManager.connectToRadio( guiclientModel: self.radioManager.guiClientModels[0], didConnect: true); self.presentationMode.wrappedValue.dismiss()}) {
-//          Text("Connect")
-//        }
-//        .padding(.leading, 25).padding(.bottom, 5)
-        
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Cancel")
         }
         .padding(.leading, 25).padding(.bottom, 5)
       }
     }
-    .background(Color.gray.opacity(0.20))
+    .background(Color.gray.opacity(0.50))
+    .frame(minWidth: 440, maxWidth: 440)
   }
 }
 
@@ -296,7 +292,7 @@ struct CWMemoriesPicker: View {
             // https://www.reddit.com/r/SwiftUI/comments/fauxsb/error_binding_textfield_to_object_in_array/
             TextField("Enter Text Here", text: self.$radioManager.cwMemoryModels[cwMemoryModel].line,
                       onEditingChanged: { _ in
-                        self.radioManager.saveCWMemories(message:
+                        self.radioManager.saveCWMemory(message:
                           self.radioManager.cwMemoryModels[cwMemoryModel].line, tag:
                           self.radioManager.cwMemoryModels[cwMemoryModel].tag)  })
           }
@@ -306,12 +302,6 @@ struct CWMemoriesPicker: View {
       .frame(minWidth: 450, maxWidth: 450)
       
       HStack {
-        
-//        Text("Set Speed")
-//        Stepper(value: self.$radioManager.cwSpeed, in: 5...80) {
-//            Text("\(self.radioManager.cwSpeed)")
-//        }
-        
         Text("Set Speed")
         Stepper(value: self.$radioManager.cwSpeed, in: 5...80,onEditingChanged: { _ in setCWSpeed(cwSpeed: self.radioManager.cwSpeed, radioManager: self.radioManager) }, label: { Text("\(self.radioManager.cwSpeed)") })
 
@@ -325,29 +315,6 @@ struct CWMemoriesPicker: View {
     .background(Color.gray.opacity(0.20))
   }
 }
-
-/**
- View of rows of stations to select from.
- */
-//struct StationRow: View {
-//  var guiClient: GUIClientModel
-//
-//  var body: some View {
-//    HStack {
-//      HStack {
-//        Text("\(guiClient.radioModel)").frame(minWidth: 70).padding(.leading, 2)
-//        Text("\(guiClient.radioNickname)").frame(minWidth: 120).padding(.leading, 25)
-//        Text("\(guiClient.stationName)").frame(minWidth: 90).padding(.leading, 5).tag(guiClient.stationName)
-//
-//        Button(action: {setDefault(stationName: self.guiClient.stationName)}) {
-//          Text("\(String(guiClient.isDefaultStation))").frame(minWidth: 65, maxWidth: 65)
-//        }
-//      }
-//      .border(Color.black)
-//    }
-//    .background(Color.blue.opacity(0.15))
-//  }
-//}
 
 /**
  Button(action: {
