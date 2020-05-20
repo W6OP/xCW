@@ -231,16 +231,17 @@ struct RadioPicker: View {
       ForEach(radioManager.guiClientModels.indices ) { guiClientModel in
         HStack {
           HStack {
-//            Text("\(self.radioManager.guiClientModels[guiclientModel].radioModel)").frame(minWidth: 70).padding(.leading, 2)
-            Button(action: {connectToRadio( guiClientModel: self.radioManager.guiClientModels[guiClientModel], radioManager: self.radioManager); self.presentationMode.wrappedValue.dismiss()}) {
-              Text("\(self.radioManager.guiClientModels[guiClientModel].radioModel)")
-            }
+            Text("\(self.radioManager.guiClientModels[guiClientModel].radioModel)").frame(minWidth: 70).padding(.leading, 2)
             
             Text("\(self.radioManager.guiClientModels[guiClientModel].radioNickname)").frame(minWidth: 120).padding(.leading, 25)
-            Text("\(self.radioManager.guiClientModels[guiClientModel].stationName)").frame(minWidth: 90).padding(.leading, 5).tag(self.radioManager.guiClientModels[guiClientModel].stationName)
+            
+            Button(action: {connectToRadio( guiClientModel: self.radioManager.guiClientModels[guiClientModel], radioManager: self.radioManager); self.presentationMode.wrappedValue.dismiss()}) {
+              Text("\(self.radioManager.guiClientModels[guiClientModel].stationName)")
+            }
+//            Text("\(self.radioManager.guiClientModels[guiClientModel].stationName)").frame(minWidth: 90).padding(.leading, 5).tag(self.radioManager.guiClientModels[guiClientModel].stationName)
             
             Button(action: {setDefault(stationName: self.radioManager.guiClientModels[guiClientModel].stationName, radioManager: self.radioManager)}) {
-              Text("\(String(self.radioManager.guiClientModels[guiClientModel].isDefaultStation))").frame(minWidth: 65, maxWidth: 65)
+              Text("\(String(self.radioManager.guiClientModels[guiClientModel].isDefaultStation))")//.frame(minWidth: 65, maxWidth: 65)
             }
           }
           .border(Color.black)
@@ -305,10 +306,20 @@ struct CWMemoriesPicker: View {
       .frame(minWidth: 450, maxWidth: 450)
       
       HStack {
-        Button(action: {sendFreeText(); self.presentationMode.wrappedValue.dismiss()}) {
+        
+//        Text("Set Speed")
+//        Stepper(value: self.$radioManager.cwSpeed, in: 5...80) {
+//            Text("\(self.radioManager.cwSpeed)")
+//        }
+        
+        Text("Set Speed")
+        Stepper(value: self.$radioManager.cwSpeed, in: 5...80,onEditingChanged: { _ in setCWSpeed(cwSpeed: self.radioManager.cwSpeed, radioManager: self.radioManager) }, label: { Text("\(self.radioManager.cwSpeed)") })
+
+        
+        Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Close")
         }
-        .padding(.leading, 125).padding(.bottom, 5)
+        .padding(.leading, 150).padding(.bottom, 5)
       }
     }
     .background(Color.gray.opacity(0.20))
@@ -364,6 +375,10 @@ func sendFreeText() {
 }
 func showDx(count: Int) {
   
+}
+
+func setCWSpeed(cwSpeed: Int, radioManager: RadioManager) {
+  radioManager.saveCWSpeed(speed: cwSpeed)
 }
 
 func connectToRadio(guiClientModel: GUIClientModel, radioManager: RadioManager){

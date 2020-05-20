@@ -188,7 +188,7 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   @Published var guiClientModels = [GUIClientModel]()
   @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
   @Published var cwMemoryModels = [CWMemoryModel]()
-  
+  @Published var cwSpeed = 25
   
   var isConnected = false
   var isBoundToClient = false
@@ -233,7 +233,12 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
     UserDefaults.standard.set(message, forKey: String(tag))
   }
   
+  func saveCWSpeed(speed: Int){
+    UserDefaults.standard.set(speed, forKey: "cwSpeed")
+  }
+  
   func setDefaultRadio(stationName: String) {
+    
     UserDefaults.standard.set(stationName, forKey: "defaultRadio")
     
     if var client = guiClientModels.first(where: { $0.isDefaultStation == true} ){
@@ -264,6 +269,8 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
       let cwTextModel = CWMemoryModel(id: index, tag: String(index), line: UserDefaults.standard.string(forKey: String(index)) ?? "")
       cwMemoryModels.append(cwTextModel)
     }
+    
+    cwSpeed = UserDefaults.standard.integer(forKey: "cwSpeed")
   }
   
   // MARK: - Open and Close Radio Methods - Required by xLib6000 - Not Used ----------------------------------------------------------------------------
@@ -637,9 +644,10 @@ class RadioManager: NSObject, ApiDelegate, ObservableObject {
   {
     let message = UserDefaults.standard.string(forKey: String(tag)) ?? ""
     
-    print("Tag: \(tag)  Message: \(message)")
+    print("Tag: \(tag)  Message: \(message)   Speed: \(cwSpeed)")
     
     if message != "" {
+      api.radio?.cwx.wpm = cwSpeed
       api.radio?.cwx.send(message)
     }
     
