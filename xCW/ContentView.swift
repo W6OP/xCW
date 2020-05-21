@@ -225,9 +225,6 @@ struct RadioPicker: View {
       .font(.system(size: 14))
       .foregroundColor(Color.blue)
       
-      // this works but I can't get a handle to radioManager in the StationRow
-      //      List(radioManager.guiClientModels, rowContent: StationRow.init)
-      //        .frame(minWidth: 450, minHeight: 120)
       // Radio Picker
       ForEach(radioManager.guiClientModels.indices, id: \.self ) { index in
         HStack {
@@ -286,20 +283,20 @@ struct CWMemoriesPicker: View {
       .foregroundColor(Color.blue)
       
       VStack {
-        ForEach(radioManager.cwMemoryModels.indices ) { cwMemoryModel in
+        ForEach(radioManager.cwMemoryModels.indices, id: \.self ) { index in
           HStack {
-            Button(action: { self.radioManager.sendCWMessage(tag: self.radioManager.cwMemoryModels[cwMemoryModel].tag) }) {
-              Text(self.radioManager.cwMemoryModels[cwMemoryModel].tag)
+            Button(action: { self.radioManager.sendCWMessage(tag: self.radioManager.cwMemoryModels[index].tag) }) {
+              Text(self.radioManager.cwMemoryModels[index].tag)
                 .frame(minWidth: 30)
             }
             .padding(.leading, 5).padding(.trailing, 5)
             
             // https://www.reddit.com/r/SwiftUI/comments/fauxsb/error_binding_textfield_to_object_in_array/
-            TextField("Enter Text Here", text: self.$radioManager.cwMemoryModels[cwMemoryModel].line,
+            TextField("Enter Text Here", text: self.$radioManager.cwMemoryModels[index].line,
                       onEditingChanged: { _ in
                         self.radioManager.saveCWMemory(message:
-                          self.radioManager.cwMemoryModels[cwMemoryModel].line, tag:
-                          self.radioManager.cwMemoryModels[cwMemoryModel].tag) })//.disabled(self.entry.count > (self.characterLimit - 1))
+                          self.radioManager.cwMemoryModels[index].line, tag:
+                          self.radioManager.cwMemoryModels[index].tag) })//.disabled(self.entry.count > (self.characterLimit - 1))
           }
         }
         .frame(minWidth: 400, maxWidth: 400)
