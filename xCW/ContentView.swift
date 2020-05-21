@@ -16,6 +16,7 @@ extension EnvironmentObject
   }
 }
 
+
 // MARK: - Primary View ----------------------------------------------------------------------------
 
 /**
@@ -48,12 +49,12 @@ struct ContentView: View {
         Divider()
         
         HStack(spacing: 25) {
-          Button(action: {showDx(count: 20)}) {
+          Button(action: {sendFreeText(transmit: false)}) {
             Text("Stop")
               .frame(minWidth: 78, maxWidth: 78)
           }.disabled(!radioManager.isConnected)
           
-          Button(action: {sendFreeText()}) {
+          Button(action: {sendFreeText(transmit: true)}) {
             Text("Send Text")
               .frame(minWidth: 78, maxWidth: 78)
           }.disabled(!radioManager.isConnected)
@@ -228,24 +229,24 @@ struct RadioPicker: View {
       //      List(radioManager.guiClientModels, rowContent: StationRow.init)
       //        .frame(minWidth: 450, minHeight: 120)
       // Radio Picker
-      ForEach(radioManager.guiClientModels.indices ) { guiClientModel in
+      ForEach(radioManager.guiClientModels.indices, id: \.self ) { index in
         HStack {
           HStack {
-            Text("\(self.radioManager.guiClientModels[guiClientModel].radioModel)")
+            Text("\(self.radioManager.guiClientModels[index].radioModel)")
               .frame(minWidth: 70, maxWidth: 70)
               .padding(.leading, 2)
             
-            Text("\(self.radioManager.guiClientModels[guiClientModel].radioNickname)")
+            Text("\(self.radioManager.guiClientModels[index].radioNickname)")
               .frame(minWidth: 120, maxWidth: 120)
               .padding(.leading, 20)
             
-            Button(action: {connectToRadio( guiClientModel: self.radioManager.guiClientModels[guiClientModel], radioManager: self.radioManager); self.presentationMode.wrappedValue.dismiss()}) {
-              Text("\(self.radioManager.guiClientModels[guiClientModel].stationName)")
+            Button(action: {self.radioManager.connectToRadio(guiClientModel: self.radioManager.guiClientModels[index])}) {
+              Text("\(self.radioManager.guiClientModels[index].stationName)")
               .frame(minWidth: 100, maxWidth: 100)
             }
-            
-            Button(action: {setDefault(stationName: self.radioManager.guiClientModels[guiClientModel].stationName, radioManager: self.radioManager)}) {
-              Text("\(String(self.radioManager.guiClientModels[guiClientModel].isDefaultStation))").frame(minWidth: 55, maxWidth: 55)
+         
+            Button(action: {self.radioManager.setDefaultRadio(stationName: self.radioManager.guiClientModels[index].stationName)}) {
+              Text("\(String(self.radioManager.guiClientModels[index].isDefaultStation))").frame(minWidth: 55, maxWidth: 55)
             }
           }
           .border(Color.black)
@@ -271,6 +272,10 @@ struct CWMemoriesPicker: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var radioManager: RadioManager
   
+  //@State private var entry = ""
+  
+  //let characterLimit = 6
+  
   var body: some View {
     
     return VStack{
@@ -283,7 +288,7 @@ struct CWMemoriesPicker: View {
       VStack {
         ForEach(radioManager.cwMemoryModels.indices ) { cwMemoryModel in
           HStack {
-            Button(action: { sendMemory(tag: self.radioManager.cwMemoryModels[cwMemoryModel].tag, radioManager: self.radioManager) }) {
+            Button(action: { self.radioManager.sendCWMessage(tag: self.radioManager.cwMemoryModels[cwMemoryModel].tag) }) {
               Text(self.radioManager.cwMemoryModels[cwMemoryModel].tag)
                 .frame(minWidth: 30)
             }
@@ -294,7 +299,7 @@ struct CWMemoriesPicker: View {
                       onEditingChanged: { _ in
                         self.radioManager.saveCWMemory(message:
                           self.radioManager.cwMemoryModels[cwMemoryModel].line, tag:
-                          self.radioManager.cwMemoryModels[cwMemoryModel].tag)  })
+                          self.radioManager.cwMemoryModels[cwMemoryModel].tag) })//.disabled(self.entry.count > (self.characterLimit - 1))
           }
         }
         .frame(minWidth: 400, maxWidth: 400)
@@ -303,9 +308,8 @@ struct CWMemoriesPicker: View {
       
       HStack {
         Text("Set Speed")
-        Stepper(value: self.$radioManager.cwSpeed, in: 5...80,onEditingChanged: { _ in setCWSpeed(cwSpeed: self.radioManager.cwSpeed, radioManager: self.radioManager) }, label: { Text("\(self.radioManager.cwSpeed)") })
+        Stepper(value: self.$radioManager.cwSpeed, in: 5...80,onEditingChanged: { _ in self.radioManager.saveCWSpeed(speed: self.radioManager.cwSpeed) }, label: { Text("\(self.radioManager.cwSpeed)") })
 
-        
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Close")
         }
@@ -332,33 +336,8 @@ struct CWMemoriesPicker: View {
 
 
 // MARK: - Button Implementation ----------------------------------------------------------------------------
-func sendMemory(tag: String, radioManager: RadioManager )
-{
-  radioManager.sendCWMessage(tag: tag)
-}
-
-func sendFreeText() {
+func sendFreeText(transmit: Bool) {
   
-}
-func showDx(count: Int) {
-  
-}
-
-func setCWSpeed(cwSpeed: Int, radioManager: RadioManager) {
-  radioManager.saveCWSpeed(speed: cwSpeed)
-}
-
-func connectToRadio(guiClientModel: GUIClientModel, radioManager: RadioManager){
-  
-  radioManager.connectToRadio(guiClientModel: guiClientModel)
-}
-
-func setDefault(stationName: String, radioManager: RadioManager) {
-  radioManager.setDefaultRadio(stationName: stationName)
-}
-
-func selectStation(stationName: String, radioManager: RadioManager )  {
- 
 }
 
 // MARK: - Preview Provider ----------------------------------------------------------------------------
@@ -408,11 +387,11 @@ struct TextView: NSViewRepresentable {
     }
     
     func textView(_ textView: NSTextView, shouldChangeTextIn range: NSRange, replacementString text: String?) -> Bool {
-      let newText = textView.string
+      var newText = textView.string
       
-      //        newText.removeAll { (character) -> Bool in
-      //            return character == " " || character == "\n"
-      //        }
+              newText.removeAll { (character) -> Bool in
+                  return character == " " || character == "\n"
+              }
       
       return newText.count < 500
       //return true
