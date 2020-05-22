@@ -678,6 +678,17 @@ class RadioManager:  ApiDelegate, ObservableObject {
     api.radio?.boundClientId = nil
   }
   
+  func setMox() {
+    if (api.radio?.mox == false)  {
+      api.radio?.mox = true
+    } else {
+      api.radio?.mox = false
+    }
+  }
+  
+  func stopTransmitting() {
+    api.radio?.cwx.clearBuffer()
+  }
   /**
    Send a CW message to the radio
    */
@@ -689,7 +700,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
       message = freeText
     }
     
-    print("Tag: \(tag)  Message: \(message)   Speed: \(cwSpeed)")
+    //print("Tag: \(tag)  Message: \(message)   Speed: \(cwSpeed)")
     
     if message != "" {
       api.radio?.cwx.wpm = cwSpeed

@@ -53,14 +53,14 @@ struct ContentView: View {
         Divider()
         
         HStack(spacing: 25) {
-          Button(action: {sendFreeText(transmit: false)}) {
-            Text("Stop")
-              .frame(minWidth: 78, maxWidth: 78)
-          }
-          .disabled(!radioManager.isConnected)
+//          Button(action: {sendFreeText(transmit: false)}) {
+//            Text("Stop")
+//              .frame(minWidth: 78, maxWidth: 78)
+//          }
+//          .disabled(!radioManager.isConnected)
           
-          Button(action: {sendFreeText(transmit: true)}) {
-            Text("Unused")
+          Button(action: {self.radioManager.setMox()}) {
+            Text("Mox")
               .frame(minWidth: 78, maxWidth: 78)
           }
           .disabled(!radioManager.isConnected)
@@ -194,17 +194,23 @@ struct SecondRowView: View {
  TextView for freeform cw
  */
 struct  FreeFormScrollView: View {
-  @EnvironmentObject var rM: RadioManager
+  @EnvironmentObject var rm: RadioManager
   @State public var cwText: CWMemoryModel
   
   var body: some View{
     VStack{
       //TextView(text: $cwText.line)
       TextField("Enter text here", text: $cwText.line)
-      Button(action: {self.rM.sendCWMessage(tag: "0", freeText: "\(self.cwText.line)")}) {
+      Button(action: {self.rm.sendCWMessage(tag: "0", freeText: "\(self.cwText.line)")}) {
         Text("Send Text")
           .frame(minWidth: 78, maxWidth: 78)
       }.disabled(self.cwText.line == "")
+      
+      Button(action: {self.rm.stopTransmitting()}) {
+        Text("Stop")
+          .frame(minWidth: 78, maxWidth: 78)
+      }
+      .disabled(self.cwText.line == "")
     }
   }
 }
