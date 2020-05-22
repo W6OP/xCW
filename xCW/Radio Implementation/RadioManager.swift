@@ -681,9 +681,13 @@ class RadioManager:  ApiDelegate, ObservableObject {
   /**
    Send a CW message to the radio
    */
-  func sendCWMessage(tag: String)
+  func sendCWMessage(tag: String, freeText: String)
   {
-    let message = UserDefaults.standard.string(forKey: String(tag)) ?? ""
+    var message = UserDefaults.standard.string(forKey: String(tag)) ?? ""
+    
+    if tag == "0" {
+      message = freeText
+    }
     
     print("Tag: \(tag)  Message: \(message)   Speed: \(cwSpeed)")
     

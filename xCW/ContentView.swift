@@ -33,16 +33,20 @@ struct ContentView: View {
   @State private var showingMemories = false
   
   var body: some View {
-   
+    
     HStack {
       VStack {
-        FirstRowView().environmentObject(self.radioManager).disabled(!radioManager.isConnected)
-        SecondRowView().environmentObject(self.radioManager).disabled(!radioManager.isConnected)
+        FirstRowView()
+          .environmentObject(self.radioManager).disabled(!radioManager.isConnected).disabled(radioManager.sliceModel.radioMode.rawValue != "CW")
+        SecondRowView()
+          .environmentObject(self.radioManager).disabled(!radioManager.isConnected).disabled(radioManager.sliceModel.radioMode.rawValue != "CW")
         
         Divider()
         
         HStack {
           FreeFormScrollView(cwText: cwText)
+            .environmentObject(self.radioManager)
+            .disabled(radioManager.sliceModel.radioMode.rawValue != "CW")
         }
         .frame(minWidth: 550, maxWidth: 550, minHeight: 110, maxHeight: 110)
         
@@ -52,12 +56,14 @@ struct ContentView: View {
           Button(action: {sendFreeText(transmit: false)}) {
             Text("Stop")
               .frame(minWidth: 78, maxWidth: 78)
-          }.disabled(!radioManager.isConnected)
+          }
+          .disabled(!radioManager.isConnected)
           
           Button(action: {sendFreeText(transmit: true)}) {
-            Text("Send Text")
+            Text("Unused")
               .frame(minWidth: 78, maxWidth: 78)
-          }.disabled(!radioManager.isConnected)
+          }
+          .disabled(!radioManager.isConnected)
           
           // show the cw memory panel
           Button(action: {
@@ -65,7 +71,8 @@ struct ContentView: View {
           }) {
             Text("Memories")
               .frame(minWidth: 78, maxWidth: 78)
-          }.disabled(!radioManager.isConnected)
+          }
+          .disabled(!radioManager.isConnected)
           .sheet(isPresented: $showingMemories) {
             return CWMemoriesPicker().environmentObject(self.radioManager)
           }
@@ -87,12 +94,6 @@ struct ContentView: View {
         
         Divider()
         HStack(spacing: 30) {
-          // this needs to be when
-          // boundStationHandle == sliceHandle
-          
-          // first(where: $0.slicehandle == guiClienet.handle
-          // guiClientModels.first(where: { $0.clientHandle == radioManager.guiClients.handle} )
-          // radioManager.guiClients.filter({ $0.handle == radioManager.sliceModel.clientHandle }).first
           Text("Slice: \(radioManager.sliceModel.sliceLetter)").frame(minWidth: 100, maxWidth: 100)
           Text("Mode: \(radioManager.sliceModel.radioMode.rawValue)").frame(minWidth: 100, maxWidth: 100)
           Text("\(radioManager.sliceModel.frequency)").frame(minWidth: 100, maxWidth: 100)
@@ -117,34 +118,34 @@ struct ContentView: View {
  The first row of memory buttons.
  */
 struct FirstRowView: View {
-  @EnvironmentObject var rM: RadioManager
+  @EnvironmentObject var rm: RadioManager
   
   var body: some View {
     HStack {
-      Button(action: {self.rM.sendCWMessage(tag: "1")}) {
-        Text("CW1")
+      Button(action: {self.rm.sendCWMessage(tag: "1", freeText: "")}) {
+        Text(self.rm.cwMemoryModels[0].line)
           .frame(minWidth: 75, maxWidth: 75)//.background(Color.blue.opacity(0.20)).cornerRadius(5)
       }
       //.background(Color.blue.opacity(0.20)).cornerRadius(5)
       
-      Button(action: {self.rM.sendCWMessage(tag: "2")}) {
-        Text("CW2")
+      Button(action: {self.rm.sendCWMessage(tag: "2", freeText: "")}) {
+        Text(self.rm.cwMemoryModels[1].line)
           .frame(minWidth: 75, maxWidth: 75)
       }
       //.background(Color.blue).cornerRadius(5)
       
-      Button(action: {self.rM.sendCWMessage(tag: "3")}) {
-        Text("CW3")
+      Button(action: {self.rm.sendCWMessage(tag: "3", freeText: "")}) {
+        Text(self.rm.cwMemoryModels[2].line)
           .frame(minWidth: 75, maxWidth: 75)
       }
       
-      Button(action: {self.rM.sendCWMessage(tag: "4")}) {
-        Text("CW4")
+      Button(action: {self.rm.sendCWMessage(tag: "4", freeText: "")}) {
+        Text(self.rm.cwMemoryModels[3].line)
           .frame(minWidth: 75, maxWidth: 75)
       }
       
-      Button(action: {self.rM.sendCWMessage(tag: "5")}) {
-        Text("CW5")
+      Button(action: {self.rm.sendCWMessage(tag: "5", freeText: "")}) {
+        Text(self.rm.cwMemoryModels[4].line)
           .frame(minWidth: 75, maxWidth: 75)
       }
     }
@@ -156,32 +157,32 @@ struct FirstRowView: View {
  The second row of memory buttons.
  */
 struct SecondRowView: View {
-  @EnvironmentObject var rM: RadioManager
+  @EnvironmentObject var rm: RadioManager
   
   var body: some View {
     HStack {
-      Button(action: {self.rM.sendCWMessage(tag: "6")}) {
-        Text("CW6")
+      Button(action: {self.rm.sendCWMessage(tag: "6", freeText: "")}) {
+        Text(self.rm.cwMemoryModels[5].line)
           .frame(minWidth: 75, maxWidth: 75)
       }
       
-      Button(action: {self.rM.sendCWMessage(tag: "7")}) {
-        Text("CW7")
+      Button(action: {self.rm.sendCWMessage(tag: "7", freeText: "")}) {
+        Text(self.rm.cwMemoryModels[6].line)
           .frame(minWidth: 75, maxWidth: 75)
       }
       
-      Button(action: {self.rM.sendCWMessage(tag: "8")}) {
-        Text("CW8")
+      Button(action: {self.rm.sendCWMessage(tag: "8", freeText: "")}) {
+        Text(self.rm.cwMemoryModels[7].line)
           .frame(minWidth: 75, maxWidth: 75)
       }
       
-      Button(action: {self.rM.sendCWMessage(tag: "9")}) {
-        Text("CW9")
+      Button(action: {self.rm.sendCWMessage(tag: "9", freeText: "")}) {
+        Text(self.rm.cwMemoryModels[8].line)
           .frame(minWidth: 75, maxWidth: 75)
       }
       
-      Button(action: {self.rM.sendCWMessage(tag: "10")}) {
-        Text("CW10")
+      Button(action: {self.rm.sendCWMessage(tag: "10", freeText: "")}) {
+        Text(self.rm.cwMemoryModels[9].line)
           .frame(minWidth: 75, maxWidth: 75)
       }
     }
@@ -193,15 +194,17 @@ struct SecondRowView: View {
  TextView for freeform cw
  */
 struct  FreeFormScrollView: View {
+  @EnvironmentObject var rM: RadioManager
   @State public var cwText: CWMemoryModel
   
   var body: some View{
     VStack{
-      TextView(text: $cwText.line)
-      Button(action: {print("Output: \(self.cwText.line)")}) {
+      //TextView(text: $cwText.line)
+      TextField("Enter text here", text: $cwText.line)
+      Button(action: {self.rM.sendCWMessage(tag: "0", freeText: "\(self.cwText.line)")}) {
         Text("Send Text")
           .frame(minWidth: 78, maxWidth: 78)
-      }
+      }.disabled(self.cwText.line == "")
     }
   }
 }
@@ -243,9 +246,9 @@ struct RadioPicker: View {
             
             Button(action: {self.radioManager.connectToRadio(guiClientModel: self.radioManager.guiClientModels[index])}) {
               Text("\(self.radioManager.guiClientModels[index].stationName)")
-              .frame(minWidth: 100, maxWidth: 100)
+                .frame(minWidth: 100, maxWidth: 100)
             }
-         
+            
             Button(action: {self.radioManager.setDefaultRadio(stationName: self.radioManager.guiClientModels[index].stationName)}) {
               Text("\(String(self.radioManager.guiClientModels[index].isDefaultStation))").frame(minWidth: 55, maxWidth: 55)
             }
@@ -254,7 +257,7 @@ struct RadioPicker: View {
         }
         .background(Color.blue.opacity(0.15))
       }
-
+      
       HStack {
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Cancel")
@@ -272,11 +275,9 @@ struct RadioPicker: View {
 struct CWMemoriesPicker: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var radioManager: RadioManager
+  @State private var entry = ""
   
-  //@State private var entry = ""
-  
-  //let characterLimit = 6
-  
+ 
   var body: some View {
     
     return VStack{
@@ -289,18 +290,19 @@ struct CWMemoriesPicker: View {
       VStack {
         ForEach(radioManager.cwMemoryModels.indices, id: \.self ) { index in
           HStack {
-            Button(action: { self.radioManager.sendCWMessage(tag: self.radioManager.cwMemoryModels[index].tag) }) {
-              Text(self.radioManager.cwMemoryModels[index].tag)
-                .frame(minWidth: 30)
+            Button(action: { self.radioManager.sendCWMessage(tag: self.radioManager.cwMemoryModels[index].tag, freeText: "") }) {
+              Text(self.radioManager.cwMemoryModels[index].line)
+                .frame(minWidth: 50, maxWidth: 50)
             }
             .padding(.leading, 5).padding(.trailing, 5)
+            .disabled(self.radioManager.sliceModel.radioMode.rawValue != "CW")
             
             // https://www.reddit.com/r/SwiftUI/comments/fauxsb/error_binding_textfield_to_object_in_array/
             TextField("Enter Text Here", text: self.$radioManager.cwMemoryModels[index].line,
                       onEditingChanged: { _ in
                         self.radioManager.saveCWMemory(message:
                           self.radioManager.cwMemoryModels[index].line, tag:
-                          self.radioManager.cwMemoryModels[index].tag) })//.disabled(self.entry.count > (self.characterLimit - 1))
+                          self.radioManager.cwMemoryModels[index].tag) })
           }
         }
         .frame(minWidth: 400, maxWidth: 400)
@@ -310,7 +312,7 @@ struct CWMemoriesPicker: View {
       HStack {
         Text("Set Speed")
         Stepper(value: self.$radioManager.cwSpeed, in: 5...80,onEditingChanged: { _ in self.radioManager.saveCWSpeed(speed: self.radioManager.cwSpeed) }, label: { Text("\(self.radioManager.cwSpeed)") })
-
+        
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Close")
         }
@@ -354,56 +356,56 @@ struct ContentView_Previews: PreviewProvider {
 // MARK: - TextView Wrapper ----------------------------------------------------------------------------
 
 
-struct TextView: NSViewRepresentable {
-  
-  @Binding var text: String
-  
-  func makeCoordinator() -> Coordinator {
-    Coordinator(self)
-  }
-  
-  func makeNSView(context: Context) -> NSTextView {
-    
-    let myTextView = NSTextView()
-    myTextView.delegate = context.coordinator
-    
-    myTextView.font = NSFont(name: "HelveticaNeue", size: 15)
-    //        myTextView.isScrollEnabled = true
-    myTextView.isEditable = true
-    myTextView.backgroundColor = NSColor(white: 0.0, alpha: 0.15)
-    
-    return myTextView
-  }
-  
-  func updateNSView(_ nsView: NSTextView, context: Context) {
-    nsView.string = text
-  }
-  
-  class Coordinator : NSObject, NSTextViewDelegate {
-    
-    var parent: TextView
-    
-    init(_ nsTextView: TextView) {
-      self.parent = nsTextView
-    }
-    
-    func textView(_ textView: NSTextView, shouldChangeTextIn range: NSRange, replacementString text: String?) -> Bool {
-      var newText = textView.string
-      
-              newText.removeAll { (character) -> Bool in
-                  return character == " " || character == "\n"
-              }
-      
-      return newText.count < 500
-      //return true
-    }
-    
-    func textViewDidChange(_ textView: NSTextView) {
-      //print("text now: \(String(describing: textView.text!))")
-      self.parent.text = textView.string
-    }
-  }
-}
+//struct TextView: NSViewRepresentable {
+//
+//  @Binding var text: String
+//
+//  func makeCoordinator() -> Coordinator {
+//    Coordinator(self)
+//  }
+//
+//  func makeNSView(context: Context) -> NSTextView {
+//
+//    let myTextView = NSTextView()
+//    myTextView.delegate = context.coordinator
+//
+//    myTextView.font = NSFont(name: "HelveticaNeue", size: 15)
+//    //        myTextView.isScrollEnabled = true
+//    myTextView.isEditable = true
+//    myTextView.backgroundColor = NSColor(white: 0.0, alpha: 0.15)
+//
+//    return myTextView
+//  }
+//
+//  func updateNSView(_ nsView: NSTextView, context: Context) {
+//    nsView.string = text
+//  }
+//
+//  class Coordinator : NSObject, NSTextViewDelegate {
+//
+//    var parent: TextView
+//
+//    init(_ nsTextView: TextView) {
+//      self.parent = nsTextView
+//    }
+//
+//    func textView(_ textView: NSTextView, shouldChangeTextIn range: NSRange, replacementString text: String?) -> Bool {
+//      var newText = textView.string
+//
+//              newText.removeAll { (character) -> Bool in
+//                  return character == " " || character == "\n"
+//              }
+//
+//      return newText.count < 500
+//      //return true
+//    }
+//
+//    func textViewDidChange(_ textView: NSTextView) {
+//      //print("text now: \(String(describing: textView.text!))")
+//      self.parent.text = textView.string
+//    }
+//  }
+//}
 
 
 /*
