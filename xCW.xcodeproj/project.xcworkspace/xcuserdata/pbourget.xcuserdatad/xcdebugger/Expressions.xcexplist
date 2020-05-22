@@ -39,5 +39,13 @@
       <ContextState
          contextName = "Discovery.parseGuiClientFields(_:):Discovery.swift">
       </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in FreeFormScrollView.body.getter:ContentView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "$cwText">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
    </ContextStates>
 </VariablesViewState>

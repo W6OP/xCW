@@ -198,6 +198,10 @@ struct  FreeFormScrollView: View {
   var body: some View{
     VStack{
       TextView(text: $cwText.line)
+      Button(action: {print("Output: \(self.cwText.line)")}) {
+        Text("Send Text")
+          .frame(minWidth: 78, maxWidth: 78)
+      }
     }
   }
 }
