@@ -53,11 +53,11 @@ struct ContentView: View {
         Divider()
         
         HStack(spacing: 25) {
-//          Button(action: {sendFreeText(transmit: false)}) {
-//            Text("Stop")
-//              .frame(minWidth: 78, maxWidth: 78)
-//          }
-//          .disabled(!radioManager.isConnected)
+          Button(action: {self.radioManager.tuneRadio()}) {
+            Text("Tune")
+              .frame(minWidth: 78, maxWidth: 78)
+          }
+          .disabled(!radioManager.isConnected)
           
           Button(action: {self.radioManager.setMox()}) {
             Text("Mox")
@@ -196,21 +196,39 @@ struct SecondRowView: View {
 struct  FreeFormScrollView: View {
   @EnvironmentObject var rm: RadioManager
   @State public var cwText: CWMemoryModel
+  @State private var isBuffered = true
   
   var body: some View{
     VStack{
       //TextView(text: $cwText.line)
-      TextField("Enter text here", text: $cwText.line)
-      Button(action: {self.rm.sendCWMessage(tag: "0", freeText: "\(self.cwText.line)")}) {
-        Text("Send Text")
-          .frame(minWidth: 78, maxWidth: 78)
-      }.disabled(self.cwText.line == "")
-      
-      Button(action: {self.rm.stopTransmitting()}) {
-        Text("Stop")
-          .frame(minWidth: 78, maxWidth: 78)
+      HStack {
+        TextField("Enter text here", text: $cwText.line)
       }
-      .disabled(self.cwText.line == "")
+      
+      HStack {
+        Button(action: {self.rm.sendCWMessage(tag: "0", freeText: "\(self.cwText.line)")}) {
+          Text("Send Text")
+            .frame(minWidth: 78, maxWidth: 78)
+        }.disabled(self.cwText.line == "")
+        
+        Button(action: {self.cwText.line = ""}) {
+          Text("Clear Text")
+            .frame(minWidth: 78, maxWidth: 78)
+        }.disabled(self.cwText.line == "")
+        
+        Toggle(isOn: $isBuffered) {
+          Text("Buffer Text")
+        }
+        .disabled(true)
+      }
+      
+      HStack {
+        Button(action: {self.rm.stopTransmitting()}) {
+          Text("Stop")
+            .frame(minWidth: 78, maxWidth: 78)
+        }
+        .disabled(self.cwText.line == "")
+      }
     }
   }
 }
@@ -250,7 +268,7 @@ struct RadioPicker: View {
               .frame(minWidth: 120, maxWidth: 120)
               .padding(.leading, 20)
             
-            Button(action: {self.radioManager.connectToRadio(guiClientModel: self.radioManager.guiClientModels[index])}) {
+            Button(action: {self.radioManager.connectToRadio(guiClientModel: self.radioManager.guiClientModels[index]);self.presentationMode.wrappedValue.dismiss()}) {
               Text("\(self.radioManager.guiClientModels[index].stationName)")
                 .frame(minWidth: 100, maxWidth: 100)
             }
@@ -308,7 +326,10 @@ struct CWMemoriesPicker: View {
                       onEditingChanged: { _ in
                         self.radioManager.saveCWMemory(message:
                           self.radioManager.cwMemoryModels[index].line, tag:
-                          self.radioManager.cwMemoryModels[index].tag) })
+                          self.radioManager.cwMemoryModels[index].tag); print("TextField changed focus")},
+                          onCommit: {
+                            print("Committed!")
+                          })
           }
         }
         .frame(minWidth: 400, maxWidth: 400)

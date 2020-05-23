@@ -451,6 +451,8 @@ class RadioManager:  ApiDelegate, ObservableObject {
           UI() {
             self.guiClientModels.append(guiClientModel)
           }
+        } else {
+            print("Added GUIClient station is missing")
         }
         os_log("Discovery packet received.", log: RadioManager.model_log, type: .info)
         
@@ -492,7 +494,11 @@ class RadioManager:  ApiDelegate, ObservableObject {
           let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station))
           
           UI() {
-            self.guiClientModels.append(guiClientModel)
+            if guiClient.station != "" {
+              self.guiClientModels.append(guiClientModel)
+            } else {
+              print("Updated GUIClient station is missing")
+            }
           }
           os_log("GUI clients have been added.", log: RadioManager.model_log, type: .info)
           
@@ -572,14 +578,17 @@ class RadioManager:  ApiDelegate, ObservableObject {
     // I really only care about a slice that is tx enabled
     if slice.txEnabled {
       UI() {
-//        self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
-      
-        self.sliceModels.append(SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle))
+        if self.sliceModel.sliceHandle != slice.clientHandle {
+          self.sliceModels.removeAll()
+          
+          self.sliceModels.append(SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle))
+        }
       }
     }
     
     os_log("Slice has been addded.", log: RadioManager.model_log, type: .info)
     print("\(slice.txEnabled)")
+    print("Slice count: \(self.sliceModels.count)")
   }
   
   /**
@@ -596,9 +605,11 @@ class RadioManager:  ApiDelegate, ObservableObject {
     
     UI() {
       if self.sliceModel.sliceHandle == slice.clientHandle {
-        self.sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
+        self.sliceModels.removeAll()
+        //self.sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
       }
     }
+    print("Slice count: \(self.sliceModels.count)")
   }
   
   /**
@@ -614,15 +625,13 @@ class RadioManager:  ApiDelegate, ObservableObject {
     
     if slice.txEnabled {
       UI() {
-//        self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+        self.sliceModels.removeAll()
+        
         self.sliceModels.append(SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle))
       }
-    } else {
-      if self.sliceModel.sliceHandle == slice.clientHandle {
-        // don't think this is correct
-        self.sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
-      }
     }
+    
+    print("Slice count: \(self.sliceModels.count)")
   }
   
   // MARK: - Utlity Functions for Slices
@@ -676,6 +685,14 @@ class RadioManager:  ApiDelegate, ObservableObject {
   // cleanup so we can bind with another station
   func cleanUp() {
     api.radio?.boundClientId = nil
+  }
+  
+  func tuneRadio() {
+    if api.radio?.transmit.tune == false {
+      api.radio?.transmit.tune = true
+    } else {
+      api.radio?.transmit.tune = false
+    } 
   }
   
   func setMox() {
