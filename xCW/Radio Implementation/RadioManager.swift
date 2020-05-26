@@ -148,7 +148,7 @@ struct SliceModel: Identifiable {
   var radioMode: radioMode
   var txEnabled: Bool = false
   var frequency: String = "00.000"
-  var sliceHandle: UInt32
+  var sliceHandle: UInt32 = 0
   var associatedStationName = ""
 }
 
@@ -197,7 +197,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
   var defaultStationName = ""
   var boundStationHandle: UInt32 = 0
   // internal collection for my use here only
-  var sliceModels = [SliceModel]()
+  //var sliceModels = [SliceModel]()
   
   // MARK: - Private properties ----------------------------------------------------------------------------
   
@@ -410,13 +410,8 @@ class RadioManager:  ApiDelegate, ObservableObject {
         boundStationName = station
         boundStationHandle = handle
         
-//        // debug only
-//        let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, serialNumber: radio.serialNumber, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.value.station))
-//
-//        printGuiClient(guiClientModel: guiClientModel, source: "bindToStation")
-//        // --------------
         
-        self.sliceModel = sliceModels.first(where: { $0.sliceHandle == boundStationHandle} )!
+//        self.sliceModel = sliceModels.first(where: { $0.sliceHandle == boundStationHandle} )!
         self.sliceModel.associatedStationName = boundStationName
 
         os_log("Bound to the Radio.", log: RadioManager.model_log, type: .info)
@@ -453,7 +448,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
         
         let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, serialNumber: radio.serialNumber, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.value.station))
         
-        //printGuiClient(guiClientModel: guiClientModel, source: "discoveryPacketsReceived")
+        printGuiClient(guiClientModel: guiClientModel, source: "discoveryPacketsReceived")
         
         if guiClient.value.station != "" {
           UI() {
@@ -472,7 +467,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
   }
   
   func printGuiClient(guiClientModel: GUIClientModel, source: String) {
-    print("\(source)")
+    print("Source: \(source)")
     print("clientID: \(guiClientModel.clientId)")
     print("handle: \(guiClientModel.handle)")
     print("model: \(guiClientModel.radioModel)")
@@ -510,14 +505,14 @@ class RadioManager:  ApiDelegate, ObservableObject {
           
           let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station))
           
-          //printGuiClient(guiClientModel: guiClientModel, source: "guiClientsAdded")
+          printGuiClient(guiClientModel: guiClientModel, source: "guiClientsAdded")
 
           
           UI() {
             if guiClient.station != "" {
               self.guiClientModels.append(guiClientModel)
             } else {
-              print("Updated GUIClient station is missing")
+              print("Added GUIClient station is missing")
             }
           }
           os_log("GUI clients have been added.", log: RadioManager.model_log, type: .info)
@@ -544,13 +539,16 @@ class RadioManager:  ApiDelegate, ObservableObject {
       for radio in discovery.discoveredRadios {
         if let client = radio.guiClients.first(where: { $0.value.station == guiClient.station} ){
           let handle = client.key
+          
+          let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station))
+          
           UI() {
             // first remove the old one
             self.guiClientModels.removeAll(where: { $0.stationName == guiClient.station })
             
-            self.guiClientModels.append( GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station)))
+            self.guiClientModels.append(guiClientModel)
             
-//            self.printGuiClient(guiClientModel: self.guiClientModels[0], source: "guiClientsUpdated")
+           self.printGuiClient(guiClientModel: guiClientModel, source: "guiClientsUpdated")
             
             if guiClient.station == self.connectedStationName {
               if guiClient.clientId != "" {
@@ -601,16 +599,16 @@ class RadioManager:  ApiDelegate, ObservableObject {
     if slice.txEnabled {
       UI() {
         if self.sliceModel.sliceHandle != slice.clientHandle {
-          self.sliceModels.removeAll()
-          
-          self.sliceModels.append(SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle))
+
+          self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+
         }
       }
     }
     
     os_log("Slice has been addded.", log: RadioManager.model_log, type: .info)
     print("\(slice.txEnabled)")
-    print("Slice count: \(self.sliceModels.count)")
+    //print("Slice count: \(self.sliceModels.count)")
   }
   
   /**
@@ -627,8 +625,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
     
     UI() {
       if self.sliceModel.sliceHandle == slice.clientHandle {
-        self.sliceModels.removeAll()
-        //self.sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
+        self.sliceModel = SliceModel(radioMode: radioMode.invalid)
       }
     }
     //print("Slice count: \(self.sliceModels.count)")
@@ -648,9 +645,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
     if slice.txEnabled {
       //print("Slice TX: \(slice.txEnabled)")
       UI() {
-        self.sliceModels.removeAll()
-        
-        self.sliceModels.append(SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle))
+        self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
       }
     }
     os_log("Slice has been updated.", log: RadioManager.model_log, type: .info)

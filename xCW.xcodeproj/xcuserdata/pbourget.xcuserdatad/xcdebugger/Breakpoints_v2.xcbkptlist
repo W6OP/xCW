@@ -315,8 +315,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "511"
-            endingLineNumber = "511"
+            startingLineNumber = "506"
+            endingLineNumber = "506"
             landmarkName = "guiClientsAdded(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -442,8 +442,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "557"
-            endingLineNumber = "557"
+            startingLineNumber = "555"
+            endingLineNumber = "555"
             landmarkName = "guiClientsUpdated(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -475,9 +475,184 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "613"
-            endingLineNumber = "613"
+            startingLineNumber = "611"
+            endingLineNumber = "611"
             landmarkName = "sliceHasBeenAdded(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6E630AD7-A395-4679-82C4-1484EA3EEC08"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "xCW/Radio Implementation/RadioManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "515"
+            endingLineNumber = "515"
+            landmarkName = "guiClientsAdded(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C285807F-646B-4AF6-A3E7-6DFCDB5F93F1"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Library/Developer/Xcode/DerivedData/xCW-encqjtpavcvfftgqkxrzbayislgh/SourcePackages/checkouts/xLib6000/Sources/xLib6000/Networking/Discovery.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "239"
+            endingLineNumber = "239"
+            landmarkName = "processPacket(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "BB865FFC-6949-49D9-9938-96D3A643C7A3"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Library/Developer/Xcode/DerivedData/xCW-encqjtpavcvfftgqkxrzbayislgh/SourcePackages/checkouts/xLib6000/Sources/xLib6000/Api/RadioExtension.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "854"
+            endingLineNumber = "854"
+            landmarkName = "unknown"
+            landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "FC15A6A4-6737-4C12-BC3F-EDFABAEF7A0E"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Library/Developer/Xcode/DerivedData/xCW-encqjtpavcvfftgqkxrzbayislgh/SourcePackages/checkouts/xLib6000/Sources/xLib6000/Networking/Discovery.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "303"
+            endingLineNumber = "303"
+            landmarkName = "scanGuiClients(_:_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "EEA626E4-579B-42D3-9486-00D8F95498CF"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Library/Developer/Xcode/DerivedData/xCW-encqjtpavcvfftgqkxrzbayislgh/SourcePackages/checkouts/xLib6000/Sources/xLib6000/Api/RadioExtension.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "865"
+            endingLineNumber = "865"
+            landmarkName = "unknown"
+            landmarkType = "0">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "FB2B04FD-88B9-4D5C-8EC3-3300229624D0"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Library/Developer/Xcode/DerivedData/xCW-encqjtpavcvfftgqkxrzbayislgh/SourcePackages/checkouts/xLib6000/Sources/xLib6000/Api/Radio.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "892"
+            endingLineNumber = "892"
+            landmarkName = "parseV3Connection(properties:handle:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4F71FD4C-0E18-4C18-8C1F-F113355559E8"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Library/Developer/Xcode/DerivedData/xCW-encqjtpavcvfftgqkxrzbayislgh/SourcePackages/checkouts/xLib6000/Sources/xLib6000/Api/Radio.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1099"
+            endingLineNumber = "1099"
+            landmarkName = "parseClient(_:_:_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "4F71FD4C-0E18-4C18-8C1F-F113355559E8 - b9ff77f751cce87e"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "xLib6000.Radio.(parseClient in _1F43B10CDAB8BAAFAF2303D54B11FED5)(xLib6000.Radio, Swift.Array&lt;(key: Swift.String, value: Swift.String)&gt;, Swift.Bool) -&gt; ()"
+                  moduleName = "xCW"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pbourget/Library/Developer/Xcode/DerivedData/xCW-encqjtpavcvfftgqkxrzbayislgh/SourcePackages/checkouts/xLib6000/Sources/xLib6000/Api/Radio.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1099"
+                  endingLineNumber = "1099"
+                  offsetFromSymbolStart = "522">
+               </Location>
+               <Location
+                  uuid = "4F71FD4C-0E18-4C18-8C1F-F113355559E8 - b9ff77f751cce87e"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "xLib6000.Radio.(parseClient in _1F43B10CDAB8BAAFAF2303D54B11FED5)(xLib6000.Radio, Swift.Array&lt;(key: Swift.String, value: Swift.String)&gt;, Swift.Bool) -&gt; ()"
+                  moduleName = "xCW"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pbourget/Library/Developer/Xcode/DerivedData/xCW-encqjtpavcvfftgqkxrzbayislgh/SourcePackages/checkouts/xLib6000/Sources/xLib6000/Api/Radio.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1099"
+                  endingLineNumber = "1099"
+                  offsetFromSymbolStart = "574">
+               </Location>
+               <Location
+                  uuid = "4F71FD4C-0E18-4C18-8C1F-F113355559E8 - b9ff77f751cce87e"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "xLib6000.Radio.(parseClient in _1F43B10CDAB8BAAFAF2303D54B11FED5)(xLib6000.Radio, Swift.Array&lt;(key: Swift.String, value: Swift.String)&gt;, Swift.Bool) -&gt; ()"
+                  moduleName = "xCW"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/pbourget/Library/Developer/Xcode/DerivedData/xCW-encqjtpavcvfftgqkxrzbayislgh/SourcePackages/checkouts/xLib6000/Sources/xLib6000/Api/Radio.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1099"
+                  endingLineNumber = "1099"
+                  offsetFromSymbolStart = "858">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C36F7D93-C0EC-452E-A87B-6A85E1F05258"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Library/Developer/Xcode/DerivedData/xCW-encqjtpavcvfftgqkxrzbayislgh/SourcePackages/checkouts/xLib6000/Sources/xLib6000/Api/Radio.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1015"
+            endingLineNumber = "1015"
+            landmarkName = "parseStatus(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
