@@ -16,6 +16,21 @@ extension EnvironmentObject
   }
 }
 
+struct DefaultButtonStyle: ButtonStyle {
+  var foregroundColor: Color
+  var backgroundColor: Color
+  var pressedColor: Color
+
+  func makeBody(configuration: Self.Configuration) -> some View {
+    configuration.label
+      //.font(.body)
+      .padding(2)
+      .foregroundColor(foregroundColor)
+      .background(configuration.isPressed ? pressedColor : backgroundColor)
+      .cornerRadius(5)
+  }
+}
+
 struct SelectButtonStyle: ButtonStyle {
   var foregroundColor: Color
   var backgroundColor: Color
@@ -32,6 +47,21 @@ struct SelectButtonStyle: ButtonStyle {
 }
 
 struct ControlButtonStyle: ButtonStyle {
+  var foregroundColor: Color
+  var backgroundColor: Color
+  var pressedColor: Color
+
+  func makeBody(configuration: Self.Configuration) -> some View {
+    configuration.label
+      //.font(.body)
+      .padding(5)
+      .foregroundColor(foregroundColor)
+      .background(configuration.isPressed ? pressedColor : backgroundColor)
+      .cornerRadius(5)
+  }
+}
+
+struct CWButtonStyle: ButtonStyle {
   var foregroundColor: Color
   var backgroundColor: Color
   var pressedColor: Color
@@ -61,14 +91,40 @@ extension View {
     )
   }
   func selectButton(
-    foregroundColor: Color = .white,
+    foregroundColor: Color = .black,
     backgroundColor: Color = .green,
     pressedColor: Color = .accentColor
   ) -> some View {
     self.buttonStyle(
       SelectButtonStyle(
         foregroundColor: foregroundColor,
-        backgroundColor: backgroundColor,
+        backgroundColor: backgroundColor.opacity(0.30),
+        pressedColor: pressedColor
+      )
+    )
+  }
+  func defaultButton(
+    foregroundColor: Color = .black,
+    backgroundColor: Color = .blue,
+    pressedColor: Color = .accentColor
+  ) -> some View {
+    self.buttonStyle(
+      DefaultButtonStyle(
+        foregroundColor: foregroundColor,
+        backgroundColor: backgroundColor.opacity(0.30),
+        pressedColor: pressedColor
+      )
+    )
+  }
+  func cwButton(
+    foregroundColor: Color = .black,
+    backgroundColor: Color = .blue,
+    pressedColor: Color = .accentColor
+  ) -> some View {
+    self.buttonStyle(
+      CWButtonStyle(
+        foregroundColor: foregroundColor,
+        backgroundColor: backgroundColor.opacity(0.30),
         pressedColor: pressedColor
       )
     )
@@ -186,32 +242,35 @@ struct FirstRowView: View {
     HStack {
       Button(action: {self.rm.sendCWMessage(tag: "1", freeText: "")}) {
         Text(self.rm.cwMemoryModels[0].line)
-          .frame(minWidth: 75, maxWidth: 75)//.background(Color.blue.opacity(0.20)).cornerRadius(5)
+          .frame(minWidth: 100, maxWidth: 100)
       }
-      //.background(Color.blue.opacity(0.20)).cornerRadius(5)
+      .cwButton()
       
       Button(action: {self.rm.sendCWMessage(tag: "2", freeText: "")}) {
         Text(self.rm.cwMemoryModels[1].line)
-          .frame(minWidth: 75, maxWidth: 75)
+          .frame(minWidth: 100, maxWidth: 100)
       }
-      //.background(Color.blue).cornerRadius(5)
+      .cwButton()
       
       Button(action: {self.rm.sendCWMessage(tag: "3", freeText: "")}) {
         Text(self.rm.cwMemoryModels[2].line)
-          .frame(minWidth: 75, maxWidth: 75)
+          .frame(minWidth: 100, maxWidth: 100)
       }
+      .cwButton()
       
       Button(action: {self.rm.sendCWMessage(tag: "4", freeText: "")}) {
         Text(self.rm.cwMemoryModels[3].line)
-          .frame(minWidth: 75, maxWidth: 75)
+          .frame(minWidth: 100, maxWidth: 100)
       }
+      .cwButton()
       
       Button(action: {self.rm.sendCWMessage(tag: "5", freeText: "")}) {
         Text(self.rm.cwMemoryModels[4].line)
-          .frame(minWidth: 75, maxWidth: 75)
+          .frame(minWidth: 100, maxWidth: 100)
       }
+      .cwButton()
     }
-    .frame(maxWidth: .infinity, maxHeight: 25).padding(.top, 5)
+    .frame(maxWidth: .infinity, maxHeight: 25).padding(.top, 10)
   }
 }
 
@@ -225,30 +284,35 @@ struct SecondRowView: View {
     HStack {
       Button(action: {self.rm.sendCWMessage(tag: "6", freeText: "")}) {
         Text(self.rm.cwMemoryModels[5].line)
-          .frame(minWidth: 75, maxWidth: 75)
-      }
+          .frame(minWidth: 100, maxWidth: 100)
+          }
+          .cwButton()
       
       Button(action: {self.rm.sendCWMessage(tag: "7", freeText: "")}) {
         Text(self.rm.cwMemoryModels[6].line)
-          .frame(minWidth: 75, maxWidth: 75)
-      }
+          .frame(minWidth: 100, maxWidth: 100)
+          }
+          .cwButton()
       
       Button(action: {self.rm.sendCWMessage(tag: "8", freeText: "")}) {
         Text(self.rm.cwMemoryModels[7].line)
-          .frame(minWidth: 75, maxWidth: 75)
-      }
+          .frame(minWidth: 100, maxWidth: 100)
+          }
+          .cwButton()
       
       Button(action: {self.rm.sendCWMessage(tag: "9", freeText: "")}) {
         Text(self.rm.cwMemoryModels[8].line)
-          .frame(minWidth: 75, maxWidth: 75)
-      }
+          .frame(minWidth: 100, maxWidth: 100)
+          }
+          .cwButton()
       
       Button(action: {self.rm.sendCWMessage(tag: "10", freeText: "")}) {
         Text(self.rm.cwMemoryModels[9].line)
-          .frame(minWidth: 75, maxWidth: 75)
-      }
+          .frame(minWidth: 100, maxWidth: 100)
+          }
+          .cwButton()
     }
-    .frame(maxWidth: .infinity, maxHeight: 25).padding(.bottom, 1)
+    .frame(maxWidth: .infinity, maxHeight: 25).padding(.bottom, 1).padding(.top, 10)
   }
 }
 
@@ -310,50 +374,70 @@ struct RadioPicker: View {
     
     return VStack{
       HStack{
-        Text("Model").frame(minWidth: 70)//.padding(.leading, 2)
-        Text("NickName").frame(minWidth: 100).padding(.leading, 30)
-        Text("Connect").frame(minWidth: 80).padding(.leading, 30)
-        Text("Set Default").frame(minWidth: 50).padding(.leading, 22)
+        VStack{
+        Text("Model")
+        }.frame(minWidth: 80, maxWidth: 80)//.padding(.leading, 2)//.border(Color.black)//.padding(.leading, 2).border(Color.black)
+        Spacer()
+        VStack{
+        Text("NickName").frame(minWidth: 80, maxWidth: 80)//.border(Color.black) //.multilineTextAlignment(.leading)
+        }.frame(minWidth: 80, maxWidth: 80)//.border(Color.black)
+        Spacer()
+        VStack{
+        Text("Connect")//.frame(minWidth: 70, maxWidth: 70).padding(.leading, 30).border(Color.black)
+        }.frame(minWidth: 80, maxWidth: 80)//.border(Color.black)
+        Spacer()
+        VStack{
+        Text("Set Default")//.frame(minWidth: 80, maxWidth: 80).padding(.leading, 18).padding(.trailing, 15).border(Color.black)
+        }.frame(minWidth: 80, maxWidth: 80)//.border(Color.black)
       }
+      .frame(minWidth: 450, maxWidth: 450)
+      .padding(.leading, 5).padding(.trailing, 5)
       .font(.system(size: 14))
-      .foregroundColor(Color.blue)
+      .foregroundColor(Color.black)
+      
+        Divider()
+          .border(Color.black)
+      
       
       // Radio Picker
       ForEach(radioManager.guiClientModels.indices, id: \.self ) { index in
         HStack {
           HStack {
+            
             Text("\(self.radioManager.guiClientModels[index].radioModel)")
-              .frame(minWidth: 70, maxWidth: 70)
-              .padding(.leading, 2)
+              .frame(minWidth: 100, maxWidth: 100)
             
             Text("\(self.radioManager.guiClientModels[index].radioNickname)")
               .frame(minWidth: 120, maxWidth: 120)
-              .padding(.leading, 20)
             
             Button(action: {self.radioManager.connectToRadio(guiClientModel: self.radioManager.guiClientModels[index]);self.presentationMode.wrappedValue.dismiss()}) {
-              Text("\(self.radioManager.guiClientModels[index].stationName)")
-                .frame(minWidth: 100, maxWidth: 100)
+              Text("\(self.radioManager.guiClientModels[index].stationName)").frame(minWidth: 100, maxWidth: 100) //
             }
             .selectButton()
             
             Button(action: {self.radioManager.setDefaultRadio(stationName: self.radioManager.guiClientModels[index].stationName)}) {
-              Text("\(String(self.radioManager.guiClientModels[index].isDefaultStation))").frame(minWidth: 55, maxWidth: 55)
+              Text("\(String(self.radioManager.guiClientModels[index].isDefaultStation))").frame(minWidth: 100)
             }
-          }
-          .border(Color.black)
-        }
-        .background(Color.blue.opacity(0.15))
+            .defaultButton()
+            
+          } // end inner stack
+            .padding(.top, 5)
+            .padding(.bottom, 5)
+        } // end outer stack
+          .frame(minWidth: 450, maxWidth: 450)
+        
       }
       
       HStack {
         Button(action: {self.presentationMode.wrappedValue.dismiss()}) {
           Text("Cancel")
         }
-        .padding(.leading, 25).padding(.bottom, 5)
+        .padding(.leading, 25).padding(.bottom, 5).padding(.top, 5)
+        .controlButton()
       }
     }
     .background(Color.gray.opacity(0.50))
-    .frame(minWidth: 440, maxWidth: 440)
+    //.frame(minWidth: 445, maxWidth: 445)
   }
 }
 

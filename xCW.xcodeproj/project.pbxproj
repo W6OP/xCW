@@ -40,6 +40,7 @@
 		996215B424719B070025299B /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		99760953246D8F26003E6B8E /* RadioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioManager.swift; sourceTree = "<group>"; };
 		99760956246D935B003E6B8E /* Repeat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Repeat.framework; path = ../../Library/Frameworks/Repeat.framework; sourceTree = "<group>"; };
+		998B733D247D6CD9008F327E /* xLib6000 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = xLib6000; path = ../xLib6000; sourceTree = "<group>"; };
 		99EDEDCB2469DF87003F7608 /* xCW.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xCW.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99EDEDCE2469DF87003F7608 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		99EDEDD02469DF87003F7608 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -84,6 +85,7 @@
 		99EDEDC22469DF87003F7608 = {
 			isa = PBXGroup;
 			children = (
+				998B733D247D6CD9008F327E /* xLib6000 */,
 				99EDEDCD2469DF87003F7608 /* xCW */,
 				99EDEDCC2469DF87003F7608 /* Products */,
 				99760955246D935B003E6B8E /* Frameworks */,
