@@ -144,11 +144,12 @@ struct CWMemoryModel: Identifiable {
 struct SliceModel: Identifiable {
   var id = UUID()
   
+  var sliceId: UInt16 = 99
   var sliceLetter: String = ""
   var radioMode: radioMode
   var txEnabled: Bool = false
   var frequency: String = "00.000"
-  var sliceHandle: UInt32 = 0
+  var clientHandle: UInt32 = 0
   var associatedStationName = ""
 }
 
@@ -186,7 +187,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
   // MARK: - Published properties ----------------------------------------------------------------------------
   
   @Published var guiClientModels = [GUIClientModel]()
-  @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, sliceHandle: 0)
+  @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, clientHandle: 0)
   @Published var cwMemoryModels = [CWMemoryModel]()
   @Published var cwSpeed = 25
   
@@ -197,7 +198,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
   var defaultStationName = ""
   var boundStationHandle: UInt32 = 0
   // internal collection for my use here only
-  //var sliceModels = [SliceModel]()
+  var sliceModels = [SliceModel]()
   
   // MARK: - Private properties ----------------------------------------------------------------------------
   
@@ -363,7 +364,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
    - doConnect: bool returning true if the connect was successful
    */
   func connectToRadio(guiClientModel: GUIClientModel) {
-    
+
     if isConnected {
       bindToStation(clientId: guiClientModel.clientId, station: guiClientModel.stationName)
       return
@@ -410,9 +411,9 @@ class RadioManager:  ApiDelegate, ObservableObject {
         boundStationName = station
         boundStationHandle = handle
         
+         updateSliceModel()
         
-//        self.sliceModel = sliceModels.first(where: { $0.sliceHandle == boundStationHandle} )!
-        self.sliceModel.associatedStationName = boundStationName
+        //self.sliceModel.associatedStationName = boundStationName
 
         os_log("Bound to the Radio.", log: RadioManager.model_log, type: .info)
         
@@ -448,7 +449,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
         
         let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, serialNumber: radio.serialNumber, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.value.station))
         
-        printGuiClient(guiClientModel: guiClientModel, source: "discoveryPacketsReceived")
+        //printGuiClient(guiClientModel: guiClientModel, source: "discoveryPacketsReceived")
         
         if guiClient.value.station != "" {
           UI() {
@@ -505,9 +506,8 @@ class RadioManager:  ApiDelegate, ObservableObject {
           
           let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station))
           
-          printGuiClient(guiClientModel: guiClientModel, source: "guiClientsAdded")
+          //printGuiClient(guiClientModel: guiClientModel, source: "guiClientsAdded")
 
-          
           UI() {
             if guiClient.station != "" {
               self.guiClientModels.append(guiClientModel)
@@ -592,23 +592,30 @@ class RadioManager:  ApiDelegate, ObservableObject {
     let slice: xLib6000.Slice = (note.object as! xLib6000.Slice)
     let mode: radioMode = radioMode(rawValue: slice.mode) ?? radioMode.invalid
     let frequency: String = convertFrequencyToDecimalString (frequency: slice.frequency)
+    var stationName = ""
     
     addObservations(slice: slice)
     
+    // get the station this slice belongs to
+    if let index = self.guiClientModels.firstIndex(where: {$0.handle == slice.clientHandle}) {
+      stationName = guiClientModels[index].stationName
+    }
+    
+    let sliceModel = SliceModel(sliceId: slice.id, sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, clientHandle: slice.clientHandle, associatedStationName: stationName)
+    
+    sliceModels.append(sliceModel)
+    
+    // probably don't care when addded
     // I really only care about a slice that is tx enabled
     if slice.txEnabled {
       UI() {
-        if self.sliceModel.sliceHandle != slice.clientHandle {
-
-          self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
-
+        if sliceModel.clientHandle == slice.clientHandle {
+          self.sliceModel = sliceModel
         }
       }
     }
     
     os_log("Slice has been addded.", log: RadioManager.model_log, type: .info)
-    print("\(slice.txEnabled)")
-    //print("Slice count: \(self.sliceModels.count)")
   }
   
   /**
@@ -620,36 +627,59 @@ class RadioManager:  ApiDelegate, ObservableObject {
   func sliceWillBeRemoved(_ note: Notification){
     
     let slice: xLib6000.Slice = (note.object as! xLib6000.Slice)
+    let clientHandle = slice.clientHandle
+    let sliceId = slice.id
     
     os_log("Slice has been removed.", log: RadioManager.model_log, type: .info)
     
+    if let index = self.sliceModels.firstIndex(where: {$0.clientHandle == clientHandle && $0.sliceId == sliceId}) {
+      self.sliceModels.remove(at: index)
+    }
+    
     UI() {
-      if self.sliceModel.sliceHandle == slice.clientHandle {
+      if self.sliceModel.clientHandle == clientHandle && self.sliceModel.sliceId == sliceId {
         self.sliceModel = SliceModel(radioMode: radioMode.invalid)
       }
     }
-    //print("Slice count: \(self.sliceModels.count)")
   }
   
   /**
    Observer handler to update the slice information for the labels on the GUI
-   when a new slice is added.
+   when a slice is updated.
    - parameters:
    - slice:
    */
   func updateSliceStatus(_ slice: xLib6000.Slice, sliceStatus: sliceStatus,  _ change: Any) {
     
-    let mode: radioMode = radioMode(rawValue: slice.mode) ?? radioMode.invalid
-    let frequency: String = convertFrequencyToDecimalString (frequency: slice.frequency)
-    
-    if slice.txEnabled {
-      //print("Slice TX: \(slice.txEnabled)")
+    // now is this slice added yet
+    if let sliceModel = sliceModels.first(where: {$0.sliceId == slice.id}) {
+      
+      if slice.txEnabled  && self.sliceModel.associatedStationName == boundStationName {
       UI() {
-        self.sliceModel = SliceModel(sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, sliceHandle: slice.clientHandle)
+        self.sliceModel = sliceModel
+        }
       }
     }
+    
     os_log("Slice has been updated.", log: RadioManager.model_log, type: .info)
-    //print("Slice count: \(self.sliceModels.count)")
+  }
+  
+  /**
+   Update the slice model for the GUI when the bound station is changed
+   */
+  func updateSliceModel(){
+    
+    for sliceModel in sliceModels {
+      if sliceModel.clientHandle == boundStationHandle {
+        if sliceModel.txEnabled {
+          //self.sliceModel.associatedStationName = boundStationName
+          self.sliceModel = sliceModel
+          break
+        } else {
+          self.sliceModel = sliceModel
+        }
+      }
+    }
   }
   
   // MARK: - Utlity Functions for Slices
@@ -702,7 +732,11 @@ class RadioManager:  ApiDelegate, ObservableObject {
   
   // cleanup so we can bind with another station
   func cleanUp() {
+    
+    boundStationName = ""
     api.radio?.boundClientId = nil
+    
+    self.sliceModel = SliceModel(radioMode: .invalid)
   }
   
   func tuneRadio() {

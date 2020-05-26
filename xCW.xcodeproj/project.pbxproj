@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		996215B324718B260025299B /* CWPreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996215B224718B260025299B /* CWPreferencesView.swift */; };
-		996215B524719B070025299B /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996215B424719B070025299B /* Components.swift */; };
 		9976094F246D8DAD003E6B8E /* xLib6000 in Frameworks */ = {isa = PBXBuildFile; productRef = 9976094E246D8DAD003E6B8E /* xLib6000 */; };
 		99760951246D8DAD003E6B8E /* CocoaAsyncSocket in Frameworks */ = {isa = PBXBuildFile; productRef = 99760950246D8DAD003E6B8E /* CocoaAsyncSocket */; };
 		99760954246D8F26003E6B8E /* RadioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99760953246D8F26003E6B8E /* RadioManager.swift */; };
@@ -37,7 +36,6 @@
 
 /* Begin PBXFileReference section */
 		996215B224718B260025299B /* CWPreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CWPreferencesView.swift; sourceTree = "<group>"; };
-		996215B424719B070025299B /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		99760953246D8F26003E6B8E /* RadioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioManager.swift; sourceTree = "<group>"; };
 		99760956246D935B003E6B8E /* Repeat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Repeat.framework; path = ../../Library/Frameworks/Repeat.framework; sourceTree = "<group>"; };
 		998B733D247D6CD9008F327E /* xLib6000 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = xLib6000; path = ../xLib6000; sourceTree = "<group>"; };
@@ -69,7 +67,6 @@
 			isa = PBXGroup;
 			children = (
 				99760953246D8F26003E6B8E /* RadioManager.swift */,
-				996215B424719B070025299B /* Components.swift */,
 			);
 			path = "Radio Implementation";
 			sourceTree = "<group>";
@@ -205,7 +202,6 @@
 			files = (
 				99EDEDD12469DF87003F7608 /* ContentView.swift in Sources */,
 				99760954246D8F26003E6B8E /* RadioManager.swift in Sources */,
-				996215B524719B070025299B /* Components.swift in Sources */,
 				99EDEDCF2469DF87003F7608 /* AppDelegate.swift in Sources */,
 				996215B324718B260025299B /* CWPreferencesView.swift in Sources */,
 			);

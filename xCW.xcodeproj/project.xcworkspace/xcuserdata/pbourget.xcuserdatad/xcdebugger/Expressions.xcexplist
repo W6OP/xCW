@@ -3,19 +3,22 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "closure #1 in closure #2 in closure #1 in CWMemoriesPicker.body.getter:ContentView.swift">
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in CWMemoriesPicker.body.getter:ContentView.swift">
+         contextName = "closure #1 in RadioManager.sliceWillBeRemoved(_:):RadioManager.swift">
       </ContextState>
       <ContextState
          contextName = "closure #2 in closure #1 in CWMemoriesPicker.body.getter:ContentView.swift">
       </ContextState>
       <ContextState
-         contextName = "closure #2 in closure #1 in closure #1 in ContentView.body.getter:ContentView.swift">
+         contextName = "Discovery.scanGuiClients(_:_:):Discovery.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #2 in RadioManager.sliceHasBeenAdded(_:):RadioManager.swift">
          <PersistentStrings>
             <PersistentString
-               value = "radioManager.discoveredRadios">
+               value = "self.sliceModel.clientHandle">
+            </PersistentString>
+            <PersistentString
+               value = "slice.clientHandle">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -31,19 +34,39 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "RadioManager.guiClientsAdded(_:):RadioManager.swift">
-      </ContextState>
-      <ContextState
-         contextName = "Discovery.scanGuiClients(_:_:):Discovery.swift">
-      </ContextState>
-      <ContextState
          contextName = "Discovery.parseGuiClientFields(_:):Discovery.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #2 in closure #1 in CWMemoriesPicker.body.getter:ContentView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in CWMemoriesPicker.body.getter:ContentView.swift">
       </ContextState>
       <ContextState
          contextName = "closure #1 in closure #1 in FreeFormScrollView.body.getter:ContentView.swift">
          <PersistentStrings>
             <PersistentString
                value = "$cwText">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "RadioManager.guiClientsAdded(_:):RadioManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "RadioManager.updateSliceStatus(_:sliceStatus:_:):RadioManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "RadioManager.discoveryPacketsReceived(_:):RadioManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "RadioManager.updateSliceModel():RadioManager.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #2 in closure #1 in closure #1 in ContentView.body.getter:ContentView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "radioManager.discoveredRadios">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
