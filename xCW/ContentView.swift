@@ -16,6 +16,64 @@ extension EnvironmentObject
   }
 }
 
+struct SelectButtonStyle: ButtonStyle {
+  var foregroundColor: Color
+  var backgroundColor: Color
+  var pressedColor: Color
+
+  func makeBody(configuration: Self.Configuration) -> some View {
+    configuration.label
+      //.font(.body)
+      .padding(2)
+      .foregroundColor(foregroundColor)
+      .background(configuration.isPressed ? pressedColor : backgroundColor)
+      .cornerRadius(5)
+  }
+}
+
+struct ControlButtonStyle: ButtonStyle {
+  var foregroundColor: Color
+  var backgroundColor: Color
+  var pressedColor: Color
+
+  func makeBody(configuration: Self.Configuration) -> some View {
+    configuration.label
+      //.font(.body)
+      .padding(2)
+      .foregroundColor(foregroundColor)
+      .background(configuration.isPressed ? pressedColor : backgroundColor)
+      .cornerRadius(5)
+  }
+}
+
+extension View {
+  func controlButton(
+    foregroundColor: Color = .white,
+    backgroundColor: Color = .gray,
+    pressedColor: Color = .accentColor
+  ) -> some View {
+    self.buttonStyle(
+      ControlButtonStyle(
+        foregroundColor: foregroundColor,
+        backgroundColor: backgroundColor,
+        pressedColor: pressedColor
+      )
+    )
+  }
+  func selectButton(
+    foregroundColor: Color = .white,
+    backgroundColor: Color = .green,
+    pressedColor: Color = .accentColor
+  ) -> some View {
+    self.buttonStyle(
+      SelectButtonStyle(
+        foregroundColor: foregroundColor,
+        backgroundColor: backgroundColor,
+        pressedColor: pressedColor
+      )
+    )
+  }
+}
 
 // MARK: - Primary View ----------------------------------------------------------------------------
 
@@ -55,14 +113,16 @@ struct ContentView: View {
         HStack(spacing: 25) {
           Button(action: {self.radioManager.tuneRadio()}) {
             Text("Tune")
-              .frame(minWidth: 78, maxWidth: 78)
+              .frame(minWidth: 58, maxWidth: 58)
           }
+          .controlButton()
           .disabled(!radioManager.isConnected)
           
           Button(action: {self.radioManager.setMox()}) {
             Text("Mox")
-              .frame(minWidth: 78, maxWidth: 78)
+              .frame(minWidth: 58, maxWidth: 58)
           }
+          .controlButton()
           .disabled(!radioManager.isConnected)
           
           // show the cw memory panel
@@ -70,8 +130,9 @@ struct ContentView: View {
             self.showingMemories.toggle()
           }) {
             Text("Memories")
-              .frame(minWidth: 78, maxWidth: 78)
+              .frame(minWidth: 100, maxWidth: 100)
           }
+            .controlButton()
           .disabled(!radioManager.isConnected)
           .sheet(isPresented: $showingMemories) {
             return CWMemoriesPicker().environmentObject(self.radioManager)
@@ -82,7 +143,7 @@ struct ContentView: View {
             self.showingRadios.toggle()
           }) {
             Text("Select Radio")
-              .frame(minWidth: 78, maxWidth: 78)
+              .frame(minWidth: 100, maxWidth: 100)
           }
           .sheet(isPresented: $showingRadios) {
             // https://stackoverflow.com/questions/58743004/swiftui-environmentobject-error-may-be-missing-as-an-ancestor-of-this-view
@@ -91,6 +152,7 @@ struct ContentView: View {
           }
         }
         .frame(minWidth: 600, maxWidth: 600).padding(.bottom, 1)
+        .controlButton()
         
         Divider()
         HStack(spacing: 30) {
@@ -272,6 +334,7 @@ struct RadioPicker: View {
               Text("\(self.radioManager.guiClientModels[index].stationName)")
                 .frame(minWidth: 100, maxWidth: 100)
             }
+            .selectButton()
             
             Button(action: {self.radioManager.setDefaultRadio(stationName: self.radioManager.guiClientModels[index].stationName)}) {
               Text("\(String(self.radioManager.guiClientModels[index].isDefaultStation))").frame(minWidth: 55, maxWidth: 55)
