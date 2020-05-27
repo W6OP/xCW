@@ -177,6 +177,14 @@ struct ContentView: View {
           Button(action: {self.radioManager.setMox()}) {
             Text("Mox")
               .frame(minWidth: 58, maxWidth: 58)
+            .focusable()
+            .touchBar {
+                Button(action: {
+                    self.radioManager.setMox()
+                }) {
+                    Text("MOX")
+                }
+            }
           }
           .controlButton()
           .disabled(!radioManager.sliceModel.txEnabled)
@@ -198,7 +206,7 @@ struct ContentView: View {
           Button(action: {
             self.showingRadios.toggle()
           }) {
-            Text("Select Radio")
+            Text("Select Station")
               .frame(minWidth: 100, maxWidth: 100)
           }
           .sheet(isPresented: $showingRadios) {
@@ -245,30 +253,70 @@ struct FirstRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
+      .focusable()
+      .touchBar {
+        Button(action: {
+          self.rm.sendCWMessage(tag: "1", freeText: "")
+        }) {
+          Text(self.rm.cwMemoryModels[0].line)
+        }
+      }
       
       Button(action: {self.rm.sendCWMessage(tag: "2", freeText: "")}) {
         Text(self.rm.cwMemoryModels[1].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
+      .focusable()
+      .touchBar {
+        Button(action: {
+          self.rm.sendCWMessage(tag: "2", freeText: "")
+        }) {
+          Text(self.rm.cwMemoryModels[1].line)
+        }
+      }
       
       Button(action: {self.rm.sendCWMessage(tag: "3", freeText: "")}) {
         Text(self.rm.cwMemoryModels[2].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
+      .focusable()
+      .touchBar {
+        Button(action: {
+          self.rm.sendCWMessage(tag: "3", freeText: "")
+        }) {
+          Text(self.rm.cwMemoryModels[2].line)
+        }
+      }
       
       Button(action: {self.rm.sendCWMessage(tag: "4", freeText: "")}) {
         Text(self.rm.cwMemoryModels[3].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
+      .focusable()
+      .touchBar {
+        Button(action: {
+          self.rm.sendCWMessage(tag: "4", freeText: "")
+        }) {
+          Text(self.rm.cwMemoryModels[3].line)
+        }
+      }
       
       Button(action: {self.rm.sendCWMessage(tag: "5", freeText: "")}) {
         Text(self.rm.cwMemoryModels[4].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
+      .focusable()
+      .touchBar {
+        Button(action: {
+          self.rm.sendCWMessage(tag: "5", freeText: "")
+        }) {
+          Text(self.rm.cwMemoryModels[4].line)
+        }
+      }
     }
     .frame(maxWidth: .infinity, maxHeight: 25).padding(.top, 10)
   }
