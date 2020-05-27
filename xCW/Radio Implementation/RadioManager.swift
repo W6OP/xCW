@@ -257,20 +257,26 @@ class RadioManager:  ApiDelegate, ObservableObject {
   */
   func setDefaultRadio(stationName: String) {
     
-    UserDefaults.standard.set(stationName, forKey: "defaultRadio")
+    var oldClientStationName = ""
     
+    // find the station that is set to true - remove it
+    // now set it to false and add it back
     if var client = guiClientModels.first(where: { $0.isDefaultStation == true} ){
+      oldClientStationName = client.stationName
       self.guiClientModels.removeAll(where: { $0.isDefaultStation == true })
       client.isDefaultStation = false
       self.guiClientModels.append((client))
+      UserDefaults.standard.set("", forKey: "defaultRadio")
     }
     
-    if var client = guiClientModels.first(where: { $0.stationName == stationName} ){
+    // now find the guiclient where the station name matches but isn't the last one
+    if var client = guiClientModels.first(where: { $0.stationName == stationName && $0.stationName != oldClientStationName} ){
       UI() {
         self.guiClientModels.removeAll(where: { $0.stationName == stationName })
         client.isDefaultStation = true
         self.guiClientModels.append((client))
       }
+      UserDefaults.standard.set(stationName, forKey: "defaultRadio")
     }
   }
   
@@ -601,17 +607,21 @@ class RadioManager:  ApiDelegate, ObservableObject {
       stationName = guiClientModels[index].stationName
     }
     
+    // check if it already exists, may have been left on a crash
+    if let index = self.sliceModels.firstIndex(where: {$0.sliceId == slice.id && $0.clientHandle == slice.clientHandle}) {
+      self.sliceModels.remove(at: index)
+    }
+    
+    // build and add the new one
     let sliceModel = SliceModel(sliceId: slice.id, sliceLetter: slice.sliceLetter ?? "Unknown", radioMode: mode, txEnabled: slice.txEnabled, frequency: frequency, clientHandle: slice.clientHandle, associatedStationName: stationName)
     
     sliceModels.append(sliceModel)
     
     // probably don't care when addded
     // I really only care about a slice that is tx enabled
-    if slice.txEnabled {
+    if slice.txEnabled && sliceModel.clientHandle == slice.clientHandle {
       UI() {
-        if sliceModel.clientHandle == slice.clientHandle {
           self.sliceModel = sliceModel
-        }
       }
     }
     
@@ -651,17 +661,47 @@ class RadioManager:  ApiDelegate, ObservableObject {
    */
   func updateSliceStatus(_ slice: xLib6000.Slice, sliceStatus: sliceStatus,  _ change: Any) {
     
-    // now is this slice added yet
-    if let sliceModel = sliceModels.first(where: {$0.sliceId == slice.id}) {
+    let mode: radioMode = radioMode(rawValue: slice.mode) ?? radioMode.invalid
+    let frequency: String = convertFrequencyToDecimalString (frequency: slice.frequency)
+    
+    // find the slice, update it
+      if let index = self.sliceModels.firstIndex(where: {$0.sliceId == slice.id && $0.clientHandle == slice.clientHandle}) {
       
-      if slice.txEnabled  && self.sliceModel.associatedStationName == boundStationName {
+      switch sliceStatus {
+      case .active:
+        break
+      case .frequency:
+        self.sliceModels[index].frequency = frequency
+      case .mode:
+        self.sliceModels[index].radioMode = mode
+      case .txEnabled:
+        self.sliceModels[index].txEnabled = slice.txEnabled
+      }
+      
+//      print("slice: \(slice.id) : \(slice.sliceLetter ?? "X") : \(slice.txEnabled)")
+//      print("model: \(self.sliceModels[index].sliceId) : \(self.sliceModels[index].sliceLetter) : \(self.sliceModels[index].txEnabled)")
+      
       UI() {
-        self.sliceModel = sliceModel
+        if self.sliceModels[index].clientHandle == self.sliceModel.clientHandle {
+          self.sliceModel = self.getTxEnabledSlice(clientHandle: self.sliceModels[index].clientHandle)
+          print("self.sliceModel: \(self.sliceModel.sliceId) : \(self.sliceModel.sliceLetter) : \(self.sliceModel.txEnabled)")
         }
       }
     }
-    
     os_log("Slice has been updated.", log: RadioManager.model_log, type: .info)
+  }
+  
+  /**
+   Return the current slice that is txEnabled or an invalid slice
+   */
+  func getTxEnabledSlice(clientHandle: UInt32) -> SliceModel {
+
+    if let model = sliceModels.first(where: { $0.clientHandle == clientHandle && $0.txEnabled}) {
+      //print("returned: \(model.sliceId) : \(model.sliceLetter) : \(model.txEnabled)")
+      return model
+    }
+    
+    return sliceModels.first(where: { $0.clientHandle == clientHandle }) ?? SliceModel(radioMode: .invalid)
   }
   
   /**
@@ -672,11 +712,14 @@ class RadioManager:  ApiDelegate, ObservableObject {
     for sliceModel in sliceModels {
       if sliceModel.clientHandle == boundStationHandle {
         if sliceModel.txEnabled {
-          //self.sliceModel.associatedStationName = boundStationName
-          self.sliceModel = sliceModel
+          UI() {
+            self.sliceModel = sliceModel
+          }
           break
         } else {
-          self.sliceModel = sliceModel
+          UI() {
+            self.sliceModel = sliceModel
+          }
         }
       }
     }

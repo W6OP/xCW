@@ -151,16 +151,16 @@ struct ContentView: View {
     HStack {
       VStack {
         FirstRowView()
-          .environmentObject(self.radioManager).disabled(!radioManager.isConnected).disabled(radioManager.sliceModel.radioMode.rawValue != "CW")
+          .environmentObject(self.radioManager).disabled(!radioManager.isConnected).disabled(radioManager.sliceModel.radioMode.rawValue != "CW" || !radioManager.sliceModel.txEnabled)
         SecondRowView()
-          .environmentObject(self.radioManager).disabled(!radioManager.isConnected).disabled(radioManager.sliceModel.radioMode.rawValue != "CW")
+          .environmentObject(self.radioManager).disabled(!radioManager.isConnected).disabled(radioManager.sliceModel.radioMode.rawValue != "CW" || !radioManager.sliceModel.txEnabled)
         
         Divider()
         
         HStack {
           FreeFormScrollView(cwText: cwText)
             .environmentObject(self.radioManager)
-            .disabled(radioManager.sliceModel.radioMode.rawValue != "CW")
+            .disabled(radioManager.sliceModel.radioMode.rawValue != "CW" || !radioManager.sliceModel.txEnabled)
         }
         .frame(minWidth: 550, maxWidth: 550, minHeight: 110, maxHeight: 110)
         
@@ -172,14 +172,14 @@ struct ContentView: View {
               .frame(minWidth: 58, maxWidth: 58)
           }
           .controlButton()
-          .disabled(!radioManager.isConnected)
+          .disabled(!radioManager.sliceModel.txEnabled)
           
           Button(action: {self.radioManager.setMox()}) {
             Text("Mox")
               .frame(minWidth: 58, maxWidth: 58)
           }
           .controlButton()
-          .disabled(!radioManager.isConnected)
+          .disabled(!radioManager.sliceModel.txEnabled)
           
           // show the cw memory panel
           Button(action: {
@@ -189,7 +189,7 @@ struct ContentView: View {
               .frame(minWidth: 100, maxWidth: 100)
           }
             .controlButton()
-          .disabled(!radioManager.isConnected)
+          .disabled(!radioManager.sliceModel.txEnabled)
           .sheet(isPresented: $showingMemories) {
             return CWMemoriesPicker().environmentObject(self.radioManager)
           }
@@ -204,7 +204,7 @@ struct ContentView: View {
           .sheet(isPresented: $showingRadios) {
             // https://stackoverflow.com/questions/58743004/swiftui-environmentobject-error-may-be-missing-as-an-ancestor-of-this-view
             // this is how to pass the radioManager
-            return RadioPicker().environmentObject(self.radioManager)
+            return StationPicker().environmentObject(self.radioManager)
           }
         }
         .frame(minWidth: 600, maxWidth: 600).padding(.bottom, 1)
@@ -366,7 +366,7 @@ struct  FreeFormScrollView: View {
  View of the Radio Picker sheet.
  https://www.hackingwithswift.com/quick-start/swiftui/how-to-present-a-new-view-using-sheets
  */
-struct RadioPicker: View {
+struct StationPicker: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var radioManager: RadioManager
   
@@ -375,35 +375,39 @@ struct RadioPicker: View {
     return VStack{
       HStack{
         VStack{
-        Text("Model")
+          Text("Model")
         }.frame(minWidth: 80, maxWidth: 80)//.padding(.leading, 2)//.border(Color.black)//.padding(.leading, 2).border(Color.black)
+        
         Spacer()
+        
         VStack{
-        Text("NickName").frame(minWidth: 80, maxWidth: 80)//.border(Color.black) //.multilineTextAlignment(.leading)
+          Text("NickName").frame(minWidth: 80, maxWidth: 80)//.border(Color.black) //.multilineTextAlignment(.leading)
+        }.frame(minWidth: 80, maxWidth: 80)//.border(Color.black)
+        
+        Spacer()
+        
+        VStack{
+          Text("Connect")//.frame(minWidth: 70, maxWidth: 70).padding(.leading, 30).border(Color.black)
         }.frame(minWidth: 80, maxWidth: 80)//.border(Color.black)
         Spacer()
+        
         VStack{
-        Text("Connect")//.frame(minWidth: 70, maxWidth: 70).padding(.leading, 30).border(Color.black)
-        }.frame(minWidth: 80, maxWidth: 80)//.border(Color.black)
-        Spacer()
-        VStack{
-        Text("Set Default")//.frame(minWidth: 80, maxWidth: 80).padding(.leading, 18).padding(.trailing, 15).border(Color.black)
-        }.frame(minWidth: 80, maxWidth: 80)//.border(Color.black)
+          Text("Set Default")
+        }.frame(minWidth: 80, maxWidth: 80)
       }
       .frame(minWidth: 450, maxWidth: 450)
       .padding(.leading, 5).padding(.trailing, 5)
       .font(.system(size: 14))
       .foregroundColor(Color.black)
       
-        Divider()
-          .border(Color.black)
+      Divider()
+        .border(Color.black)
       
       
       // Radio Picker
       ForEach(radioManager.guiClientModels.indices, id: \.self ) { index in
         HStack {
           HStack {
-            
             Text("\(self.radioManager.guiClientModels[index].radioModel)")
               .frame(minWidth: 100, maxWidth: 100)
             
