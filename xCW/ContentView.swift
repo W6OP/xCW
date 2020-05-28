@@ -179,14 +179,16 @@ struct ContentView: View {
           Button(action: {self.radioManager.setMox()}) {
             Text("Mox")
               .frame(minWidth: 58, maxWidth: 58)
-              .touchBar {
-                Button(action: {
-                  self.radioManager.setMox()
-                }) {
-                  Text("MOX")
-                }
-            }
           }
+        .focusable()
+        .touchBar {
+            Button(action: {
+              self.radioManager.setMox()
+            }) {
+              Text("MOX")
+            }
+        }
+            
           .controlButton()
           .disabled(!radioManager.sliceModel.txEnabled)
           
@@ -412,12 +414,22 @@ struct  FreeFormScrollView: View {
         Button(action: {self.radioManager.sendCWMessage(tag: "0", freeText: "\(self.cwText.line)")}) {
           Text("Send Text")
             .frame(minWidth: 78, maxWidth: 78)
-        }.disabled(self.cwText.line == "")
+        }
+        .disabled(self.cwText.line == "")
+        .focusable()
+        .touchBar {
+            Button(action: {
+              self.radioManager.sendCWMessage(tag: "0", freeText: "\(self.cwText.line)")
+            }) {
+              Text("Send")
+            }
+        }
         
         Button(action: {self.cwText.line = ""}) {
           Text("Clear Text")
             .frame(minWidth: 78, maxWidth: 78)
-        }.disabled(self.cwText.line == "")
+        }
+        .disabled(self.cwText.line == "")
         
         Toggle(isOn: $isBuffered) {
           Text("Buffer Text")
