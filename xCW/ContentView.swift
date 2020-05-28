@@ -65,10 +65,10 @@ struct CWButtonStyle: ButtonStyle {
   var foregroundColor: Color
   var backgroundColor: Color
   var pressedColor: Color
+  //var disabledColor: Color
   
   func makeBody(configuration: Self.Configuration) -> some View {
     configuration.label
-      //.font(.body)
       .padding(2)
       .foregroundColor(foregroundColor)
       .background(configuration.isPressed ? pressedColor : backgroundColor)
@@ -120,12 +120,14 @@ extension View {
     foregroundColor: Color = .black,
     backgroundColor: Color = .blue,
     pressedColor: Color = .accentColor
+    //disabledColor: Color = .gray
   ) -> some View {
     self.buttonStyle(
       CWButtonStyle(
         foregroundColor: foregroundColor,
         backgroundColor: backgroundColor.opacity(0.30),
         pressedColor: pressedColor
+        //disabledColor: disabledColor.opacity(0.30)
       )
     )
   }
@@ -177,7 +179,6 @@ struct ContentView: View {
           Button(action: {self.radioManager.setMox()}) {
             Text("Mox")
               .frame(minWidth: 58, maxWidth: 58)
-              .focusable()
               .touchBar {
                 Button(action: {
                   self.radioManager.setMox()
@@ -210,8 +211,6 @@ struct ContentView: View {
               .frame(minWidth: 100, maxWidth: 100)
           }
           .sheet(isPresented: $showingRadios) {
-            // https://stackoverflow.com/questions/58743004/swiftui-environmentobject-error-may-be-missing-as-an-ancestor-of-this-view
-            // this is how to pass the radioManager
             return StationPicker().environmentObject(self.radioManager)
           }
         }
@@ -253,7 +252,6 @@ struct FirstRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .focusable()
       .touchBar {
         Button(action: {
           self.radioManager.sendCWMessage(tag: "1", freeText: "")
@@ -267,7 +265,6 @@ struct FirstRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .focusable()
       .touchBar {
         Button(action: {
           self.radioManager.sendCWMessage(tag: "2", freeText: "")
@@ -281,7 +278,6 @@ struct FirstRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .focusable()
       .touchBar {
         Button(action: {
           self.radioManager.sendCWMessage(tag: "3", freeText: "")
@@ -295,7 +291,6 @@ struct FirstRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .focusable()
       .touchBar {
         Button(action: {
           self.radioManager.sendCWMessage(tag: "4", freeText: "")
@@ -309,7 +304,6 @@ struct FirstRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .focusable()
       .touchBar {
         Button(action: {
           self.radioManager.sendCWMessage(tag: "5", freeText: "")
@@ -335,7 +329,6 @@ struct SecondRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .focusable()
       .touchBar {
         Button(action: {
           self.radioManager.sendCWMessage(tag: "6", freeText: "")
@@ -349,7 +342,6 @@ struct SecondRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .focusable()
       .touchBar {
         Button(action: {
           self.radioManager.sendCWMessage(tag: "7", freeText: "")
@@ -363,7 +355,6 @@ struct SecondRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .focusable()
       .touchBar {
         Button(action: {
           self.radioManager.sendCWMessage(tag: "8", freeText: "")
@@ -377,7 +368,6 @@ struct SecondRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .focusable()
       .touchBar {
         Button(action: {
           self.radioManager.sendCWMessage(tag: "9", freeText: "")
@@ -391,7 +381,6 @@ struct SecondRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .focusable()
       .touchBar {
         Button(action: {
           self.radioManager.sendCWMessage(tag: "10", freeText: "")
