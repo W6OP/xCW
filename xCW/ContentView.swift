@@ -20,7 +20,7 @@ struct DefaultButtonStyle: ButtonStyle {
   var foregroundColor: Color
   var backgroundColor: Color
   var pressedColor: Color
-
+  
   func makeBody(configuration: Self.Configuration) -> some View {
     configuration.label
       //.font(.body)
@@ -35,7 +35,7 @@ struct SelectButtonStyle: ButtonStyle {
   var foregroundColor: Color
   var backgroundColor: Color
   var pressedColor: Color
-
+  
   func makeBody(configuration: Self.Configuration) -> some View {
     configuration.label
       //.font(.body)
@@ -50,7 +50,7 @@ struct ControlButtonStyle: ButtonStyle {
   var foregroundColor: Color
   var backgroundColor: Color
   var pressedColor: Color
-
+  
   func makeBody(configuration: Self.Configuration) -> some View {
     configuration.label
       //.font(.body)
@@ -65,7 +65,7 @@ struct CWButtonStyle: ButtonStyle {
   var foregroundColor: Color
   var backgroundColor: Color
   var pressedColor: Color
-
+  
   func makeBody(configuration: Self.Configuration) -> some View {
     configuration.label
       //.font(.body)
@@ -177,12 +177,12 @@ struct ContentView: View {
           Button(action: {self.radioManager.setMox()}) {
             Text("Mox")
               .frame(minWidth: 58, maxWidth: 58)
-            .focusable()
-            .touchBar {
+              .focusable()
+              .touchBar {
                 Button(action: {
-                    self.radioManager.setMox()
+                  self.radioManager.setMox()
                 }) {
-                    Text("MOX")
+                  Text("MOX")
                 }
             }
           }
@@ -196,7 +196,7 @@ struct ContentView: View {
             Text("Memories")
               .frame(minWidth: 100, maxWidth: 100)
           }
-            .controlButton()
+          .controlButton()
           .disabled(!radioManager.sliceModel.txEnabled)
           .sheet(isPresented: $showingMemories) {
             return CWMemoriesPicker().environmentObject(self.radioManager)
@@ -234,7 +234,7 @@ struct ContentView: View {
         .padding(.bottom, 5)
       }
       .frame(minWidth: 600, maxWidth: 600)
-    }
+    }//.onAppear(perform: { ContentView.view?.level = .floating})
   } // end body
 }
 
@@ -244,77 +244,77 @@ struct ContentView: View {
  The first row of memory buttons.
  */
 struct FirstRowView: View {
-  @EnvironmentObject var rm: RadioManager
+  @EnvironmentObject var radioManager: RadioManager
   
   var body: some View {
     HStack {
-      Button(action: {self.rm.sendCWMessage(tag: "1", freeText: "")}) {
-        Text(self.rm.cwMemoryModels[0].line)
+      Button(action: {self.radioManager.sendCWMessage(tag: "1", freeText: "")}) {
+        Text(self.radioManager.cwMemoryModels[0].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
       .focusable()
       .touchBar {
         Button(action: {
-          self.rm.sendCWMessage(tag: "1", freeText: "")
+          self.radioManager.sendCWMessage(tag: "1", freeText: "")
         }) {
-          Text(self.rm.cwMemoryModels[0].line)
+          Text(self.radioManager.cwMemoryModels[0].line)
         }
       }
       
-      Button(action: {self.rm.sendCWMessage(tag: "2", freeText: "")}) {
-        Text(self.rm.cwMemoryModels[1].line)
+      Button(action: {self.radioManager.sendCWMessage(tag: "2", freeText: "")}) {
+        Text(self.radioManager.cwMemoryModels[1].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
       .focusable()
       .touchBar {
         Button(action: {
-          self.rm.sendCWMessage(tag: "2", freeText: "")
+          self.radioManager.sendCWMessage(tag: "2", freeText: "")
         }) {
-          Text(self.rm.cwMemoryModels[1].line)
+          Text(self.radioManager.cwMemoryModels[1].line)
         }
       }
       
-      Button(action: {self.rm.sendCWMessage(tag: "3", freeText: "")}) {
-        Text(self.rm.cwMemoryModels[2].line)
+      Button(action: {self.radioManager.sendCWMessage(tag: "3", freeText: "")}) {
+        Text(self.radioManager.cwMemoryModels[2].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
       .focusable()
       .touchBar {
         Button(action: {
-          self.rm.sendCWMessage(tag: "3", freeText: "")
+          self.radioManager.sendCWMessage(tag: "3", freeText: "")
         }) {
-          Text(self.rm.cwMemoryModels[2].line)
+          Text(self.radioManager.cwMemoryModels[2].line)
         }
       }
       
-      Button(action: {self.rm.sendCWMessage(tag: "4", freeText: "")}) {
-        Text(self.rm.cwMemoryModels[3].line)
+      Button(action: {self.radioManager.sendCWMessage(tag: "4", freeText: "")}) {
+        Text(self.radioManager.cwMemoryModels[3].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
       .focusable()
       .touchBar {
         Button(action: {
-          self.rm.sendCWMessage(tag: "4", freeText: "")
+          self.radioManager.sendCWMessage(tag: "4", freeText: "")
         }) {
-          Text(self.rm.cwMemoryModels[3].line)
+          Text(self.radioManager.cwMemoryModels[3].line)
         }
       }
       
-      Button(action: {self.rm.sendCWMessage(tag: "5", freeText: "")}) {
-        Text(self.rm.cwMemoryModels[4].line)
+      Button(action: {self.radioManager.sendCWMessage(tag: "5", freeText: "")}) {
+        Text(self.radioManager.cwMemoryModels[4].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
       .focusable()
       .touchBar {
         Button(action: {
-          self.rm.sendCWMessage(tag: "5", freeText: "")
+          self.radioManager.sendCWMessage(tag: "5", freeText: "")
         }) {
-          Text(self.rm.cwMemoryModels[4].line)
+          Text(self.radioManager.cwMemoryModels[4].line)
         }
       }
     }
@@ -326,39 +326,79 @@ struct FirstRowView: View {
  The second row of memory buttons.
  */
 struct SecondRowView: View {
-  @EnvironmentObject var rm: RadioManager
+  @EnvironmentObject var radioManager: RadioManager
   
   var body: some View {
     HStack {
-      Button(action: {self.rm.sendCWMessage(tag: "6", freeText: "")}) {
-        Text(self.rm.cwMemoryModels[5].line)
+      Button(action: {self.radioManager.sendCWMessage(tag: "6", freeText: "")}) {
+        Text(self.radioManager.cwMemoryModels[5].line)
           .frame(minWidth: 100, maxWidth: 100)
-          }
-          .cwButton()
+      }
+      .cwButton()
+      .focusable()
+      .touchBar {
+        Button(action: {
+          self.radioManager.sendCWMessage(tag: "6", freeText: "")
+        }) {
+          Text(self.radioManager.cwMemoryModels[5].line)
+        }
+      }
       
-      Button(action: {self.rm.sendCWMessage(tag: "7", freeText: "")}) {
-        Text(self.rm.cwMemoryModels[6].line)
+      Button(action: {self.radioManager.sendCWMessage(tag: "7", freeText: "")}) {
+        Text(self.radioManager.cwMemoryModels[6].line)
           .frame(minWidth: 100, maxWidth: 100)
-          }
-          .cwButton()
+      }
+      .cwButton()
+      .focusable()
+      .touchBar {
+        Button(action: {
+          self.radioManager.sendCWMessage(tag: "7", freeText: "")
+        }) {
+          Text(self.radioManager.cwMemoryModels[6].line)
+        }
+      }
       
-      Button(action: {self.rm.sendCWMessage(tag: "8", freeText: "")}) {
-        Text(self.rm.cwMemoryModels[7].line)
+      Button(action: {self.radioManager.sendCWMessage(tag: "8", freeText: "")}) {
+        Text(self.radioManager.cwMemoryModels[7].line)
           .frame(minWidth: 100, maxWidth: 100)
-          }
-          .cwButton()
+      }
+      .cwButton()
+      .focusable()
+      .touchBar {
+        Button(action: {
+          self.radioManager.sendCWMessage(tag: "8", freeText: "")
+        }) {
+          Text(self.radioManager.cwMemoryModels[7].line)
+        }
+      }
       
-      Button(action: {self.rm.sendCWMessage(tag: "9", freeText: "")}) {
-        Text(self.rm.cwMemoryModels[8].line)
+      Button(action: {self.radioManager.sendCWMessage(tag: "9", freeText: "")}) {
+        Text(self.radioManager.cwMemoryModels[8].line)
           .frame(minWidth: 100, maxWidth: 100)
-          }
-          .cwButton()
+      }
+      .cwButton()
+      .focusable()
+      .touchBar {
+        Button(action: {
+          self.radioManager.sendCWMessage(tag: "9", freeText: "")
+        }) {
+          Text(self.radioManager.cwMemoryModels[8].line)
+        }
+      }
       
-      Button(action: {self.rm.sendCWMessage(tag: "10", freeText: "")}) {
-        Text(self.rm.cwMemoryModels[9].line)
+      Button(action: {self.radioManager.sendCWMessage(tag: "10", freeText: "")}) {
+        Text(self.radioManager.cwMemoryModels[9].line)
           .frame(minWidth: 100, maxWidth: 100)
-          }
-          .cwButton()
+      }
+      .cwButton()
+      .focusable()
+      .touchBar {
+        Button(action: {
+          self.radioManager.sendCWMessage(tag: "10", freeText: "")
+        }) {
+          Text(self.radioManager.cwMemoryModels[9].line)
+        }
+      }
     }
     .frame(maxWidth: .infinity, maxHeight: 25).padding(.bottom, 1).padding(.top, 10)
   }
@@ -368,7 +408,7 @@ struct SecondRowView: View {
  TextView for freeform cw
  */
 struct  FreeFormScrollView: View {
-  @EnvironmentObject var rm: RadioManager
+  @EnvironmentObject var radioManager: RadioManager
   @State public var cwText: CWMemoryModel
   @State private var isBuffered = true
   
@@ -380,7 +420,7 @@ struct  FreeFormScrollView: View {
       }
       
       HStack {
-        Button(action: {self.rm.sendCWMessage(tag: "0", freeText: "\(self.cwText.line)")}) {
+        Button(action: {self.radioManager.sendCWMessage(tag: "0", freeText: "\(self.cwText.line)")}) {
           Text("Send Text")
             .frame(minWidth: 78, maxWidth: 78)
         }.disabled(self.cwText.line == "")
@@ -397,11 +437,20 @@ struct  FreeFormScrollView: View {
       }
       
       HStack {
-        Button(action: {self.rm.stopTransmitting()}) {
-          Text("Stop")
-            .frame(minWidth: 78, maxWidth: 78)
+        HStack {
+          Button(action: {self.radioManager.stopTransmitting()}) {
+            Text("Stop")
+              .frame(minWidth: 78, maxWidth: 78)
+          }
         }
-        .disabled(self.cwText.line == "")
+        
+        Spacer()
+          .frame(maxWidth: 95)
+        
+        HStack {
+          Text("Set Speed")
+          Stepper(value: self.$radioManager.cwSpeed, in: 5...80,onEditingChanged: { _ in self.radioManager.saveCWSpeed(speed: self.radioManager.cwSpeed) }, label: { Text("\(self.radioManager.cwSpeed)") })
+        }
       }
     }
   }
@@ -500,7 +549,7 @@ struct CWMemoriesPicker: View {
   @EnvironmentObject var radioManager: RadioManager
   @State private var entry = ""
   
- 
+  
   var body: some View {
     
     return VStack{
@@ -526,9 +575,9 @@ struct CWMemoriesPicker: View {
                         self.radioManager.saveCWMemory(message:
                           self.radioManager.cwMemoryModels[index].line, tag:
                           self.radioManager.cwMemoryModels[index].tag); print("TextField changed focus")},
-                          onCommit: {
-                            print("Committed!")
-                          })
+                      onCommit: {
+                        print("Committed!")
+            })
           }
         }
         .frame(minWidth: 400, maxWidth: 400)
