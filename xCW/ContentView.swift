@@ -16,6 +16,9 @@ extension EnvironmentObject
   }
 }
 
+/**
+ Custom button template for the default button style.
+ */
 struct DefaultButtonStyle: ButtonStyle {
   var foregroundColor: Color
   var backgroundColor: Color
@@ -31,6 +34,9 @@ struct DefaultButtonStyle: ButtonStyle {
   }
 }
 
+/**
+Custom button template for the select button style.
+*/
 struct SelectButtonStyle: ButtonStyle {
   var foregroundColor: Color
   var backgroundColor: Color
@@ -46,6 +52,9 @@ struct SelectButtonStyle: ButtonStyle {
   }
 }
 
+/**
+Custom button template for the control button style.
+*/
 struct ControlButtonStyle: ButtonStyle {
   var foregroundColor: Color
   var backgroundColor: Color
@@ -61,6 +70,9 @@ struct ControlButtonStyle: ButtonStyle {
   }
 }
 
+/**
+Custom button template for the cw button style.
+*/
 struct CWButtonStyle: ButtonStyle {
   var foregroundColor: Color
   var backgroundColor: Color
@@ -76,6 +88,9 @@ struct CWButtonStyle: ButtonStyle {
   }
 }
 
+/**
+ Extension to apply custom button styles.
+ */
 extension View {
   func controlButton(
     foregroundColor: Color = .white,
@@ -90,6 +105,7 @@ extension View {
       )
     )
   }
+  
   func selectButton(
     foregroundColor: Color = .black,
     backgroundColor: Color = .green,
@@ -103,6 +119,7 @@ extension View {
       )
     )
   }
+  
   func defaultButton(
     foregroundColor: Color = .black,
     backgroundColor: Color = .blue,
@@ -116,6 +133,7 @@ extension View {
       )
     )
   }
+  
   func cwButton(
     foregroundColor: Color = .black,
     backgroundColor: Color = .blue,
@@ -158,6 +176,7 @@ struct ContentView: View {
           .environmentObject(self.radioManager).disabled(!radioManager.isConnected).disabled(radioManager.sliceModel.radioMode.rawValue != "CW" || !radioManager.sliceModel.txEnabled)
         
         Divider()
+          .padding(.top, 5)
         
         HStack {
           FreeFormScrollView(cwText: cwText)
@@ -180,15 +199,6 @@ struct ContentView: View {
             Text("Mox")
               .frame(minWidth: 58, maxWidth: 58)
           }
-        .focusable()
-        .touchBar {
-            Button(action: {
-              self.radioManager.setMox()
-            }) {
-              Text("MOX")
-            }
-        }
-            
           .controlButton()
           .disabled(!radioManager.sliceModel.txEnabled)
           
@@ -202,6 +212,7 @@ struct ContentView: View {
           .controlButton()
           .disabled(!radioManager.sliceModel.txEnabled)
           .sheet(isPresented: $showingMemories) {
+          
             return CWMemoriesPicker().environmentObject(self.radioManager)
           }
           
@@ -213,6 +224,7 @@ struct ContentView: View {
               .frame(minWidth: 100, maxWidth: 100)
           }
           .sheet(isPresented: $showingRadios) {
+            
             return StationPicker().environmentObject(self.radioManager)
           }
         }
@@ -220,6 +232,8 @@ struct ContentView: View {
         .controlButton()
         
         Divider()
+        
+        // status labels
         HStack(spacing: 30) {
           Text("Slice: \(radioManager.sliceModel.sliceLetter)").frame(minWidth: 100, maxWidth: 100)
           Text("Mode: \(radioManager.sliceModel.radioMode.rawValue)").frame(minWidth: 100, maxWidth: 100)
@@ -242,7 +256,7 @@ struct ContentView: View {
 // MARK: - Sub Views ----------------------------------------------------------------------------
 
 /**
- The first row of memory buttons.
+ The first row of cw memory buttons.
  */
 struct FirstRowView: View {
   @EnvironmentObject var radioManager: RadioManager
@@ -254,72 +268,37 @@ struct FirstRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .touchBar {
-        Button(action: {
-          self.radioManager.sendCWMessage(tag: "1", freeText: "")
-        }) {
-          Text(self.radioManager.cwMemoryModels[0].line)
-        }
-      }
       
       Button(action: {self.radioManager.sendCWMessage(tag: "2", freeText: "")}) {
         Text(self.radioManager.cwMemoryModels[1].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .touchBar {
-        Button(action: {
-          self.radioManager.sendCWMessage(tag: "2", freeText: "")
-        }) {
-          Text(self.radioManager.cwMemoryModels[1].line)
-        }
-      }
       
       Button(action: {self.radioManager.sendCWMessage(tag: "3", freeText: "")}) {
         Text(self.radioManager.cwMemoryModels[2].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .touchBar {
-        Button(action: {
-          self.radioManager.sendCWMessage(tag: "3", freeText: "")
-        }) {
-          Text(self.radioManager.cwMemoryModels[2].line)
-        }
-      }
       
       Button(action: {self.radioManager.sendCWMessage(tag: "4", freeText: "")}) {
         Text(self.radioManager.cwMemoryModels[3].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .touchBar {
-        Button(action: {
-          self.radioManager.sendCWMessage(tag: "4", freeText: "")
-        }) {
-          Text(self.radioManager.cwMemoryModels[3].line)
-        }
-      }
       
       Button(action: {self.radioManager.sendCWMessage(tag: "5", freeText: "")}) {
         Text(self.radioManager.cwMemoryModels[4].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .touchBar {
-        Button(action: {
-          self.radioManager.sendCWMessage(tag: "5", freeText: "")
-        }) {
-          Text(self.radioManager.cwMemoryModels[4].line)
-        }
-      }
     }
     .frame(maxWidth: .infinity, maxHeight: 25).padding(.top, 10)
   }
 }
 
 /**
- The second row of memory buttons.
+ The second row of cw memory buttons.
  */
 struct SecondRowView: View {
   @EnvironmentObject var radioManager: RadioManager
@@ -331,72 +310,37 @@ struct SecondRowView: View {
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .touchBar {
-        Button(action: {
-          self.radioManager.sendCWMessage(tag: "6", freeText: "")
-        }) {
-          Text(self.radioManager.cwMemoryModels[5].line)
-        }
-      }
       
       Button(action: {self.radioManager.sendCWMessage(tag: "7", freeText: "")}) {
         Text(self.radioManager.cwMemoryModels[6].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .touchBar {
-        Button(action: {
-          self.radioManager.sendCWMessage(tag: "7", freeText: "")
-        }) {
-          Text(self.radioManager.cwMemoryModels[6].line)
-        }
-      }
       
       Button(action: {self.radioManager.sendCWMessage(tag: "8", freeText: "")}) {
         Text(self.radioManager.cwMemoryModels[7].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .touchBar {
-        Button(action: {
-          self.radioManager.sendCWMessage(tag: "8", freeText: "")
-        }) {
-          Text(self.radioManager.cwMemoryModels[7].line)
-        }
-      }
       
       Button(action: {self.radioManager.sendCWMessage(tag: "9", freeText: "")}) {
         Text(self.radioManager.cwMemoryModels[8].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .touchBar {
-        Button(action: {
-          self.radioManager.sendCWMessage(tag: "9", freeText: "")
-        }) {
-          Text(self.radioManager.cwMemoryModels[8].line)
-        }
-      }
       
       Button(action: {self.radioManager.sendCWMessage(tag: "10", freeText: "")}) {
         Text(self.radioManager.cwMemoryModels[9].line)
           .frame(minWidth: 100, maxWidth: 100)
       }
       .cwButton()
-      .touchBar {
-        Button(action: {
-          self.radioManager.sendCWMessage(tag: "10", freeText: "")
-        }) {
-          Text(self.radioManager.cwMemoryModels[9].line)
-        }
-      }
     }
     .frame(maxWidth: .infinity, maxHeight: 25).padding(.bottom, 1).padding(.top, 10)
   }
 }
 
 /**
- TextView for freeform cw
+ Text area for freeform cw input
  */
 struct  FreeFormScrollView: View {
   @EnvironmentObject var radioManager: RadioManager
@@ -416,14 +360,6 @@ struct  FreeFormScrollView: View {
             .frame(minWidth: 78, maxWidth: 78)
         }
         .disabled(self.cwText.line == "")
-        .focusable()
-        .touchBar {
-            Button(action: {
-              self.radioManager.sendCWMessage(tag: "0", freeText: "\(self.cwText.line)")
-            }) {
-              Text("Send")
-            }
-        }
         
         Button(action: {self.cwText.line = ""}) {
           Text("Clear Text")
@@ -448,6 +384,7 @@ struct  FreeFormScrollView: View {
         Spacer()
           .frame(maxWidth: 95)
         
+        // the value here syncs with the memory panel
         HStack {
           Text("Set Speed")
           Stepper(value: self.$radioManager.cwSpeed, in: 5...80,onEditingChanged: { _ in self.radioManager.saveCWSpeed(speed: self.radioManager.cwSpeed) }, label: { Text("\(self.radioManager.cwSpeed)") })
@@ -474,19 +411,23 @@ struct StationPicker: View {
       HStack{
         VStack{
           Text("Model")
-        }.frame(minWidth: 80, maxWidth: 80)//.padding(.leading, 2)//.border(Color.black)//.padding(.leading, 2).border(Color.black)
+        }
+        .frame(minWidth: 80, maxWidth: 80)
         
         Spacer()
         
         VStack{
-          Text("NickName").frame(minWidth: 80, maxWidth: 80)//.border(Color.black) //.multilineTextAlignment(.leading)
-        }.frame(minWidth: 80, maxWidth: 80)//.border(Color.black)
+          Text("NickName").frame(minWidth: 80, maxWidth: 80)
+        }
+        .frame(minWidth: 80, maxWidth: 80)
         
         Spacer()
         
         VStack{
           Text("Connect")//.frame(minWidth: 70, maxWidth: 70).padding(.leading, 30).border(Color.black)
-        }.frame(minWidth: 80, maxWidth: 80)//.border(Color.black)
+        }
+          .frame(minWidth: 80, maxWidth: 80)//.border(Color.black)
+        
         Spacer()
         
         VStack{
@@ -501,8 +442,7 @@ struct StationPicker: View {
       Divider()
         .border(Color.black)
       
-      
-      // Radio Picker
+      // Station Picker
       ForEach(radioManager.guiClientModels.indices, id: \.self ) { index in
         HStack {
           HStack {
@@ -513,7 +453,7 @@ struct StationPicker: View {
               .frame(minWidth: 120, maxWidth: 120)
             
             Button(action: {self.radioManager.connectToRadio(guiClientModel: self.radioManager.guiClientModels[index]);self.presentationMode.wrappedValue.dismiss()}) {
-              Text("\(self.radioManager.guiClientModels[index].stationName)").frame(minWidth: 100, maxWidth: 100) //
+              Text("\(self.radioManager.guiClientModels[index].stationName)").frame(minWidth: 100, maxWidth: 100)
             }
             .selectButton()
             
@@ -539,17 +479,18 @@ struct StationPicker: View {
       }
     }
     .background(Color.gray.opacity(0.50))
-    //.frame(minWidth: 445, maxWidth: 445)
   }
 }
 
 // MARK: - CW Message Panel ----------------------------------------------------------------------------
 
+/**
+View of the CW Memory sheet.
+*/
 struct CWMemoriesPicker: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject var radioManager: RadioManager
   @State private var entry = ""
-  
   
   var body: some View {
     
@@ -585,6 +526,7 @@ struct CWMemoriesPicker: View {
       }
       .frame(minWidth: 450, maxWidth: 450)
       
+      // syncs with main panel
       HStack {
         Text("Set Speed")
         Stepper(value: self.$radioManager.cwSpeed, in: 5...80,onEditingChanged: { _ in self.radioManager.saveCWSpeed(speed: self.radioManager.cwSpeed) }, label: { Text("\(self.radioManager.cwSpeed)") })
@@ -612,12 +554,6 @@ struct CWMemoriesPicker: View {
  .shadow(radius: 10)
  .padding(10)
  */
-
-
-// MARK: - Button Implementation ----------------------------------------------------------------------------
-func sendFreeText(transmit: Bool) {
-  
-}
 
 // MARK: - Preview Provider ----------------------------------------------------------------------------
 /**
