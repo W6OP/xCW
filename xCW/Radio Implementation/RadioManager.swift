@@ -416,11 +416,10 @@ class RadioManager:  ApiDelegate, ObservableObject {
         
         boundStationName = station
         boundStationHandle = handle
+        connectedStationName = station
         
-         updateSliceModel()
+        updateSliceModel()
         
-        //self.sliceModel.associatedStationName = boundStationName
-
         os_log("Bound to the Radio.", log: RadioManager.model_log, type: .info)
         
       }
@@ -565,6 +564,8 @@ class RadioManager:  ApiDelegate, ObservableObject {
           os_log("GUI clients have been updated.", log: RadioManager.model_log, type: .info)
         }
       }
+      // needed here because slices are added before the guiClients are updated.
+      updateSliceModel()
     }
   }
   
@@ -683,8 +684,9 @@ class RadioManager:  ApiDelegate, ObservableObject {
       
       UI() {
         if self.sliceModels[index].clientHandle == self.sliceModel.clientHandle {
+          
           self.sliceModel = self.getTxEnabledSlice(clientHandle: self.sliceModels[index].clientHandle)
-          print("self.sliceModel: \(self.sliceModel.sliceId) : \(self.sliceModel.sliceLetter) : \(self.sliceModel.txEnabled)")
+//          print("self.sliceModel: \(self.sliceModel.sliceId) : \(self.sliceModel.sliceLetter) : \(self.sliceModel.txEnabled)")
         }
       }
     }
@@ -713,12 +715,12 @@ class RadioManager:  ApiDelegate, ObservableObject {
       if sliceModel.clientHandle == boundStationHandle {
         if sliceModel.txEnabled {
           UI() {
-            self.sliceModel = sliceModel
+            self.sliceModel = SliceModel(sliceId: sliceModel.sliceId, sliceLetter: sliceModel.sliceLetter, radioMode: sliceModel.radioMode, txEnabled: sliceModel.txEnabled, frequency: sliceModel.frequency, clientHandle: sliceModel.clientHandle, associatedStationName: self.boundStationName)
           }
           break
         } else {
           UI() {
-            self.sliceModel = sliceModel
+            self.sliceModel = SliceModel(sliceId: sliceModel.sliceId, sliceLetter: sliceModel.sliceLetter, radioMode: sliceModel.radioMode, txEnabled: sliceModel.txEnabled, frequency: sliceModel.frequency, clientHandle: sliceModel.clientHandle, associatedStationName: self.boundStationName)
           }
         }
       }
