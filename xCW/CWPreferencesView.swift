@@ -27,7 +27,7 @@ struct FreeFormTextView: View {
     
     VStack(spacing: 0) {
       TextField("Placeholder1", text: $cwString1)
-      
+      .textFieldStyle(RoundedBorderTextFieldStyle())
     }.frame(minHeight: 100, maxHeight: 100)
     
   }

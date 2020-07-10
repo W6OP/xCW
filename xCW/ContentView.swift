@@ -212,7 +212,7 @@ struct ContentView: View {
           .controlButton()
           .disabled(!radioManager.sliceModel.txEnabled)
           .sheet(isPresented: $showingMemories) {
-          
+  
             return CWMemoriesPicker().environmentObject(self.radioManager)
           }
           
@@ -353,6 +353,7 @@ struct  FreeFormScrollView: View {
       HStack {
         TextField("Enter text here", text: $cwText.line)
       }
+      .textFieldStyle(RoundedBorderTextFieldStyle())
       
       HStack {
         Button(action: {self.radioManager.sendCWMessage(tag: "0", freeText: "\(self.cwText.line)")}) {
@@ -520,6 +521,7 @@ struct CWMemoriesPicker: View {
                       onCommit: {
                         print("Committed!")
             })
+            .textFieldStyle(RoundedBorderTextFieldStyle())
           }
         }
         .frame(minWidth: 400, maxWidth: 400)
