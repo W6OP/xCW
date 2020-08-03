@@ -211,8 +211,6 @@ class RadioManager:  ApiDelegate, ObservableObject {
    */
    init() {
     
-    //super.init()
-    
     // add notification subscriptions
     addNotificationListeners()
     
@@ -233,8 +231,6 @@ class RadioManager:  ApiDelegate, ObservableObject {
   
     let index = Int(tag)!
     
-    //cwMemoryModels.First({where: $0 == tag}).line = message
-    //cwMemoryModels.First({where: $0 == tag}).tag = tag
     cwMemoryModels[index - 1].line = String(message.prefix(50))
     cwMemoryModels[index - 1].tag = tag
     
@@ -453,9 +449,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
         let handle = guiClient.key
         
         let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, serialNumber: radio.serialNumber, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.value.station))
-        
-        //printGuiClient(guiClientModel: guiClientModel, source: "discoveryPacketsReceived")
-        
+       
         if guiClient.value.station != "" {
           UI() {
             self.guiClientModels.append(guiClientModel)
@@ -472,6 +466,9 @@ class RadioManager:  ApiDelegate, ObservableObject {
     }
   }
   
+  /**
+   For debugging
+   */
   func printGuiClient(guiClientModel: GUIClientModel, source: String) {
     print("Source: \(source)")
     print("clientID: \(guiClientModel.clientId)")
@@ -510,9 +507,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
           let handle = client.key
           
           let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station))
-          
-          //printGuiClient(guiClientModel: guiClientModel, source: "guiClientsAdded")
-
+         
           UI() {
             if guiClient.station != "" {
               self.guiClientModels.append(guiClientModel)
@@ -678,15 +673,11 @@ class RadioManager:  ApiDelegate, ObservableObject {
       case .txEnabled:
         self.sliceModels[index].txEnabled = slice.txEnabled
       }
-      
-//      print("slice: \(slice.id) : \(slice.sliceLetter ?? "X") : \(slice.txEnabled)")
-//      print("model: \(self.sliceModels[index].sliceId) : \(self.sliceModels[index].sliceLetter) : \(self.sliceModels[index].txEnabled)")
-      
+     
       UI() {
         if self.sliceModels[index].clientHandle == self.sliceModel.clientHandle {
           
           self.sliceModel = self.getTxEnabledSlice(clientHandle: self.sliceModels[index].clientHandle)
-//          print("self.sliceModel: \(self.sliceModel.sliceId) : \(self.sliceModel.sliceLetter) : \(self.sliceModel.txEnabled)")
         }
       }
     }
@@ -699,7 +690,6 @@ class RadioManager:  ApiDelegate, ObservableObject {
   func getTxEnabledSlice(clientHandle: UInt32) -> SliceModel {
 
     if let model = sliceModels.first(where: { $0.clientHandle == clientHandle && $0.txEnabled}) {
-      //print("returned: \(model.sliceId) : \(model.sliceLetter) : \(model.txEnabled)")
       return model
     }
     
@@ -784,6 +774,9 @@ class RadioManager:  ApiDelegate, ObservableObject {
     self.sliceModel = SliceModel(radioMode: .invalid)
   }
   
+  /*
+   Tune button was clicked
+   */
   func tuneRadio() {
     if api.radio?.transmit.tune == false {
       api.radio?.transmit.tune = true
@@ -792,6 +785,9 @@ class RadioManager:  ApiDelegate, ObservableObject {
     } 
   }
   
+  /*
+   MOX button clicked
+   */
   func setMox() {
     if (api.radio?.mox == false)  {
       api.radio?.mox = true
@@ -813,9 +809,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
     if tag == "0" {
       message = freeText
     }
-    
-    //print("Tag: \(tag)  Message: \(message)   Speed: \(cwSpeed)")
-    
+   
     if message != "" {
       api.radio?.cwx.wpm = cwSpeed
       api.radio?.cwx.send(message)
