@@ -100,22 +100,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "38FE0DC8-3628-4EF1-933F-1E2D503FEC52"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "xCW/ContentView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "539"
-            endingLineNumber = "539"
-            landmarkName = "unknown"
-            landmarkType = "0">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "6EC39162-86A8-40B8-A937-C637D4905FDE"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -267,8 +251,8 @@
             filePath = "xCW/ContentView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "643"
-            endingLineNumber = "643"
+            startingLineNumber = "533"
+            endingLineNumber = "533"
             landmarkName = "unknown"
             landmarkType = "0">
          </BreakpointContent>
@@ -283,8 +267,8 @@
             filePath = "xCW/ContentView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "646"
-            endingLineNumber = "646">
+            startingLineNumber = "536"
+            endingLineNumber = "536">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
