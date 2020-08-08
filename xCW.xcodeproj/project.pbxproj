@@ -11,6 +11,7 @@
 		9976094F246D8DAD003E6B8E /* xLib6000 in Frameworks */ = {isa = PBXBuildFile; productRef = 9976094E246D8DAD003E6B8E /* xLib6000 */; };
 		99760951246D8DAD003E6B8E /* CocoaAsyncSocket in Frameworks */ = {isa = PBXBuildFile; productRef = 99760950246D8DAD003E6B8E /* CocoaAsyncSocket */; };
 		99760954246D8F26003E6B8E /* RadioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99760953246D8F26003E6B8E /* RadioManager.swift */; };
+		99B4818824DF346B009AB879 /* MemoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B4818724DF346B009AB879 /* MemoryView.swift */; };
 		99EDEDCF2469DF87003F7608 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99EDEDCE2469DF87003F7608 /* AppDelegate.swift */; };
 		99EDEDD12469DF87003F7608 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99EDEDD02469DF87003F7608 /* ContentView.swift */; };
 		99EDEDD32469DF88003F7608 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99EDEDD22469DF88003F7608 /* Assets.xcassets */; };
@@ -35,6 +36,7 @@
 		996215B224718B260025299B /* CWPreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CWPreferencesView.swift; sourceTree = "<group>"; };
 		99760953246D8F26003E6B8E /* RadioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioManager.swift; sourceTree = "<group>"; };
 		998B733D247D6CD9008F327E /* xLib6000 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = xLib6000; path = ../xLib6000; sourceTree = "<group>"; };
+		99B4818724DF346B009AB879 /* MemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryView.swift; sourceTree = "<group>"; };
 		99EDEDCB2469DF87003F7608 /* xCW.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xCW.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99EDEDCE2469DF87003F7608 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		99EDEDD02469DF87003F7608 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 				99760952246D8EF5003E6B8E /* Radio Implementation */,
 				99EDEDCE2469DF87003F7608 /* AppDelegate.swift */,
 				99EDEDD02469DF87003F7608 /* ContentView.swift */,
+				99B4818724DF346B009AB879 /* MemoryView.swift */,
 				996215B224718B260025299B /* CWPreferencesView.swift */,
 				99EDEDD22469DF88003F7608 /* Assets.xcassets */,
 				99EDEDD72469DF88003F7608 /* Main.storyboard */,
@@ -196,6 +199,7 @@
 			files = (
 				99EDEDD12469DF87003F7608 /* ContentView.swift in Sources */,
 				99760954246D8F26003E6B8E /* RadioManager.swift in Sources */,
+				99B4818824DF346B009AB879 /* MemoryView.swift in Sources */,
 				99EDEDCF2469DF87003F7608 /* AppDelegate.swift in Sources */,
 				996215B324718B260025299B /* CWPreferencesView.swift in Sources */,
 			);
