@@ -7,99 +7,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "C6E47181-6294-495C-8076-DE5CA3808268"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "xCW/AppDelegate.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "18"
-            endingLineNumber = "18"
-            landmarkName = "AppDelegate"
-            landmarkType = "3">
-            <Locations>
-               <Location
-                  uuid = "C6E47181-6294-495C-8076-DE5CA3808268 - e752270af2f97678"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "xCW.AppDelegate.radioManager.getter : xCW.RadioManager"
-                  moduleName = "xCW"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pbourget/XcodeProjects/xCW/xCW/AppDelegate.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "18"
-                  endingLineNumber = "18"
-                  offsetFromSymbolStart = "126">
-               </Location>
-               <Location
-                  uuid = "C6E47181-6294-495C-8076-DE5CA3808268 - 647ac59782c8166c"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "xCW.AppDelegate.radioManager.setter : xCW.RadioManager"
-                  moduleName = "xCW"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pbourget/XcodeProjects/xCW/xCW/AppDelegate.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "18"
-                  endingLineNumber = "18"
-                  offsetFromSymbolStart = "164">
-               </Location>
-               <Location
-                  uuid = "C6E47181-6294-495C-8076-DE5CA3808268 - 66d5d1c2ca6abe7b"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "xCW.AppDelegate.radioManager.modify : xCW.RadioManager"
-                  moduleName = "xCW"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pbourget/XcodeProjects/xCW/xCW/AppDelegate.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "0"
-                  endingLineNumber = "0"
-                  offsetFromSymbolStart = "18">
-               </Location>
-               <Location
-                  uuid = "C6E47181-6294-495C-8076-DE5CA3808268 - f2b84d057407666c"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "xCW.AppDelegate.radioManager.modify : xCW.RadioManager with unmangled suffix &quot;.resume.0&quot;"
-                  moduleName = "xCW"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pbourget/XcodeProjects/xCW/xCW/AppDelegate.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "18"
-                  endingLineNumber = "18"
-                  offsetFromSymbolStart = "4">
-               </Location>
-               <Location
-                  uuid = "C6E47181-6294-495C-8076-DE5CA3808268 - 7e7b87c417301140"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "xCW.AppDelegate.init() -&gt; xCW.AppDelegate"
-                  moduleName = "xCW"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/pbourget/XcodeProjects/xCW/xCW/AppDelegate.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "18"
-                  endingLineNumber = "18"
-                  offsetFromSymbolStart = "183">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "6EC39162-86A8-40B8-A937-C637D4905FDE"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -107,8 +14,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "296"
-            endingLineNumber = "296"
+            startingLineNumber = "295"
+            endingLineNumber = "295"
             landmarkName = "retrieveUserDefaults()"
             landmarkType = "7">
          </BreakpointContent>
@@ -123,8 +30,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "237"
-            endingLineNumber = "237"
+            startingLineNumber = "236"
+            endingLineNumber = "236"
             landmarkName = "saveCWMemory(message:tag:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -194,7 +101,7 @@
             landmarkType = "24">
             <Locations>
                <Location
-                  uuid = "EE96A775-6100-4E01-A38C-473C9B1629B6 - c4bf41a77ee77455"
+                  uuid = "EE96A775-6100-4E01-A38C-473C9B1629B6 - 4e11e4ec9500df4c"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -209,7 +116,7 @@
                   offsetFromSymbolStart = "555">
                </Location>
                <Location
-                  uuid = "EE96A775-6100-4E01-A38C-473C9B1629B6 - 39de1f23fd565fec"
+                  uuid = "EE96A775-6100-4E01-A38C-473C9B1629B6 - b370ba6816b1f4f5"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -224,7 +131,7 @@
                   offsetFromSymbolStart = "32">
                </Location>
                <Location
-                  uuid = "EE96A775-6100-4E01-A38C-473C9B1629B6 - bf13527f7a6457d8"
+                  uuid = "EE96A775-6100-4E01-A38C-473C9B1629B6 - 35bdf7349183fca2"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -281,10 +188,10 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "369"
-            endingLineNumber = "369"
-            landmarkName = "connectToRadio(guiClientModel:)"
-            landmarkType = "7">
+            startingLineNumber = "413"
+            endingLineNumber = "413"
+            landmarkName = "RadioManager"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -383,7 +290,7 @@
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "4F71FD4C-0E18-4C18-8C1F-F113355559E8 - b9ff77f751cce87e"
+                  uuid = "4F71FD4C-0E18-4C18-8C1F-F113355559E8 - c2316175f88a57d5"
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -398,7 +305,7 @@
                   offsetFromSymbolStart = "522">
                </Location>
                <Location
-                  uuid = "4F71FD4C-0E18-4C18-8C1F-F113355559E8 - b9ff77f751cce87e"
+                  uuid = "4F71FD4C-0E18-4C18-8C1F-F113355559E8 - c2316175f88a57d5"
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -413,7 +320,7 @@
                   offsetFromSymbolStart = "574">
                </Location>
                <Location
-                  uuid = "4F71FD4C-0E18-4C18-8C1F-F113355559E8 - b9ff77f751cce87e"
+                  uuid = "4F71FD4C-0E18-4C18-8C1F-F113355559E8 - c2316175f88a57d5"
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -456,10 +363,10 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "451"
-            endingLineNumber = "451"
-            landmarkName = "discoveryPacketsReceived(_:)"
-            landmarkType = "7">
+            startingLineNumber = "526"
+            endingLineNumber = "526"
+            landmarkName = "RadioManager"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -472,13 +379,13 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "269"
-            endingLineNumber = "269"
+            startingLineNumber = "268"
+            endingLineNumber = "268"
             landmarkName = "setDefaultRadio(stationName:)"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "1A2E29F0-714A-4E5A-8D11-0845697ACDE2 - 665556ff904928d1"
+                  uuid = "1A2E29F0-714A-4E5A-8D11-0845697ACDE2 - 97ff9d7ab9364480"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -493,7 +400,7 @@
                   offsetFromSymbolStart = "1235">
                </Location>
                <Location
-                  uuid = "1A2E29F0-714A-4E5A-8D11-0845697ACDE2 - 12276dc6bc088958"
+                  uuid = "1A2E29F0-714A-4E5A-8D11-0845697ACDE2 - e38da6439577e509"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -508,7 +415,7 @@
                   offsetFromSymbolStart = "43">
                </Location>
                <Location
-                  uuid = "1A2E29F0-714A-4E5A-8D11-0845697ACDE2 - 7b022049484d900a"
+                  uuid = "1A2E29F0-714A-4E5A-8D11-0845697ACDE2 - 8aa8ebcc6132fc5b"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -535,8 +442,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "417"
-            endingLineNumber = "417"
+            startingLineNumber = "463"
+            endingLineNumber = "463"
             landmarkName = "bindToStation(clientId:station:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -551,8 +458,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "194"
-            endingLineNumber = "194"
+            startingLineNumber = "192"
+            endingLineNumber = "192"
             landmarkName = "RadioManager"
             landmarkType = "3">
          </BreakpointContent>
@@ -571,6 +478,94 @@
             endingLineNumber = "227"
             landmarkName = "body"
             landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "72444B19-3C5F-448C-AAA4-6F773C021D8F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../xLib6000/Sources/xLib6000/Networking/Discovery.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "82"
+            endingLineNumber = "82"
+            landmarkName = "init(discoveryPort:checkInterval:notSeenInterval:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3286B75A-8482-404D-A8C8-835A4CEC2D9E"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../xLib6000/Sources/xLib6000/Networking/Discovery.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "79"
+            endingLineNumber = "79"
+            landmarkName = "init(discoveryPort:checkInterval:notSeenInterval:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D0FE87C8-58D8-4FB1-875C-B664C45F095E"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../xLib6000/Sources/xLib6000/Api/Radio.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "865"
+            endingLineNumber = "865"
+            landmarkName = "parseV3Connection(properties:handle:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9E2B56D1-17F6-4CAD-BE4E-3005C21983FF"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "Yes"
+            filePath = "../xLib6000/Sources/xLib6000/Api/Radio.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1102"
+            endingLineNumber = "1102"
+            landmarkName = "parseClient(_:_:_:)"
+            landmarkType = "7">
+            <Actions>
+               <BreakpointActionProxy
+                  ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
+                  <ActionContent
+                     consoleCommand = "po properties">
+                  </ActionContent>
+               </BreakpointActionProxy>
+            </Actions>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "CDF04241-2FE8-4C9D-A51E-8C79FA8777CD"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "xCW/Radio Implementation/RadioManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "632"
+            endingLineNumber = "632"
+            landmarkName = "RadioManager"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

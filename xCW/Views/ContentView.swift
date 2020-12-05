@@ -9,12 +9,12 @@
 import SwiftUI
 
 
-extension EnvironmentObject
-{
-  var safeToUse: Bool {
-    return (Mirror(reflecting: self).children.first(where: { $0.label == "_store"})?.value as? ObjectType) != nil
-  }
-}
+//extension EnvironmentObject
+//{
+//  var safeToUse: Bool {
+//    return (Mirror(reflecting: self).children.first(where: { $0.label == "_store"})?.value as? ObjectType) != nil
+//  }
+//}
 
 /**
  Custom button template for the default button style.
@@ -458,22 +458,28 @@ struct StationPicker: View {
         .border(Color.black)
       
       // Station Picker
-      ForEach(radioManager.guiClientModels.indices, id: \.self ) { index in
+      ForEach(radioManager.stationModels.indices, id: \.self ) { index in
         HStack {
           HStack {
-            Text("\(self.radioManager.guiClientModels[index].radioModel)")
+            Text("\(self.radioManager.stationModels[index].radioModel)")
               .frame(minWidth: 100, maxWidth: 100)
             
-            Text("\(self.radioManager.guiClientModels[index].radioNickname)")
+            Text("\(self.radioManager.stationModels[index].radioNickname)")
               .frame(minWidth: 120, maxWidth: 120)
             
-            Button(action: {self.radioManager.connectToRadio(guiClientModel: self.radioManager.guiClientModels[index]);self.presentationMode.wrappedValue.dismiss()}) {
-              Text("\(self.radioManager.guiClientModels[index].stationName)").frame(minWidth: 100, maxWidth: 100)
+            /**
+             self.radioManager.connectToRadio(guiClientModel: self.radioManager.guiClientModels[index])
+             */
+            Button(action: {
+                    let station = self.radioManager.stationModels[index]
+                    _ = self.radioManager.connectToRadio(serialNumber: station.serialNumber, station: station.stationName, clientId: station.clientId, didConnect: false)
+                    ;self.presentationMode.wrappedValue.dismiss()}) {
+              Text("\(self.radioManager.stationModels[index].stationName)").frame(minWidth: 100, maxWidth: 100)
             }
             .selectButton()
             
-            Button(action: {self.radioManager.setDefaultRadio(stationName: self.radioManager.guiClientModels[index].stationName)}) {
-              Text("\(String(self.radioManager.guiClientModels[index].isDefaultStation))").frame(minWidth: 100)
+            Button(action: {self.radioManager.setDefaultRadio(stationName: self.radioManager.stationModels[index].stationName)}) {
+              Text("\(String(self.radioManager.stationModels[index].isDefaultStation))").frame(minWidth: 100)
             }
             .defaultButton()
             

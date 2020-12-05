@@ -43,7 +43,6 @@
 
 import Foundation
 import xLib6000
-import Repeat
 import os
 
 // MARK: Extensions ------------------------------------------------------------------------------------------------
@@ -116,7 +115,7 @@ public enum sliceStatus : String {
 /**
  Data model for a radio and station selection in the Radio Picker.
  */
-struct GUIClientModel: Identifiable {
+struct StationModel: Identifiable, Equatable {
   var id = UUID()
   
   var radioModel: String = ""
@@ -133,7 +132,6 @@ struct GUIClientModel: Identifiable {
  */
 struct CWMemoryModel: Identifiable {
   var id: Int
-  
   var tag: String = ""
   var line: String = ""
 }
@@ -186,12 +184,12 @@ class RadioManager:  ApiDelegate, ObservableObject {
   
   // MARK: - Published properties ----------------------------------------------------------------------------
   
-  @Published var guiClientModels = [GUIClientModel]()
+  @Published var stationModels = [StationModel]()
   @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, clientHandle: 0)
   @Published var cwMemoryModels = [CWMemoryModel]()
   @Published var cwSpeed = 25
   
-  var isConnected = false
+  var isConnected = false // should I publish this ?
   var isBoundToClient = false
   var boundStationName = ""
   var connectedStationName = ""
@@ -202,7 +200,8 @@ class RadioManager:  ApiDelegate, ObservableObject {
   
   // MARK: - Private properties ----------------------------------------------------------------------------
   
-  private let clientProgramName = "xCW"
+  //private let clientProgramName = "xCW"
+  private let clientProgram = "xCW"
   
   // MARK: - RadioManager Initialization ----------------------------------------------------------------------------
   
@@ -257,20 +256,20 @@ class RadioManager:  ApiDelegate, ObservableObject {
     
     // find the station that is set to true - remove it
     // now set it to false and add it back
-    if var client = guiClientModels.first(where: { $0.isDefaultStation == true} ){
+    if var client = stationModels.first(where: { $0.isDefaultStation == true} ){
       oldClientStationName = client.stationName
-      self.guiClientModels.removeAll(where: { $0.isDefaultStation == true })
+      self.stationModels.removeAll(where: { $0.isDefaultStation == true })
       client.isDefaultStation = false
-      self.guiClientModels.append((client))
+      self.stationModels.append((client))
       UserDefaults.standard.set("", forKey: "defaultRadio")
     }
     
     // now find the guiclient where the station name matches but isn't the last one
-    if var client = guiClientModels.first(where: { $0.stationName == stationName && $0.stationName != oldClientStationName} ){
+    if var client = stationModels.first(where: { $0.stationName == stationName && $0.stationName != oldClientStationName} ){
       UI() {
-        self.guiClientModels.removeAll(where: { $0.stationName == stationName })
+        self.stationModels.removeAll(where: { $0.stationName == stationName })
         client.isDefaultStation = true
-        self.guiClientModels.append((client))
+        self.stationModels.append((client))
       }
       UserDefaults.standard.set(stationName, forKey: "defaultRadio")
     }
@@ -365,11 +364,16 @@ class RadioManager:  ApiDelegate, ObservableObject {
    - clientId: client id if available
    - doConnect: bool returning true if the connect was successful
    */
-  func connectToRadio(guiClientModel: GUIClientModel) {
-
+  func connectToRadio(serialNumber: String, station: String, clientId: String, didConnect: Bool) -> Bool {
+    
+    os_log("Connect to the Radio.", log: RadioManager.model_log, type: .info)
+    
+    // allow time to hear the UDP broadcasts
+    usleep(1500)
+    
     if isConnected {
-      bindToStation(clientId: guiClientModel.clientId, station: guiClientModel.stationName)
-      return
+      bindToStation(clientId: clientId, station: station)
+      return false
     }
     
     isConnected = false
@@ -378,20 +382,60 @@ class RadioManager:  ApiDelegate, ObservableObject {
     
     os_log("Connect to the Radio.", log: RadioManager.model_log, type: .info)
     
-    // allow time to hear the UDP broadcasts
-    usleep(1500)
-    
-      for (_, foundRadio) in discovery.discoveredRadios.enumerated() where foundRadio.serialNumber == guiClientModel.serialNumber {
+    if (didConnect){
+      for (_, foundRadio) in discovery.discoveryPackets.enumerated() where foundRadio.serialNumber == serialNumber {
         
         activeRadio = foundRadio
         
-        if api.connect(activeRadio!, program: clientProgramName, clientId: nil, isGui: false) {
-          os_log("Connected to the Radio.", log: RadioManager.model_log, type: .info)
-          isConnected = true
-          connectedStationName = guiClientModel.stationName
-        }
+        // TODO: How do I know it connected?
+        api.connect(activeRadio!, program: clientProgram, clientId: nil, isGui: false)
+        
+        isConnected = true
+        connectedStationName = station
+        
+        os_log("Connected to the Radio.", log: RadioManager.model_log, type: .info)
+        // check if radio is null
+        return true
+      }
     }
+    return false
   }
+  
+  /**
+   Exposed function for the GUI to indicate which radio to connect to.
+   - parameters:
+   - serialNumber: a string representing the serial number of the radio to connect
+   - station: station name for the connection
+   - clientId: client id if available
+   - doConnect: bool returning true if the connect was successful
+   */
+//  func connectToRadio(guiClientModel: GUIClientModel) {
+//
+//    if isConnected {
+//      bindToStation(clientId: guiClientModel.clientId, station: guiClientModel.stationName)
+//      return
+//    }
+//
+//    isConnected = false
+//    connectedStationName = ""
+//    boundStationName = ""
+//
+//    os_log("Connect to the Radio.", log: RadioManager.model_log, type: .info)
+//
+//    // allow time to hear the UDP broadcasts
+//    usleep(1500)
+//
+//      for (_, foundRadio) in discovery.discoveredRadios.enumerated() where foundRadio.serialNumber == guiClientModel.serialNumber {
+//
+//        activeRadio = foundRadio
+//
+//        if api.connect(activeRadio!, program: clientProgramName, clientId: nil, isGui: false) {
+//          os_log("Connected to the Radio.", log: RadioManager.model_log, type: .info)
+//          isConnected = true
+//          connectedStationName = guiClientModel.stationName
+//        }
+//    }
+//  }
   
   /**
    Bind to a specific station so we get their messages and updates
@@ -405,10 +449,12 @@ class RadioManager:  ApiDelegate, ObservableObject {
     
     api.radio?.boundClientId = clientId
     
-    for radio in discovery.discoveredRadios {
-      
-      if let guiClient = radio.guiClients.filter({ $0.value.station == station }).first {
-        let handle = guiClient.key
+    //for radio in discovery.discoveredRadios {
+    for radio in discovery.discoveryPackets {
+      //if let guiClient = radio.guiClients.filter({ $0.value.station == station }).first {
+      if let guiClient = radio.guiClients.filter({ $0.station == station }).first {
+        let handle = guiClient.handle //.key
+      //let handle = guiClient.key
         
         boundStationName = station
         boundStationHandle = handle
@@ -433,49 +479,80 @@ class RadioManager:  ApiDelegate, ObservableObject {
   // MARK: - Dicovery Methods ----------------------------------------------------------------------------
   
   /**
-   Notification that one or more radios were discovered.
+   Notification that one or more radios were discovered. Each station for each radio
+   is added to an array and sent to the view controller.
    - parameters:
    - note: a Notification instance
    */
   func discoveryPacketsReceived(_ note: Notification) {
     // receive the updated list of Radios
-    let discoveryPacket = (note.object as! [DiscoveryPacket])
-    
+    let discoveryPackets = (note.object as! [DiscoveryPacket])
     
     // just collect the radio's gui clients
-    for radio in discoveryPacket {
-      for guiClient in radio.guiClients {
-        
-        let handle = guiClient.key
-        
-        let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, serialNumber: radio.serialNumber, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.value.station))
-       
-        if guiClient.value.station != "" {
-          UI() {
-            self.guiClientModels.append(guiClientModel)
+    for radio in discoveryPackets {
+      for station in radio.guiClients {
+        let stationModel = StationModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: station.station, serialNumber: radio.serialNumber, clientId: station.clientId ?? "", handle: station.handle, isDefaultStation: self.isDefaultStation(stationName: station.station))
+        UI {
+          if !self.stationModels.contains(stationModel) { self.stationModels.append(stationModel) }
+
+          if station.station == self.defaultStationName {
+            _ = self.connectToRadio(serialNumber: radio.serialNumber, station: station.station, clientId: station.clientId ?? "", didConnect: true)
           }
-        } else {
-            print("Added GUIClient station is missing")
-        }
-        os_log("Discovery packet received.", log: RadioManager.model_log, type: .info)
-        
-        if guiClient.value.station == defaultStationName {
-          connectToRadio(guiClientModel: guiClientModel)
         }
       }
     }
+    
+    os_log("Discovery packets received.", log: RadioManager.model_log, type: .info)
+    
   }
+  
+  /**
+   Notification that one or more radios were discovered.
+   - parameters:
+   - note: a Notification instance
+   */
+//  func discoveryPacketsReceived(_ note: Notification) {
+//    // receive the updated list of Radios
+//    let discoveryPacket = (note.object as! [DiscoveryPacket])
+//
+//
+//    // just collect the radio's gui clients
+//    for radio in discoveryPacket {
+//      for guiClient in radio.guiClients {
+//
+//
+//        let handle = guiClient.key
+//
+//        let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, serialNumber: radio.serialNumber, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.value.station))
+//
+//        printGuiClient(guiClientModel: guiClientModel, source: "StringdiscoveryPacketsReceived")
+//
+//        if guiClient.value.station != "" {
+//          UI() {
+//            self.guiClientModels.append(guiClientModel)
+//          }
+//        } else {
+//            print("Added GUIClient station is missing")
+//        }
+//        os_log("Discovery packet received.", log: RadioManager.model_log, type: .info)
+//
+//        if guiClient.value.station == defaultStationName {
+//          connectToRadio(guiClientModel: guiClientModel)
+//        }
+//      }
+//    }
+//  }
   
   /**
    For debugging
    */
-  func printGuiClient(guiClientModel: GUIClientModel, source: String) {
+  func printStations(stationModel: StationModel, source: String) {
     print("Source: \(source)")
-    print("clientID: \(guiClientModel.clientId)")
-    print("handle: \(guiClientModel.handle)")
-    print("model: \(guiClientModel.radioModel)")
-    print("nickName: \(guiClientModel.radioNickname)")
-    print("stationName: \(guiClientModel.stationName)")
+    print("clientID: \(stationModel.clientId)")
+    print("handle: \(stationModel.handle)")
+    print("model: \(stationModel.radioModel)")
+    print("nickName: \(stationModel.radioNickname)")
+    print("stationName: \(stationModel.stationName)")
   }
   
   /**
@@ -500,28 +577,44 @@ class RadioManager:  ApiDelegate, ObservableObject {
    */
   func guiClientsAdded(_ note: Notification) {
     
-    if let guiClient = note.object as? GuiClient {
+    if (note.object as? [GuiClient]) != nil {
       
-      for radio in discovery.discoveredRadios {
-        if let client = radio.guiClients.first(where: { $0.value.station == guiClient.station} ){
-          let handle = client.key
-          
-          let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station))
-         
-          UI() {
-            if guiClient.station != "" {
-              self.guiClientModels.append(guiClientModel)
-            } else {
-              print("Added GUIClient station is missing")
-            }
-          }
-          os_log("GUI clients have been added.", log: RadioManager.model_log, type: .info)
-          
-          if !isConnected && guiClient.station == defaultStationName {
-            connectToRadio(guiClientModel: guiClientModel)
+      for radio in discovery.discoveryPackets {
+        for station in radio.guiClients {
+          let stationModel = StationModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: station.station, serialNumber: radio.serialNumber, clientId: station.clientId ?? "", handle: station.handle, isDefaultStation: self.isDefaultStation(stationName: station.station))
+          UI {
+            if !self.stationModels.contains(stationModel) { self.stationModels.append(stationModel) }
           }
         }
       }
+      
+      os_log("GUI clients have been added.", log: RadioManager.model_log, type: .info)
+    }
+  }
+  
+  /**
+   When a GUI client is updated we receive a notification.
+   Let the view controller know there has been an update.
+   - parameters:
+   - note: a Notification instance
+   */
+  func guiClientsUpdated(_ note: Notification) {
+    
+    //var stationView = [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)]()
+    
+    if (note.object as? [GuiClient]) != nil {
+  
+      for radio in discovery.discoveryPackets {
+        for station in radio.guiClients {
+          let stationModel = StationModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: station.station, serialNumber: radio.serialNumber, clientId: station.clientId ?? "", handle: station.handle, isDefaultStation: self.isDefaultStation(stationName: station.station))
+          UI {
+            self.stationModels.removeAll { $0.stationName == stationModel.stationName }
+            self.stationModels.append(stationModel)
+          }
+        }
+      }
+      
+      os_log("GUI clients have been updated.", log: RadioManager.model_log, type: .info)
     }
   }
   
@@ -532,37 +625,37 @@ class RadioManager:  ApiDelegate, ObservableObject {
    - parameters:
    - note: a Notification instance
    */
-  func guiClientsUpdated(_ note: Notification) {
-    
-    if let guiClient = note.object as? GuiClient {
-      
-      for radio in discovery.discoveredRadios {
-        if let client = radio.guiClients.first(where: { $0.value.station == guiClient.station} ){
-          let handle = client.key
-          
-          let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station))
-          
-          UI() {
-            // first remove the old one
-            self.guiClientModels.removeAll(where: { $0.stationName == guiClient.station })
-            
-            self.guiClientModels.append(guiClientModel)
-            
-           self.printGuiClient(guiClientModel: guiClientModel, source: "guiClientsUpdated")
-            
-            if guiClient.station == self.connectedStationName {
-              if guiClient.clientId != "" {
-                self.bindToStation(clientId: guiClient.clientId ?? "", station: self.connectedStationName)
-              }
-            }
-          }
-          os_log("GUI clients have been updated.", log: RadioManager.model_log, type: .info)
-        }
-      }
-      // needed here because slices are added before the guiClients are updated.
-      updateSliceModel()
-    }
-  }
+//  func guiClientsUpdated(_ note: Notification) {
+//
+//    if let guiClient = note.object as? GuiClient {
+//
+//      for radio in discovery.discoveredRadios {
+//        if let client = radio.guiClients.first(where: { $0.value.station == guiClient.station} ){
+//          let handle = client.key
+//
+//          let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station))
+//
+//          UI() {
+//            // first remove the old one
+//            self.guiClientModels.removeAll(where: { $0.stationName == guiClient.station })
+//
+//            self.guiClientModels.append(guiClientModel)
+//
+//           self.printGuiClient(guiClientModel: guiClientModel, source: "guiClientsUpdated")
+//
+//            if guiClient.station == self.connectedStationName {
+//              if guiClient.clientId != "" {
+//                self.bindToStation(clientId: guiClient.clientId ?? "", station: self.connectedStationName)
+//              }
+//            }
+//          }
+//          os_log("GUI clients have been updated.", log: RadioManager.model_log, type: .info)
+//        }
+//      }
+//      // needed here because slices are added before the guiClients are updated.
+//      updateSliceModel()
+//    }
+//  }
   
   /**
    When a GUI client is removed we receive a notification.
@@ -574,7 +667,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
     
     if let guiClient = note.object as? GuiClient {
       UI() {
-        self.guiClientModels.removeAll(where: { $0.stationName == guiClient.station })
+        self.stationModels.removeAll(where: { $0.stationName == guiClient.station })
       }
       os_log("GUI clients have been removed.", log: RadioManager.model_log, type: .info)
       
@@ -599,8 +692,8 @@ class RadioManager:  ApiDelegate, ObservableObject {
     addObservations(slice: slice)
     
     // get the station this slice belongs to
-    if let index = self.guiClientModels.firstIndex(where: {$0.handle == slice.clientHandle}) {
-      stationName = guiClientModels[index].stationName
+    if let index = self.stationModels.firstIndex(where: {$0.handle == slice.clientHandle}) {
+      stationName = stationModels[index].stationName
     }
     
     // check if it already exists, may have been left on a crash
