@@ -17,6 +17,7 @@
 		99EDEDD32469DF88003F7608 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99EDEDD22469DF88003F7608 /* Assets.xcassets */; };
 		99EDEDD62469DF88003F7608 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99EDEDD52469DF88003F7608 /* Preview Assets.xcassets */; };
 		99EDEDD92469DF88003F7608 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 99EDEDD72469DF88003F7608 /* Main.storyboard */; };
+		99F1B6182585359800D983CC /* SwiftUIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F1B6172585359800D983CC /* SwiftUIExtensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -45,6 +46,7 @@
 		99EDEDD82469DF88003F7608 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		99EDEDDA2469DF88003F7608 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		99EDEDDB2469DF88003F7608 /* xCW.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = xCW.entitlements; sourceTree = "<group>"; };
+		99F1B6172585359800D983CC /* SwiftUIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIExtensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +108,7 @@
 		99EDEDCD2469DF87003F7608 /* xCW */ = {
 			isa = PBXGroup;
 			children = (
+				99F1B6162585358100D983CC /* Extensions */,
 				99EDEDCE2469DF87003F7608 /* AppDelegate.swift */,
 				996B18692507CEED001F72FB /* Views */,
 				99760952246D8EF5003E6B8E /* Radio Implementation */,
@@ -124,6 +127,14 @@
 				99EDEDD52469DF88003F7608 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		99F1B6162585358100D983CC /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				99F1B6172585359800D983CC /* SwiftUIExtensions.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -208,6 +219,7 @@
 				99EDEDD12469DF87003F7608 /* ContentView.swift in Sources */,
 				99760954246D8F26003E6B8E /* RadioManager.swift in Sources */,
 				99B4818824DF346B009AB879 /* MemoryView.swift in Sources */,
+				99F1B6182585359800D983CC /* SwiftUIExtensions.swift in Sources */,
 				99EDEDCF2469DF87003F7608 /* AppDelegate.swift in Sources */,
 				996215B324718B260025299B /* CWPreferencesView.swift in Sources */,
 			);

@@ -8,163 +8,6 @@
 
 import SwiftUI
 
-
-//extension EnvironmentObject
-//{
-//  var safeToUse: Bool {
-//    return (Mirror(reflecting: self).children.first(where: { $0.label == "_store"})?.value as? ObjectType) != nil
-//  }
-//}
-
-/**
- Custom button template for the default button style.
- */
-struct DefaultButtonStyle: ButtonStyle {
-  var foregroundColor: Color
-  var backgroundColor: Color
-  var pressedColor: Color
-  
-  func makeBody(configuration: Self.Configuration) -> some View {
-    configuration.label
-      //.font(.body)
-      .padding(2)
-      .foregroundColor(foregroundColor)
-      .background(configuration.isPressed ? pressedColor : backgroundColor)
-      .cornerRadius(5)
-  }
-}
-
-/**
-Custom button template for the select button style.
-*/
-struct SelectButtonStyle: ButtonStyle {
-  var foregroundColor: Color
-  var backgroundColor: Color
-  var pressedColor: Color
-  
-  func makeBody(configuration: Self.Configuration) -> some View {
-    configuration.label
-      //.font(.body)
-      .padding(2)
-      .foregroundColor(foregroundColor)
-      .background(configuration.isPressed ? pressedColor : backgroundColor)
-      .cornerRadius(5)
-  }
-}
-
-/**
-Custom button template for the control button style.
-*/
-struct ControlButtonStyle: ButtonStyle {
-  var foregroundColor: Color
-  var backgroundColor: Color
-  var pressedColor: Color
-  
-  func makeBody(configuration: Self.Configuration) -> some View {
-    configuration.label
-      //.font(.body)
-      .padding(5)
-      .foregroundColor(foregroundColor)
-      .background(configuration.isPressed ? pressedColor : backgroundColor)
-      .cornerRadius(5)
-  }
-}
-
-/**
-Custom button template for the cw button style.
-*/
-struct CWButtonStyle: ButtonStyle {
-  var foregroundColor: Color
-  var backgroundColor: Color
-  var pressedColor: Color
-  //var disabledColor: Color
-  
-  func makeBody(configuration: Self.Configuration) -> some View {
-    configuration.label
-      .padding(2)
-      .foregroundColor(foregroundColor)
-      .background(configuration.isPressed ? pressedColor : backgroundColor)
-      .cornerRadius(5)
-  }
-}
-
-/**
- Extension to apply custom button styles.
- */
-extension View {
-  func controlButton(
-    foregroundColor: Color = .white,
-    backgroundColor: Color = .gray,
-    pressedColor: Color = .accentColor
-  ) -> some View {
-    self.buttonStyle(
-      ControlButtonStyle(
-        foregroundColor: foregroundColor,
-        backgroundColor: backgroundColor,
-        pressedColor: pressedColor
-      )
-    )
-  }
-  
-  func memoryButton(
-    foregroundColor: Color = .black,
-    backgroundColor: Color = .blue,
-    pressedColor: Color = .accentColor
-  ) -> some View {
-    self.buttonStyle(
-      ControlButtonStyle(
-        foregroundColor: foregroundColor,
-        backgroundColor: backgroundColor.opacity(0.30),
-        pressedColor: pressedColor
-      )
-    )
-  }
-  
-  func selectButton(
-    foregroundColor: Color = .black,
-    backgroundColor: Color = .green,
-    pressedColor: Color = .accentColor
-  ) -> some View {
-    self.buttonStyle(
-      SelectButtonStyle(
-        foregroundColor: foregroundColor,
-        backgroundColor: backgroundColor.opacity(0.30),
-        pressedColor: pressedColor
-      )
-    )
-  }
-  
-  func defaultButton(
-    foregroundColor: Color = .black,
-    backgroundColor: Color = .blue,
-    pressedColor: Color = .accentColor
-  ) -> some View {
-    self.buttonStyle(
-      DefaultButtonStyle(
-        foregroundColor: foregroundColor,
-        backgroundColor: backgroundColor.opacity(0.30),
-        pressedColor: pressedColor
-      )
-    )
-  }
-  
-  func cwButton(
-    foregroundColor: Color = .black,
-    backgroundColor: Color = .blue,
-    pressedColor: Color = .accentColor
-    //disabledColor: Color = .gray
-  ) -> some View {
-    self.buttonStyle(
-      CWButtonStyle(
-        foregroundColor: foregroundColor,
-        backgroundColor: backgroundColor.opacity(0.30),
-        pressedColor: pressedColor
-        //disabledColor: disabledColor.opacity(0.30)
-      )
-    )
-  }
-}
-
 // MARK: - Primary View ----------------------------------------------------------------------------
 
 /**
@@ -175,7 +18,7 @@ struct ContentView: View {
   @EnvironmentObject var radioManager: RadioManager
   @Environment(\.presentationMode) var presentationMode
   
-  @State private var isConnected = false
+  //@State private var isConnected = false
   @State private var cwText = CWMemoryModel(id: 0)
   @State private var showingRadios = false
   @State private var showingMemories = false
@@ -263,7 +106,7 @@ struct ContentView: View {
         .padding(.bottom, 5)
       }
       .frame(minWidth: 600, maxWidth: 600)
-    }//.onAppear(perform: { ContentView.view?.level = .floating})
+    }
   } // end body
 }
 
@@ -363,7 +206,6 @@ struct  FreeFormScrollView: View {
   
   var body: some View{
     VStack{
-      //TextView(text: $cwText.line)
       HStack {
         TextField("Enter text here", text: $cwText.line)
       }
@@ -439,9 +281,9 @@ struct StationPicker: View {
         Spacer()
         
         VStack{
-          Text("Connect")//.frame(minWidth: 70, maxWidth: 70).padding(.leading, 30).border(Color.black)
+          Text("Connect")
         }
-          .frame(minWidth: 80, maxWidth: 80)//.border(Color.black)
+          .frame(minWidth: 80, maxWidth: 80)
         
         Spacer()
         

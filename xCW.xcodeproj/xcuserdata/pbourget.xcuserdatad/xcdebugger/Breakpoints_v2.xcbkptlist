@@ -14,8 +14,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "295"
-            endingLineNumber = "295"
+            startingLineNumber = "294"
+            endingLineNumber = "294"
             landmarkName = "retrieveUserDefaults()"
             landmarkType = "7">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "236"
-            endingLineNumber = "236"
+            startingLineNumber = "235"
+            endingLineNumber = "235"
             landmarkName = "saveCWMemory(message:tag:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -188,8 +188,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "413"
-            endingLineNumber = "413"
+            startingLineNumber = "412"
+            endingLineNumber = "412"
             landmarkName = "RadioManager"
             landmarkType = "3">
          </BreakpointContent>
@@ -363,8 +363,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "526"
-            endingLineNumber = "526"
+            startingLineNumber = "525"
+            endingLineNumber = "525"
             landmarkName = "RadioManager"
             landmarkType = "3">
          </BreakpointContent>
@@ -379,8 +379,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "268"
-            endingLineNumber = "268"
+            startingLineNumber = "267"
+            endingLineNumber = "267"
             landmarkName = "setDefaultRadio(stationName:)"
             landmarkType = "7">
             <Locations>
@@ -442,8 +442,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "463"
-            endingLineNumber = "463"
+            startingLineNumber = "462"
+            endingLineNumber = "462"
             landmarkName = "bindToStation(clientId:station:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -562,8 +562,8 @@
             filePath = "xCW/Radio Implementation/RadioManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "632"
-            endingLineNumber = "632"
+            startingLineNumber = "631"
+            endingLineNumber = "631"
             landmarkName = "RadioManager"
             landmarkType = "3">
          </BreakpointContent>

@@ -200,7 +200,6 @@ class RadioManager:  ApiDelegate, ObservableObject {
   
   // MARK: - Private properties ----------------------------------------------------------------------------
   
-  //private let clientProgramName = "xCW"
   private let clientProgram = "xCW"
   
   // MARK: - RadioManager Initialization ----------------------------------------------------------------------------
