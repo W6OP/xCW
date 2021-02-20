@@ -3,14 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 53;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		991005AB2550A09B007DA9A7 /* CocoaAsyncSocket in Frameworks */ = {isa = PBXBuildFile; productRef = 991005AA2550A09B007DA9A7 /* CocoaAsyncSocket */; };
-		991005AD2550A09B007DA9A7 /* xLib6000 in Frameworks */ = {isa = PBXBuildFile; productRef = 991005AC2550A09B007DA9A7 /* xLib6000 */; };
 		996215B324718B260025299B /* CWPreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 996215B224718B260025299B /* CWPreferencesView.swift */; };
 		99760954246D8F26003E6B8E /* RadioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99760953246D8F26003E6B8E /* RadioManager.swift */; };
+		99B07D7625E1831400579324 /* xLib6000 in Frameworks */ = {isa = PBXBuildFile; productRef = 99B07D7525E1831400579324 /* xLib6000 */; };
 		99B4818824DF346B009AB879 /* MemoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99B4818724DF346B009AB879 /* MemoryView.swift */; };
 		99EDEDCF2469DF87003F7608 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99EDEDCE2469DF87003F7608 /* AppDelegate.swift */; };
 		99EDEDD12469DF87003F7608 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99EDEDD02469DF87003F7608 /* ContentView.swift */; };
@@ -36,7 +35,6 @@
 /* Begin PBXFileReference section */
 		996215B224718B260025299B /* CWPreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CWPreferencesView.swift; sourceTree = "<group>"; };
 		99760953246D8F26003E6B8E /* RadioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioManager.swift; sourceTree = "<group>"; };
-		998B733D247D6CD9008F327E /* xLib6000 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = xLib6000; path = ../xLib6000; sourceTree = "<group>"; };
 		99B4818724DF346B009AB879 /* MemoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryView.swift; sourceTree = "<group>"; };
 		99EDEDCB2469DF87003F7608 /* xCW.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xCW.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99EDEDCE2469DF87003F7608 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -54,8 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				991005AB2550A09B007DA9A7 /* CocoaAsyncSocket in Frameworks */,
-				991005AD2550A09B007DA9A7 /* xLib6000 in Frameworks */,
+				99B07D7625E1831400579324 /* xLib6000 in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,7 +87,6 @@
 		99EDEDC22469DF87003F7608 = {
 			isa = PBXGroup;
 			children = (
-				998B733D247D6CD9008F327E /* xLib6000 */,
 				99EDEDCD2469DF87003F7608 /* xCW */,
 				99EDEDCC2469DF87003F7608 /* Products */,
 				99760955246D935B003E6B8E /* Frameworks */,
@@ -155,8 +151,7 @@
 			);
 			name = xCW;
 			packageProductDependencies = (
-				991005AA2550A09B007DA9A7 /* CocoaAsyncSocket */,
-				991005AC2550A09B007DA9A7 /* xLib6000 */,
+				99B07D7525E1831400579324 /* xLib6000 */,
 			);
 			productName = xCW;
 			productReference = 99EDEDCB2469DF87003F7608 /* xCW.app */;
@@ -178,7 +173,7 @@
 				};
 			};
 			buildConfigurationList = 99EDEDC62469DF87003F7608 /* Build configuration list for PBXProject "xCW" */;
-			compatibilityVersion = "Xcode 11.4";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -187,7 +182,7 @@
 			);
 			mainGroup = 99EDEDC22469DF87003F7608;
 			packageReferences = (
-				991005A92550A09B007DA9A7 /* XCRemoteSwiftPackageReference "xLib6000" */,
+				99B07D7425E1831400579324 /* XCRemoteSwiftPackageReference "xLib6000" */,
 			);
 			productRefGroup = 99EDEDCC2469DF87003F7608 /* Products */;
 			projectDirPath = "";
@@ -436,25 +431,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		991005A92550A09B007DA9A7 /* XCRemoteSwiftPackageReference "xLib6000" */ = {
+		99B07D7425E1831400579324 /* XCRemoteSwiftPackageReference "xLib6000" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/K3TZR/xLib6000.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.6.1;
+				minimumVersion = 1.6.15;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		991005AA2550A09B007DA9A7 /* CocoaAsyncSocket */ = {
+		99B07D7525E1831400579324 /* xLib6000 */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 991005A92550A09B007DA9A7 /* XCRemoteSwiftPackageReference "xLib6000" */;
-			productName = CocoaAsyncSocket;
-		};
-		991005AC2550A09B007DA9A7 /* xLib6000 */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 991005A92550A09B007DA9A7 /* XCRemoteSwiftPackageReference "xLib6000" */;
+			package = 99B07D7425E1831400579324 /* XCRemoteSwiftPackageReference "xLib6000" */;
 			productName = xLib6000;
 		};
 /* End XCSwiftPackageProductDependency section */

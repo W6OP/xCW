@@ -1,34 +1,3 @@
-
-/**
- * Copyright (c) 2019 Peter Bourget W6OP
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
- * distribute, sublicense, create a derivative work, and/or sell copies of the
- * Software in any work that is designed, intended, or marketed for pedagogical or
- * instructional purposes related to programming, coding, application development,
- * or information technology.  Permission for such use, copying, modification,
- * merger, publication, distribution, sublicensing, creation of derivative works,
- * or sale is expressly withheld.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
 /*
  RadioManager.swift
  xCW
@@ -89,6 +58,31 @@ func UI(_ block: @escaping ()->Void) {
   DispatchQueue.main.async(execute: block)
 }
 
+// MARK: Event Delegates ------------------------------------------------------------------------------------------------
+
+/**
+ Implement in your View Controller to receive messages from the radio manager (legacy)
+ */
+protocol RadioManagerDelegate: class {
+  // radio and gui clients were discovered - notify GUI
+  func didDiscoverStations(discoveredStations: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isGuiClientUpdate: Bool)
+  
+  func didAddStations(discoveredStations: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isGuiClientUpdate: Bool)
+  
+  func didUpdateStations(discoveredStations: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isStationUpdate: Bool)
+ 
+  func didRemoveStation(discoveredStations: [(model: String, nickname: String, stationName: String, default: String, serialNumber: String, clientId: String, handle: UInt32)], isStationUpdate: Bool)
+  
+  func didAddSlice(slice: [(sliceLetter: String, radioMode: radioMode, txEnabled: Bool, frequency: String, sliceHandle: UInt32)])
+  
+  func didRemoveSlice(sliceHandle: UInt32, sliceLetter: String)
+  
+  func didUpdateSlice(sliceHandle: UInt32, sliceLetter: String, sliceStatus: sliceStatus, newValue: Any)
+  
+  // notify the GUI the tcp connection to the radio was closed
+  func didDisconnectFromRadio()
+}
+
 // MARK: - Enums ------------------------------------------------------------------------------------------------
 
 public enum radioMode : String {
@@ -108,6 +102,16 @@ public enum sliceStatus : String {
   case active
   case mode
   case frequency
+}
+
+public enum daxChannels: UInt16, Identifiable, CaseIterable {
+  case Dax_None = 0
+  case Dax_One = 1
+  case Dax_Two = 2
+  case Dax_Three = 3
+  case Dax_Four = 4
+  
+  public var id: UInt16 { self.rawValue }
 }
 
 // MARK: - Models ----------------------------------------------------------------------------
@@ -155,10 +159,24 @@ struct SliceModel: Identifiable {
 
 /**
  Wrapper class for the FlexAPI Library xLib6000 written for the Mac by Doug Adams K3TZR.
- This class will isolate other apps from the API implemenation allowing reuse by multiple
+ This class will isolate other apps from the API implementation allowing reuse by multiple
  programs.
  */
-class RadioManager:  ApiDelegate, ObservableObject {
+class RadioManager:  ApiDelegate, StreamHandler, ObservableObject {
+  
+  //let cwprocessor = CWProcessor()
+
+  // cCWReader Specific
+  let inputQueue = DispatchQueue(
+      label: "com.w6op.cwreaderIn.serial",
+      qos: .userInitiated
+  )
+  
+  let outputQueue = DispatchQueue(
+      label: "com.w6op.cwreaderOut.serial",
+      qos: .userInitiated,
+      attributes: .concurrent
+  )
   
   func addReplyHandler(_ sequenceNumber: SequenceNumber, replyTuple: ReplyTuple) {
     os_log("addReplyHandler added.", log: RadioManager.model_log, type: .info)
@@ -173,6 +191,9 @@ class RadioManager:  ApiDelegate, ObservableObject {
   // setup logging for the RadioManager
   static let model_log = OSLog(subsystem: "com.w6op.RadioManager-Swift", category: "xCW")
   
+  // delegate to pass messages back to View Controller (legacy)
+  //weak var radioManagerDelegate: RadioManagerDelegate?
+  
   // MARK: - Internal Radio properties ----------------------------------------------------------------------------
   
   // Radio currently running
@@ -182,10 +203,15 @@ class RadioManager:  ApiDelegate, ObservableObject {
   private var api = Api.sharedInstance
   private let discovery = Discovery.sharedInstance
   
+  // xCWReader Specific
+  private var daxRxAudioStreamRequested = false
+  
   // MARK: - Published properties ----------------------------------------------------------------------------
   
   @Published var stationModels = [StationModel]()
   @Published var sliceModel = SliceModel(radioMode: radioMode.invalid, clientHandle: 0)
+  
+  // xCW Specific
   @Published var cwMemoryModels = [CWMemoryModel]()
   @Published var cwSpeed = 25
   
@@ -198,9 +224,35 @@ class RadioManager:  ApiDelegate, ObservableObject {
   // internal collection for my use here only
   var sliceModels = [SliceModel]()
   
+  // xCWReader
+  //var audioManager: AudioManager
+  var daxRxStreamId: StreamId
+  
+  // xCWReader Specific
+  @Published var audioData = [CGFloat]()
+  // move this to a controller stub
+  @Published var receive = (daxChannel: UInt16(1), state: false) { didSet {
+    if receive.state {startAudioReceive(daxChannel: receive.daxChannel)}}}
+  
+  @Published var level: Double = 0.001 { didSet {
+    //print("level: \(level / 10000)")
+    //sendClusterCommand(tag: clusterCommand.tag, command: clusterCommand.command)
+    }
+  }
+  
   // MARK: - Private properties ----------------------------------------------------------------------------
   
-  private let clientProgram = "xCW"
+  // Notification observers collection
+  private var notifications = [NSObjectProtocol]()
+  
+  //private let clientProgram = "xCW"
+  private let clientProgramName = Bundle.main.infoDictionary?["CFBundleName"] as? String
+  
+  private var daxTxAudioStreamRequested = false
+  private var audioBuffer = [Float]()
+  // not used in this program
+  //private var audioStreamTimer :Repeater? // timer to meter audio chunks to radio at 24khz sample rate
+  private var xmitGain = 35
   
   // MARK: - RadioManager Initialization ----------------------------------------------------------------------------
   
@@ -209,15 +261,18 @@ class RadioManager:  ApiDelegate, ObservableObject {
    */
    init() {
     
+    daxRxStreamId = UInt32(0)
+    
     // add notification subscriptions
     addNotificationListeners()
     
     api.delegate = self
     
     retrieveUserDefaults()
+    // retrieveFromBuffer()
   }
   
-   // MARK: - CW Memory Functions ----------------------------------------------------------------------------
+   // MARK: - xCW Specific ----------------------------------------------------------------------------
   
   /**
    Save the memory set by the user.
@@ -245,7 +300,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
   }
   
   /**
-  Save the default staion to UserDefaults.
+  Save the default station to UserDefaults.
   - parameters:
   - stationName: name of the station to save.
   */
@@ -263,7 +318,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
       UserDefaults.standard.set("", forKey: "defaultRadio")
     }
     
-    // now find the guiclient where the station name matches but isn't the last one
+    // now find the guiClient where the station name matches but isn't the last one
     if var client = stationModels.first(where: { $0.stationName == stationName && $0.stationName != oldClientStationName} ){
       UI() {
         self.stationModels.removeAll(where: { $0.stationName == stationName })
@@ -297,6 +352,9 @@ class RadioManager:  ApiDelegate, ObservableObject {
     cwSpeed = UserDefaults.standard.integer(forKey: "cwSpeed")
     defaultStationName = UserDefaults.standard.string(forKey: "defaultRadio") ?? ""
   }
+  
+  // MARK: xCWReader Specific
+  
   
   // MARK: - Open and Close Radio Methods - Required by xLib6000 - Not Used ----------------------------------------------------------------------------
   
@@ -371,11 +429,10 @@ class RadioManager:  ApiDelegate, ObservableObject {
     usleep(1500)
     
     if isConnected {
-      bindToStation(clientId: clientId, station: station)
+      _ = bindToStation(clientId: clientId, station: station)
       return false
     }
     
-    isConnected = false
     connectedStationName = ""
     boundStationName = ""
     
@@ -387,7 +444,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
         activeRadio = foundRadio
         
         // TODO: How do I know it connected?
-        api.connect(activeRadio!, program: clientProgram, clientId: nil, isGui: false)
+        api.connect(activeRadio!, program: clientProgramName ?? "my program", clientId: nil, isGui: false)
         
         isConnected = true
         connectedStationName = station
@@ -401,62 +458,23 @@ class RadioManager:  ApiDelegate, ObservableObject {
   }
   
   /**
-   Exposed function for the GUI to indicate which radio to connect to.
-   - parameters:
-   - serialNumber: a string representing the serial number of the radio to connect
-   - station: station name for the connection
-   - clientId: client id if available
-   - doConnect: bool returning true if the connect was successful
-   */
-//  func connectToRadio(guiClientModel: GUIClientModel) {
-//
-//    if isConnected {
-//      bindToStation(clientId: guiClientModel.clientId, station: guiClientModel.stationName)
-//      return
-//    }
-//
-//    isConnected = false
-//    connectedStationName = ""
-//    boundStationName = ""
-//
-//    os_log("Connect to the Radio.", log: RadioManager.model_log, type: .info)
-//
-//    // allow time to hear the UDP broadcasts
-//    usleep(1500)
-//
-//      for (_, foundRadio) in discovery.discoveredRadios.enumerated() where foundRadio.serialNumber == guiClientModel.serialNumber {
-//
-//        activeRadio = foundRadio
-//
-//        if api.connect(activeRadio!, program: clientProgramName, clientId: nil, isGui: false) {
-//          os_log("Connected to the Radio.", log: RadioManager.model_log, type: .info)
-//          isConnected = true
-//          connectedStationName = guiClientModel.stationName
-//        }
-//    }
-//  }
-  
-  /**
    Bind to a specific station so we get their messages and updates
    - parameters:
    - clientId: the client id to bind with represented as a string
    - station: station name used to find the key which is the guiClient handle
    */
-  func bindToStation(clientId: String, station: String)  { //-> UInt32
+  func bindToStation(clientId: String, station: String) -> UInt32 {
     
     cleanUp()
     
     api.radio?.boundClientId = clientId
     
-    //for radio in discovery.discoveredRadios {
     for radio in discovery.discoveryPackets {
-      //if let guiClient = radio.guiClients.filter({ $0.value.station == station }).first {
+      
       if let guiClient = radio.guiClients.filter({ $0.station == station }).first {
-        let handle = guiClient.handle //.key
-      //let handle = guiClient.key
         
         boundStationName = station
-        boundStationHandle = handle
+        boundStationHandle = guiClient.handle
         connectedStationName = station
         
         updateSliceModel()
@@ -465,6 +483,9 @@ class RadioManager:  ApiDelegate, ObservableObject {
         
       }
     }
+    
+    // legacy for xVoiceKeyer
+    return boundStationHandle
   }
   
   /**
@@ -475,7 +496,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
     activeRadio = nil
   }
   
-  // MARK: - Dicovery Methods ----------------------------------------------------------------------------
+  // MARK: - Discovery Methods ----------------------------------------------------------------------------
   
   /**
    Notification that one or more radios were discovered. Each station for each radio
@@ -504,43 +525,6 @@ class RadioManager:  ApiDelegate, ObservableObject {
     os_log("Discovery packets received.", log: RadioManager.model_log, type: .info)
     
   }
-  
-  /**
-   Notification that one or more radios were discovered.
-   - parameters:
-   - note: a Notification instance
-   */
-//  func discoveryPacketsReceived(_ note: Notification) {
-//    // receive the updated list of Radios
-//    let discoveryPacket = (note.object as! [DiscoveryPacket])
-//
-//
-//    // just collect the radio's gui clients
-//    for radio in discoveryPacket {
-//      for guiClient in radio.guiClients {
-//
-//
-//        let handle = guiClient.key
-//
-//        let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.value.station, serialNumber: radio.serialNumber, clientId: guiClient.value.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.value.station))
-//
-//        printGuiClient(guiClientModel: guiClientModel, source: "StringdiscoveryPacketsReceived")
-//
-//        if guiClient.value.station != "" {
-//          UI() {
-//            self.guiClientModels.append(guiClientModel)
-//          }
-//        } else {
-//            print("Added GUIClient station is missing")
-//        }
-//        os_log("Discovery packet received.", log: RadioManager.model_log, type: .info)
-//
-//        if guiClient.value.station == defaultStationName {
-//          connectToRadio(guiClientModel: guiClientModel)
-//        }
-//      }
-//    }
-//  }
   
   /**
    For debugging
@@ -616,45 +600,6 @@ class RadioManager:  ApiDelegate, ObservableObject {
       os_log("GUI clients have been updated.", log: RadioManager.model_log, type: .info)
     }
   }
-  
-  /**
-   When a GUI client is updated we receive a notification.
-   Let the view controller know there has been an update.
-   Do bind after this
-   - parameters:
-   - note: a Notification instance
-   */
-//  func guiClientsUpdated(_ note: Notification) {
-//
-//    if let guiClient = note.object as? GuiClient {
-//
-//      for radio in discovery.discoveredRadios {
-//        if let client = radio.guiClients.first(where: { $0.value.station == guiClient.station} ){
-//          let handle = client.key
-//
-//          let guiClientModel = GUIClientModel(radioModel: radio.model, radioNickname: radio.nickname, stationName: guiClient.station, serialNumber: radio.serialNumber, clientId: guiClient.clientId ?? "", handle: handle, isDefaultStation: self.isDefaultStation(stationName: guiClient.station))
-//
-//          UI() {
-//            // first remove the old one
-//            self.guiClientModels.removeAll(where: { $0.stationName == guiClient.station })
-//
-//            self.guiClientModels.append(guiClientModel)
-//
-//           self.printGuiClient(guiClientModel: guiClientModel, source: "guiClientsUpdated")
-//
-//            if guiClient.station == self.connectedStationName {
-//              if guiClient.clientId != "" {
-//                self.bindToStation(clientId: guiClient.clientId ?? "", station: self.connectedStationName)
-//              }
-//            }
-//          }
-//          os_log("GUI clients have been updated.", log: RadioManager.model_log, type: .info)
-//        }
-//      }
-//      // needed here because slices are added before the guiClients are updated.
-//      updateSliceModel()
-//    }
-//  }
   
   /**
    When a GUI client is removed we receive a notification.
@@ -809,7 +754,7 @@ class RadioManager:  ApiDelegate, ObservableObject {
     }
   }
   
-  // MARK: - Utlity Functions for Slices
+  // MARK: - Utility Functions for Slices
   
   /**
    Respond to a change in a slice
@@ -857,6 +802,29 @@ class RadioManager:  ApiDelegate, ObservableObject {
   
   // MARK: Transmit methods ----------------------------------------------------------------------------
   
+  /**
+   Prepare to key the selected Radio. Create the audio stream to be sent.
+   - parameters:
+   - doTransmit: true create and send an audio stream, false will unkey MOX
+   - buffer: an array of floats representing an audio sample in PCM format
+   */
+  func keyRadio(doTransmit: Bool, buffer: [Float]? = nil, xmitGain: Int) {
+    
+    self.xmitGain = xmitGain
+    
+    // temp code
+    if buffer == nil {
+      if doTransmit  {
+        if (api.radio?.mox == false)  {
+          api.radio?.mox = true
+        } else {
+          api.radio?.mox = false
+        }
+        return
+      }
+    }
+  }
+    
   // cleanup so we can bind with another station
   func cleanUp() {
     
@@ -906,7 +874,302 @@ class RadioManager:  ApiDelegate, ObservableObject {
       api.radio?.cwx.wpm = cwSpeed
       api.radio?.cwx.send(message)
     }
+  }
+  
+  // MARK: Audio Methods (xCWReader) ----------------------------------------------------------------------------
+  
+  func startAudioReceive(daxChannel: UInt16)  {
+    
+    if daxRxAudioStreamRequested == false {
+      
+      api.radio!.requestDaxRxAudioStream(String(daxChannel), callback: updateDaxRxStreamId)
+      daxRxAudioStreamRequested = true
+      
+      os_log("Audio stream requested.", log: RadioManager.model_log, type: .info)
+    }
+    else{
+      // do something else
+    }
+  }
+  
+  func daxRxAudioStreamHasBeenAdded(_ note: Notification){
+    
+    if (note.object as? DaxRxAudioStream) != nil {
+      os_log("Audio stream added.", log: RadioManager.model_log, type: .info)
+    }
+  }
+  
+  
+  /**
+   Callback for the TX Stream Request command.
+   - Parameters:
+   - command:        the original command
+   - sequenceNumber: the Sequence Number of the original command
+   - responseValue:  the response value
+   - reply:          the reply
+   */
+  func updateDaxRxStreamId(_ command: String, sequenceNumber: UInt, responseValue: String, reply: String) {
+    
+    os_log("Audio stream updated.", log: RadioManager.model_log, type: .info)
+    
+    guard responseValue == "0" else {
+      // Anything other than 0 is an error, log it and ignore the Reply
+      os_log("Error requesting rx audio stream ID.", log: RadioManager.model_log, type: .error)
+      // TODO: notify GUI
+      return
+    }
+    
+    // check if we have a stream requested
+    if !daxRxAudioStreamRequested {
+      os_log("Unsolicited audio stream received.", log: RadioManager.model_log, type: .error)
+      return
+    }
+    
+    // dax channel == 0
+    if reply.streamId != 0 {
+      if let streamId = reply.streamId {
+        let audioStream = api.radio?.daxRxAudioStreams[streamId]
+        audioStream?.delegate = self //audioManager
+      }
+    }
+  }
+  
+  // MARK: - StreamHandler Handler Implementation (xCWReader)
+  
+  var tempArray = [CGFloat]()
+  
+  func streamHandler<T>(_ streamFrame: T) {
+    guard let frame = streamFrame as? DaxRxAudioFrame else { return }
+    processFrame(frame: frame)
+  }
+  
+  /**
+   timing specification for morse code:
+   
+   A dash is three times as long as a dot.
+   The space between dots/dashes within one character is equally long as a dot.
+   The space between two characters is three times as long as a dot.
+   The space between two words is seven times as long as a dot.
+   */
+  func processFrame(frame: DaxRxAudioFrame) {
+    
+    var temp = [Float]()
+    temp.reserveCapacity(128)
+    
+    // just need one audio channel since they are identical
+    // SHOULD be able to just nomalize into temp or itself
+    let result = frame.rightAudio //normalizeData(rawData: frame.rightAudio)
+    
+    // now have array with just positive values but all negatives are added
+    // as positives for greater precision
+    for item in result {
+      temp.append(abs(item)) // change bottom half of sine wave to positive to expand sample
+    }
+    
+    // need to clip bottom according to slider value (min threshold)
+    temp = clipArray(source: temp, level: Float(level / 10000))
+    
+    temp = preProcessFrame(source: temp)
+    
+    // get average value
+    let sumArray = temp.reduce(0, +)
+    let avgArrayValue = sumArray / Float(temp.count)
+    
+    // I look at average and init a new array with all 1.0 or all 0.0
+    // need to average over multiple frames - sort of like I do in preProcessFrame()
+    if avgArrayValue > 0.3 {
+      let floats = [Float](repeating: 1.0, count: 128)
+      temp = floats
+    } else {
+      let floats = [Float](repeating: 0.0, count: 128)
+      temp = floats
+    }
+    
+    // --------------------------------
+    
+         addToBuffer(source: temp)
+    
+    // --------------------------------
+    
+    // make float array a cgfloat array
+    let dataCGFloat = temp.map{CGFloat($0)}
+    
+    UI { [self] in
+      for item in dataCGFloat {
+        audioData.append(item / 5) // audioData.append(item * 5)
+      }
+      
+      if audioData.count > 24576 {
+        audioData.removeSubrange(0..<128)
+      }
+    }
+  }
+  
+  
+  // use a queue here
+  func addToBuffer(source: [Float]) {
+    
+    //inputQueue.async() { [self] in
+        //cwprocessor.addToBuffer(frame: source)
+      print("\(source.count) items added to buffer")
+    //}
+    
+    //if !rbuf.isEmpty() {
+    //  retrieveFromBuffer()
+    //}
+  }
+  
+  //var oneCount = 0;
+  //var zeroCount = 0
+  
+  func retrieveFromBuffer() {
+
+//    outputQueue.async() { [self] in
+//      while true {
+//        //let element = cwprocessor.retrievefromBuffer()
+//      //if element == 1 {
+//       // print("element: \(element)")
+//      //}
+//        //cwprocessor.processElement(element: element)
+//      }
+//     }
+  }
+  
+  
+  /// try to reduce the number of spikes from noise
+  /// analyze a block of 4 bits at a time
+  /// 0000 - 0xx0 - 0x0x -
+  func preProcessFrame(source: [Float]) -> [Float] {
+    var temp = [Float]()
+    var count = 0
+    
+    // process in 4 float increments
+    let result = source.chunked(into: 4)
+    
+    for index in 0...result.count - 1 {
+      
+      count += 1
+      
+      switch result[index] {
+      
+      // all blocks - if the first and last are 0 then all are 0
+      // 0xx0 -> 0000
+      case _ where result[index][1] == 0 && result[index][3] == 0:
+        temp.append(contentsOf: result[index].map { _ in 0 })
+        
+      // all blocks - if the first and last are > 0 then all are > 0.09
+      // XxxX -> XXXX
+      //case _ where result[index][1] > 0 && result[index][3] > 0:
+      //  temp.append(contentsOf: result[index].map { _ in 0.09 })
+      
+      // first block only - if third = 0 then first and second = 0
+      // 0x0x -> 0000
+      case _ where index == 0 && result[index][2] == 0:
+        temp.append(contentsOf: [0,0,0])
+        temp.append(1.0) //result[index][3])
+        break
+        
+      // first block only - if second = 0 then one = 0
+      // x0xx -> 0000
+      case _ where index == 0 && result[index][1] == 0:
+        temp.append(contentsOf: [0,0])
+        temp.append(contentsOf: [1,1])
+        break
+        
+      // all but first block - last one of last group and last one of this group are 0 then all are 0
+      // xxx0xxx0 -> xxx00000
+      case _ where index > 0 && result[index - 1][3] == 0 && result[index][3] == 0:
+        temp.append(contentsOf: result[index].map { _ in 0 })
+        break
+        
+      // all but first block - last one of last group = 0 and third one of this group = 0
+      // xxx0xx0x -> xxx0000x
+      case _ where index > 0 && result[index - 1][3] == 0 && result[index][2] == 0:
+        temp.append(contentsOf: [0,0,0])
+        temp.append(1.0) //(result[index][3])
+      
+      // all but first block - last one of last group = 0 and second one of this group = 0
+      // xxx0x0xx -> xxx000xx
+      case _ where index > 0 && result[index - 1][3] == 0 && result[index][1] == 0:
+        temp.append(contentsOf: [0,0])
+        temp.append(contentsOf: [1,1])
+      
+      // all but first block - last one of last group = 0 and second one of this group = 0
+      // xxx0x0xx -> xxx000xx
+      //      case _ where index > 0 && result[index - 1][3] == 0 && result[index][1] == 0:
+      //        temp.append(0)
+      //        temp.append(0)
+      //        temp.append(0.06) //(result[index][2])
+      //        temp.append(0.06) //(result[index][3])
+      
+      default:
+        //temp.append(contentsOf: result[index])
+        temp.append(contentsOf: result[index].map { _ in 1.0 })
+        if index == 0 {
+          //print("Default: \(result[index].map { _ in 0.06 })")
+        } else {
+          //print("Default: \(result[index - 1].map { _ in 0.06 }):\(result[index].map { _ in 0.06 })")
+        }
+      }
+    }
+    
+    // every time the count gets to 8 we need to re-evaluate
+    
+    // if not all 0 then display
+    //    if !temp.dropFirst().allSatisfy({ $0 == 0 }) {
+    //print(temp)
+    //    }
+    
+    //analyzeData(source: temp)
+    
+    //print("Count: \(temp.count)")
+    return temp
     
   }
+  
+  /**
+   
+   
+   */
+  
+  /// clip the peaks, if above average set to average
+  /// if below average set to 0
+  /// just making an assumption that the average is the noise level
+  func clipArray(source: [Float], level: Float) -> [Float] {
+    var temp = [Float]()
+    
+    for item in source {
+      var a = item
+      //      if item < 0 {
+      //        //a = 0 //abs(item)
+      //      }
+      //print("level: \(level) -- a: \(a)")
+      // this should be the average of the peaks above average
+      if a > level {
+        a = 1.0
+        temp.append(a)
+      } else {
+        temp.append(0)
+      }
+    }
+    
+    return temp
+  }
+  
+  
+  // make everything positive
+  func normalizeData(rawData: [Float]) -> [Float] {
+    
+    let results = rawData.map { ($0 - (-1)) / (1 - (-1)) }
+    
+    return results
+  }
+  
+  func analyzeData(source: [Float]) {
+    
+    //print(source)
+    
+  }
+  
 } // end class
 
